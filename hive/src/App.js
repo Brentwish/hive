@@ -2,49 +2,50 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-const board = [
-  [1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0],
-  [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0],
-  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
-  [1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0],
-  [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-  [0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0],
-  [1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0],
-  [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-  [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0],
-  [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0],
-  [1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
-  [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-  [0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0],
-  [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-  [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1],
-  [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1],
-  [1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0],
-  [0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0]
+const Colors = [
+  "Black",
+  "White",
+  "Green",
+  "Blue",
+  "Red"
 ];
 
 class Game extends Component {
   componentDidMount() {
-    this.updateCanvas();
+    this.handleStart();
   }
 
   constructor(props) {
     super(props);
-    this.state = {count: 0, pixelScale: 1};
+    this.state = {
+      pixelScale: 1,
+      board: [[]],
+      width: 100,
+      height: 100,
+    };
   }
 
   handleStart = () => {
-    this.setState({count: this.state.count + 1});
+    this.getRandomBoard();
+    this.updateCanvas();
+  }
+
+  getRandomBoard() {
+    this.state.board = [[]];
+    for (var i = 0; i < this.state.width; i++) {
+      this.state.board[i] = [];
+      for (var j = 0; j < this.state.height; j++) {
+        this.state.board[i][j] = Math.floor(Math.random() * Colors.length);
+      }
+    }
   }
 
   updateCanvas() {
     const ctx = this.refs.canvas.getContext('2d');
     ctx.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
-    for (var x = 0; x < board[0].length; x++) {
-      for (var y = 0; y < board.length; y++) {
-        ctx.fillStyle = board[x][y] == 1 ? "Black" : "White";
+    for (var x = 0; x < this.state.width; x++) {
+      for (var y = 0; y < this.state.height; y++) {
+        ctx.fillStyle = Colors[this.state.board[x][y]];
         ctx.fillRect(this.state.pixelScale*x, this.state.pixelScale*y, this.state.pixelScale, this.state.pixelScale);
       }
     }
@@ -69,7 +70,7 @@ class Game extends Component {
     return (
       <div>
         <div>
-          <canvas ref="canvas" className="game_board" width="200" height="200">
+          <canvas ref="canvas" className="game_board" width={ this.state.width } height={ this.state.height}>
           </canvas>
         </div>
         <div>
@@ -77,7 +78,7 @@ class Game extends Component {
           <button onClick={ this.incPixelScale }>Increment</button>
         </div>
         <div>
-          <button onClick={ this.handleStart }>{ this.state.count }</button>
+          <button onClick={ this.handleStart }>New Board!</button>
         </div>
       </div>
     );
