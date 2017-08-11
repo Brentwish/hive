@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Board from "./Board.js";
+import Board from "../js/Board.js";
 
 const Colors = [
   "Black",
@@ -29,14 +29,17 @@ class Game extends Component {
     this.updateCanvas();
   }
 
-  updateCanvas() {
+  updateCanvas(pixelScale) {
+    if (pixelScale == null) {
+      pixelScale = this.state.pixelScale;
+    }
     const ctx = this._canvas.getContext('2d');
 
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     for (var i = 0; i < this._canvas.board.width; i++) {
       for (var j = 0; j < this._canvas.board.height; j++) {
         ctx.fillStyle = Colors[this._canvas.board.squares[i][j]];
-        ctx.fillRect(this.state.pixelScale * i, this.state.pixelScale * j, this.state.pixelScale, this.state.pixelScale);
+        ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
     }
   }
@@ -49,7 +52,7 @@ class Game extends Component {
     this.setState({
       pixelScale : newScale
     });
-    this.updateCanvas();
+    this.updateCanvas(newScale);
   }
 
   incPixelScale = () => {
@@ -60,7 +63,7 @@ class Game extends Component {
     this.setState({
       pixelScale : newScale
     });
-    this.updateCanvas();
+    this.updateCanvas(newScale);
   }
 
   render() {
