@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Hive from "../js/Hive.js";
+import HiveGame from "../js/HiveGame.js";
 
 const Colors = [
   "Black",
@@ -14,14 +14,19 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 2,
+      pixelScale: 1,
       width: 0,
       height: 0
     };
   }
 
   componentDidMount() {
-    this._canvas.hive = new Hive();
+    var gameProps = {
+      width: 300,
+      height: 200
+    };
+    this._canvas.hive = new HiveGame(gameProps);
+    this._canvas.hive.init();
     this.setState({
       width: this._canvas.hive.board.width,
       height: this._canvas.hive.board.width

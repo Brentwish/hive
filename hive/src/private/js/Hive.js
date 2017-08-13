@@ -1,11 +1,14 @@
-import Board from "./Board.js";
+import Ant from "./Ant.js";
 
-function Hive() {
-  this.board = new Board(200,200);
+function Hive(props) {
+  this.health = props.health;
+  this.player = props.player;
+
+  this.player.ants.push(new Ant({
+    type: 'queen',
+    color: 4,
+    position: this.player.board.getRandomPosition(),
+    owner: this.player
+  }));
 }
-
-Hive.prototype.update = function(updateCanvas) {
-  this.board.randomBoard(this.board.width, this.board.height);
-}
-
 export default Hive;
