@@ -35,6 +35,13 @@ Board.prototype.borderedBoard = function() {
   }
 }
 
+Board.prototype.isInBounds = function(position, dir) {
+  return (dir == "left" && position.x > 1) ||
+  (dir == "up" && position.y > 1) ||
+  (dir == "right" && position.x < this.width - 2) ||
+  (dir == "down" && position.y < this.height - 2)
+}
+
 Board.prototype.getRandomPosition = function() {
   return {
     x: Math.floor(Math.random() * this.width),

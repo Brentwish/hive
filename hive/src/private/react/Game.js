@@ -14,7 +14,7 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 1,
+      pixelScale: 10,
       width: 0,
       height: 0
     };
@@ -22,16 +22,16 @@ class Game extends Component {
 
   componentDidMount() {
     var gameProps = {
-      width: 300,
-      height: 200
+      width: 10,
+      height: 10
     };
     this._canvas.hive = new HiveGame(gameProps);
     this._canvas.hive.init();
     this.setState({
-      width: this._canvas.hive.board.width,
-      height: this._canvas.hive.board.width
+      width: this._canvas.hive.board.width * this.state.pixelScale,
+      height: this._canvas.hive.board.height * this.state.pixelScale
     });
-    this._canvas.interval = setInterval(this.update, 42);
+    this._canvas.interval = setInterval(this.update, 80);
   }
 
   update = () => {
@@ -44,7 +44,6 @@ class Game extends Component {
       pixelScale = this.state.pixelScale;
     }
     const ctx = this._canvas.getContext('2d');
-
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     for (var i = 0; i < this._canvas.hive.board.width; i++) {
       for (var j = 0; j < this._canvas.hive.board.height; j++) {
@@ -60,7 +59,9 @@ class Game extends Component {
       newScale = 1;
     }
     this.setState({
-      pixelScale : newScale
+      pixelScale : newScale,
+      width: this._canvas.hive.board.width * newScale,
+      height: this._canvas.hive.board.height * newScale
     });
     this.updateCanvas(newScale);
   }
@@ -71,7 +72,9 @@ class Game extends Component {
       newScale = 10;
     }
     this.setState({
-      pixelScale : newScale
+      pixelScale : newScale,
+      width: this._canvas.hive.board.width * newScale,
+      height: this._canvas.hive.board.height * newScale
     });
     this.updateCanvas(newScale);
   }
