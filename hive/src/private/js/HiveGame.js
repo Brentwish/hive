@@ -1,6 +1,7 @@
 import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
+import playerGameActions from "./playerGameActions.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -12,8 +13,10 @@ HiveGame.prototype.init = function() {
   this.board.borderedBoard();
   this.players.push(new Player({
     id: 'player_1',
-    ants: []
+    ants: [],
+    playerGameActions: playerGameActions
   }));
+
   for (var i = 0; i < this.players.length; i++) {
     var ant = new Ant({
       type: 'queen',
@@ -26,13 +29,13 @@ HiveGame.prototype.init = function() {
 }
 
 HiveGame.prototype.update = function() {
-  this.updatePlayers();
   this.turn += 1;
+  this.updatePlayers();
 }
 
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
-    this.players[i].updateHive();
+    this.players[i].hiveAction();
     for (var j = 0; j < this.players[i].ants.length; j++) {
       var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
       this.performAction(this.players[i].ants[j], action);

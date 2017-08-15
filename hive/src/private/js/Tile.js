@@ -1,6 +1,6 @@
 const tileColors = {
   "empty": "#F6DDCC",
-  "wall": "#873600",
+  "wall": "#424949",
   "food": "#2ECC71",
   "water": "#5DADE2"
 };

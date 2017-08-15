@@ -93,8 +93,5 @@ class Game extends Component {
     );
   }
 }
-//        <div>
-//          <button onClick={ this.handleStart }>New Board!</button>
-//        </div>
 
 export default Game;
