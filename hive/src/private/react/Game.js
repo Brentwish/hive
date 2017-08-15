@@ -6,7 +6,7 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 10,
+      pixelScale: 5,
       width: 0,
       height: 0
     };
@@ -14,8 +14,8 @@ class Game extends Component {
 
   componentDidMount() {
     var gameProps = {
-      width: 10,
-      height: 10
+      width: 40,
+      height: 40
     };
     this._canvas.hive = new HiveGame(gameProps);
     this._canvas.hive.init();
@@ -39,9 +39,6 @@ class Game extends Component {
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     for (var i = 0; i < this._canvas.hive.board.width; i++) {
       for (var j = 0; j < this._canvas.hive.board.height; j++) {
-        if (this._canvas.hive.board.tiles[i][j].hasAnt()) {
-          console.log("");
-        }
         ctx.fillStyle = this._canvas.hive.board.tiles[i][j].color();
         ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
