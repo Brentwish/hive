@@ -1,52 +1,54 @@
-const Colors = [
-  "Black",
-  "White",
-  "Green",
-  "Blue",
-  "Red"
-];
+import Tile from "./Tile.js";
 
 function Board(width, height) {
-  this.squares = [[]];
+  this.tiles = [[]];
   this.width = width;
   this.height = height;
 }
 
-Board.prototype.randomBoard = function() {
-  for (var i = 0; i < this.width; i++) {
-    this.squares[i] = [];
-    for (var j = 0; j < this.height; j++) {
-      this.squares[i][j] = Math.floor(Math.random() * Colors.length);
-    }
-  }
-}
-
 Board.prototype.borderedBoard = function() {
-  var color = 1;
+  var type;
   for (var i = 0; i < this.width; i++) {
-    this.squares[i] = [];
+    this.tiles[i] = [];
     for (var j = 0; j < this.height; j++) {
-      color = 1;
-      if (i == 0 || i == this.width - 1 || j == 0 || j == this.height - 1) {
-        color = 2;
-      }
-      this.squares[i][j] = color;
+      type = (i == 0 || i == this.width - 1 || j == 0 || j == this.height - 1) ? "wall" : "empty";
+      this.tiles[i][j] = new Tile({
+        x: i,
+        y: j,
+        type: type,
+        ant: null
+      });
     }
   }
 }
 
-Board.prototype.isInBounds = function(position, dir) {
-  return (dir == "left" && position.x > 1) ||
-  (dir == "up" && position.y > 1) ||
-  (dir == "right" && position.x < this.width - 2) ||
-  (dir == "down" && position.y < this.height - 2)
+Board.prototype.tileFromDirection = function(x, y, dir) {
+  if (dir == "left") {
+    x -= 1;
+  } else if (dir == "right") {
+    x += 1;
+  } else if (dir == "up") {
+    y -= 1;
+  } else if (dir == "down") {
+    y += 1;
+  } else {
+    return false;
+  }
+  return this.tiles[x][y];
 }
 
-Board.prototype.getRandomPosition = function() {
-  return {
-    x: Math.floor(Math.random() * this.width),
-    y: Math.floor(Math.random() * this.height)
-  };
+Board.prototype.isInBounds = function(x, y) {
+  return (x > 0) && (x < this.width - 1) && (y > 0) && (y < this.height - 1);
+}
+
+Board.prototype.getRandomVacantTile = function() {
+  var tile;
+  while (true) {
+    tile = this.tiles[Math.floor(Math.random() * this.width)][Math.floor(Math.random() * this.height)];
+    if (tile.isVacant()) {
+      return tile;
+    }
+  }
 }
 
 export default Board;

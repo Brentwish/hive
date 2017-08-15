@@ -1,11 +1,11 @@
 //import Hive from "./Hive.js";
 import Ant from "./Ant.js";
 
+const dirs = ["left", "right", "up", "down"];
+
 function Player(props) {
   this.id = props.id;
-  this.board = props.board;
-  this.ants = [];
-  this.dirs = ["left", "right", "up", "down"];
+  this.ants = props.ants;
 }
 
 Player.prototype.updateHive = function(hive) {
@@ -15,7 +15,7 @@ Player.prototype.updateHive = function(hive) {
 Player.prototype.antAction = function(antData) {
   var action = {};
   action.type = "move";
-  action.dir = this.dirs[Math.floor(Math.random() * this.dirs.length)];
+  action.dir = dirs[Math.floor(Math.random() * dirs.length)];
   return action;
 }
 

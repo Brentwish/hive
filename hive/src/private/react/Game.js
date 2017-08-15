@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
 
-const Colors = [
-  "Black",
-  "White",
-  "Green",
-  "Blue",
-  "Red"
-];
-
 class Game extends Component {
 
   constructor(props) {
@@ -47,7 +39,10 @@ class Game extends Component {
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     for (var i = 0; i < this._canvas.hive.board.width; i++) {
       for (var j = 0; j < this._canvas.hive.board.height; j++) {
-        ctx.fillStyle = Colors[this._canvas.hive.board.squares[i][j]];
+        if (this._canvas.hive.board.tiles[i][j].hasAnt()) {
+          console.log("");
+        }
+        ctx.fillStyle = this._canvas.hive.board.tiles[i][j].color();
         ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
     }

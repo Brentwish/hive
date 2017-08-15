@@ -1,14 +1,13 @@
 function Ant(props) {
   this.type = props.type;
-  this.position = props.position;
   this.owner = props.owner;
-  this.color = props.color;
-  this.squareType = props.squareType;
+  this.tile = props.tile;
 }
 
 Ant.prototype.toDataHash = function(dir) {
   return {
-    position: { x: this.position.x, y: this.position.y }
+    x: this.tile.x,
+    y: this.tile.y
   }
 }
 

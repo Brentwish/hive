@@ -5,30 +5,29 @@ import Ant from "./Ant.js";
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
   this.players = [];
+  this.turn = 0;
 }
 
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
-  var playerProps = {
+  this.players.push(new Player({
     id: 'player_1',
-    board: this.board
-  };
-  this.players.push(new Player(playerProps));
+    ants: []
+  }));
   for (var i = 0; i < this.players.length; i++) {
-    var pos = this.board.getRandomPosition();
-    this.players[i].ants.push(new Ant({
+    var ant = new Ant({
       type: 'queen',
-      color: 4,
-      position: pos,
-      squareType: this.board.squares[pos.x][pos.y],
-      owner: this.players[i]
-    }));
+      owner: this.players[i],
+      tile: this.board.getRandomVacantTile()
+    });
+    this.players[i].ants.push(ant);
+    ant.tile.ant = ant;
   }
 }
 
 HiveGame.prototype.update = function() {
-  //this.board.borderedBoard();
   this.updatePlayers();
+  this.turn += 1;
 }
 
 HiveGame.prototype.updatePlayers = function() {
@@ -43,17 +42,17 @@ HiveGame.prototype.updatePlayers = function() {
 
 HiveGame.prototype.performAction = function(entity, action) {
   if (action.type == "move") {
-    if (this.isLegalMove(entity, action.dir)) {
-      this.board.squares[entity.position.x][entity.position.y] = entity.squareType;
-      this.move(entity, action.dir);
-      entity.squareType = this.board.squares[entity.position.x][entity.position.y];
-      this.board.squares[entity.position.x][entity.position.y] = entity.color;
+    var newTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.dir);
+    if (this.isLegalMove(newTile)) {
+      entity.tile.ant = null;
+      newTile.ant = entity;
+      entity.tile = newTile;
     }
   }
 }
 
-HiveGame.prototype.isLegalMove = function(entity, dir) {
-  return this.board.isInBounds(entity.position, dir);
+HiveGame.prototype.isLegalMove = function(tile) {
+  return tile.isVacant() && this.board.isInBounds(tile.x, tile.y);
 }
 
 HiveGame.prototype.move = function(entity, dir) {
