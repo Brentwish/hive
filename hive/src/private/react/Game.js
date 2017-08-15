@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
 
 const Colors = [
+  "Blue",
+  "Green",
+  "Red",
   "Black",
   "White",
-  "Green",
-  "Blue",
-  "Red"
 ];
 
 class Game extends Component {
@@ -16,7 +16,10 @@ class Game extends Component {
     this.state = {
       pixelScale: 10,
       width: 0,
-      height: 0
+      height: 0,
+      blue: 0,
+      red: 0,
+      green:0
     };
   }
 
@@ -31,12 +34,17 @@ class Game extends Component {
       width: this._canvas.hive.board.width * this.state.pixelScale,
       height: this._canvas.hive.board.height * this.state.pixelScale
     });
-    this._canvas.interval = setInterval(this.update, 80);
+    this._canvas.interval = setInterval(this.update, 1);
   }
 
   update = () => {
     this._canvas.hive.update();
     this.updateCanvas();
+    this.setState({
+      green: this._canvas.hive.players[0].ants[0].score,
+      red: this._canvas.hive.players[0].ants[1].score,
+      blue: this._canvas.hive.players[0].ants[2].score
+    });
   }
 
   updateCanvas(pixelScale) {
@@ -96,6 +104,9 @@ class Game extends Component {
           <button onClick={ this.decPixelScale }>Decrement</button>
           <span>{ this.state.pixelScale }</span>
           <button onClick={ this.incPixelScale }>Increment</button>
+        </div>
+        <div>
+          <span>Blue: { this.state.blue } Green: { this.state.green } Red: { this.state.red }</span>
         </div>
       </div>
     );

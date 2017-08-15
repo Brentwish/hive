@@ -4,6 +4,7 @@ function Ant(props) {
   this.owner = props.owner;
   this.color = props.color;
   this.squareType = props.squareType;
+  this.score = 0;
 }
 
 Ant.prototype.toDataHash = function(dir) {
