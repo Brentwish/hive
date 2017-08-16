@@ -13,7 +13,7 @@ Board.prototype.borderedBoard = function() {
   for (var i = 0; i < this.width; i++) {
     this.tiles[i] = [];
     for (var j = 0; j < this.height; j++) {
-      type = (i == 0 || i == this.width - 1 || j == 0 || j == this.height - 1) ? "wall" : "empty";
+      type = (i == 0 || i == this.width - 1 || j == 0 || j == this.height - 1) ? "wall" : "food";
       this.tiles[i][j] = new Tile({
         x: i,
         y: j,

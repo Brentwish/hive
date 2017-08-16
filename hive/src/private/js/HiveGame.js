@@ -13,7 +13,7 @@ function HiveGame(props) {
 
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
-  this.board.addRandomFood();
+  //this.board.addRandomFood();
   this.players.push(new Player({
     id: 'player_1',
     ants: [],
@@ -27,15 +27,18 @@ HiveGame.prototype.init = function() {
       owner: this.players[i],
       tile: this.board.getRandomVacantTile()
     });
-    var worker = new Ant({
-      type: 'worker',
-      owner: this.players[i],
-      tile: this.board.getRandomVacantTile()
-    });
     this.players[i].ants.push(queen);
-    this.players[i].ants.push(worker);
     queen.tile.ant = queen;
-    worker.tile.ant = worker;
+
+    for (var j = 0; j < 5; j++) {
+      var worker = new Ant({
+        type: 'worker',
+        owner: this.players[i],
+        tile: this.board.getRandomVacantTile()
+      });
+      worker.tile.ant = worker;
+      this.players[i].ants.push(worker);
+    }
   }
 }
 
