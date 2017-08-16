@@ -1,4 +1,6 @@
 import Tile from "./Tile.js";
+import { dirs } from "./constants.js";
+import { randomInt } from "./constants.js";
 
 function Board(width, height) {
   this.tiles = [[]];
@@ -23,7 +25,7 @@ Board.prototype.borderedBoard = function() {
 }
 
 Board.prototype.addRandomFood = function() {
-  var numFood = Math.floor(this.width * (Math.random() + 1));
+  var numFood = randomInt(this.width, this.width);
   for (var i = 0; i < numFood; i++) {
     var t = this.getRandomVacantTile();
     t.type = "food";
@@ -47,17 +49,18 @@ Board.prototype.tileFromDirection = function(x, y, dir) {
 
 Board.prototype.adjacentFoodTiles = function(tile) {
   var tiles = this.adjacentTiles(tile);
+  var foodTiles = [];
   for (var i = 0; i < tiles.length; i++) {
-    if (tiles[i].type != "food") {
-      tiles.splice(i, 1);
+    if (tiles[i].type == "food") {
+      foodTiles.push(tiles[i]);
     }
   }
-  return tiles;
+  return foodTiles;
 }
 
 Board.prototype.adjacentTiles = function(tile) {
   var tiles = [];
-  ["up", "down", "left", "right"].map((dir) => {
+  dirs.map((dir) => {
     let t = this.tileFromDirection(tile.x, tile.y, dir);
     if (t) tiles.push(t);
   });
@@ -71,7 +74,7 @@ Board.prototype.isInBounds = function(x, y) {
 Board.prototype.getRandomVacantTile = function() {
   var tile;
   while (true) {
-    tile = this.tiles[Math.floor(Math.random() * this.width)][Math.floor(Math.random() * this.height)];
+    tile = this.tiles[randomInt(this.width)][randomInt(this.height)];
     if (tile.isVacant()) {
       return tile;
     }

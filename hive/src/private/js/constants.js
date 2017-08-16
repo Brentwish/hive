@@ -12,3 +12,7 @@ export const antColors = {
   "scout": "#424949",
   "fighter": "#C0392B"
 };
+
+export function randomInt(upper = 1, lower = 0) {
+  return Math.floor(Math.random() * upper + lower);
+}

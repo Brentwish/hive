@@ -17,17 +17,25 @@ HiveGame.prototype.init = function() {
   this.players.push(new Player({
     id: 'player_1',
     ants: [],
+    board: this.board,
     playerGameActions: playerGameActions
   }));
 
   for (var i = 0; i < this.players.length; i++) {
-    var ant = new Ant({
+    var queen = new Ant({
       type: 'queen',
       owner: this.players[i],
       tile: this.board.getRandomVacantTile()
     });
-    this.players[i].ants.push(ant);
-    ant.tile.ant = ant;
+    var worker = new Ant({
+      type: 'worker',
+      owner: this.players[i],
+      tile: this.board.getRandomVacantTile()
+    });
+    this.players[i].ants.push(queen);
+    this.players[i].ants.push(worker);
+    queen.tile.ant = queen;
+    worker.tile.ant = worker;
   }
 }
 
@@ -48,17 +56,25 @@ HiveGame.prototype.updatePlayers = function() {
 
 HiveGame.prototype.performAction = function(entity, action) {
   if (action.type == "move") {
-    var newTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.dir);
-    if (newTile && this.isLegalMove(newTile)) {
+    if (this.isLegalMove(action.tile)) {
+      entity.prevTile = entity.tile;
       entity.tile.ant = null;
-      newTile.ant = entity;
-      entity.tile = newTile;
+      action.tile.ant = entity;
+      entity.tile = action.tile;
+    }
+  } else if (action.type == "gather") {
+    if (this.isLegalGather(action.tile)) {
+      action.tile.type = "empty";
     }
   }
 }
 
 HiveGame.prototype.isLegalMove = function(tile) {
   return tile.isVacant();
+}
+
+HiveGame.prototype.isLegalGather = function(tile) {
+  return tile.isFood();
 }
 
 export default HiveGame;

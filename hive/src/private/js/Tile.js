@@ -27,4 +27,8 @@ Tile.prototype.isEmpty = function() {
   return this.type == "empty";
 }
 
+Tile.prototype.isFood = function() {
+  return this.type == "food";
+}
+
 export default Tile;
