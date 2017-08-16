@@ -2,7 +2,7 @@ const dirs = ["left", "right", "up", "down"];
 
 var playerGameActions = {
   hiveAction: function(antData) {
-    console.log(this.id);
+		//
   },
 
   antAction: function(antData) {

@@ -3,6 +3,8 @@ import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
 
+import { dirs } from "./constants.js";
+
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
   this.players = [];
@@ -11,6 +13,7 @@ function HiveGame(props) {
 
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
+  this.board.addRandomFood();
   this.players.push(new Player({
     id: 'player_1',
     ants: [],
@@ -46,7 +49,7 @@ HiveGame.prototype.updatePlayers = function() {
 HiveGame.prototype.performAction = function(entity, action) {
   if (action.type == "move") {
     var newTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.dir);
-    if (this.isLegalMove(newTile)) {
+    if (newTile && this.isLegalMove(newTile)) {
       entity.tile.ant = null;
       newTile.ant = entity;
       entity.tile = newTile;
@@ -55,21 +58,7 @@ HiveGame.prototype.performAction = function(entity, action) {
 }
 
 HiveGame.prototype.isLegalMove = function(tile) {
-  return tile.isVacant() && this.board.isInBounds(tile.x, tile.y);
-}
-
-HiveGame.prototype.move = function(entity, dir) {
-  if (dir == "left") {
-    entity.position.x -= 1;
-  } else if (dir == "right") {
-    entity.position.x += 1;
-  } else if (dir == "up") {
-    entity.position.y -= 1;
-  } else if (dir == "down") {
-    entity.position.y += 1;
-  } else {
-    //
-  }
+  return tile.isVacant();
 }
 
 export default HiveGame;

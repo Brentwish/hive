@@ -22,6 +22,14 @@ Board.prototype.borderedBoard = function() {
   }
 }
 
+Board.prototype.addRandomFood = function() {
+  var numFood = Math.floor(this.width * (Math.random() + 1));
+  for (var i = 0; i < numFood; i++) {
+    var t = this.getRandomVacantTile();
+    t.type = "food";
+  }
+}
+
 Board.prototype.tileFromDirection = function(x, y, dir) {
   if (dir == "left") {
     x -= 1;
@@ -32,9 +40,28 @@ Board.prototype.tileFromDirection = function(x, y, dir) {
   } else if (dir == "down") {
     y += 1;
   } else {
-    return false;
+    return null;
   }
-  return this.tiles[x][y];
+  return this.isInBounds(x, y) ? this.tiles[x][y] : null;
+}
+
+Board.prototype.adjacentFoodTiles = function(tile) {
+  var tiles = this.adjacentTiles(tile);
+  for (var i = 0; i < tiles.length; i++) {
+    if (tiles[i].type != "food") {
+      tiles.splice(i, 1);
+    }
+  }
+  return tiles;
+}
+
+Board.prototype.adjacentTiles = function(tile) {
+  var tiles = [];
+  ["up", "down", "left", "right"].map((dir) => {
+    let t = this.tileFromDirection(tile.x, tile.y, dir);
+    if (t) tiles.push(t);
+  });
+  return tiles;
 }
 
 Board.prototype.isInBounds = function(x, y) {
