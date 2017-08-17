@@ -1,4 +1,3 @@
-import { dirs } from "./constants.js";
 import { randomInt } from "./constants.js";
 
 var playerGameActions = {

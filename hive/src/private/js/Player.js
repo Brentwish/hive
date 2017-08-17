@@ -1,5 +1,4 @@
 //import Hive from "./Hive.js";
-import Ant from "./Ant.js";
 
 function Player(props) {
   this.id = props.id;

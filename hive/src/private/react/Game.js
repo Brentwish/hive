@@ -6,32 +6,44 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 5,
-      width: 0,
-      height: 0
+      pixelScale: 1,
+      width: 1300,
+      height: 650,
+      shouldRenderAll: true,
     };
   }
 
   componentDidMount() {
-    var gameProps = {
-      width: 40,
-      height: 40
-    };
-    this._canvas.hive = new HiveGame(gameProps);
+    this._canvas.hive = new HiveGame(this.state);
     this._canvas.hive.init();
-    this.setState({
-      width: this._canvas.hive.board.width * this.state.pixelScale,
-      height: this._canvas.hive.board.height * this.state.pixelScale
-    });
-    this._canvas.interval = setInterval(this.update, 80);
+    this._canvas.interval = setInterval(this.update, 48);
   }
 
   update = () => {
     this._canvas.hive.update();
-    this.updateCanvas();
+    if (this.state.shouldRenderAll) {
+      this.renderAll();
+      this.setState({ shouldRenderAll: false });
+    } else {
+      this.renderUpdates();
+    }
   }
 
-  updateCanvas(pixelScale) {
+  renderUpdates(pixelScale) {
+    if (pixelScale == null) {
+      pixelScale = this.state.pixelScale;
+    }
+    const ctx = this._canvas.getContext('2d');
+    if (this._canvas.hive.toRender.length > 0) {
+      this._canvas.hive.toRender.forEach(function(tile) {
+        ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
+        ctx.fillStyle = tile.color();
+        ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
+      });
+    }
+  }
+
+  renderAll(pixelScale) {
     if (pixelScale == null) {
       pixelScale = this.state.pixelScale;
     }
@@ -52,10 +64,8 @@ class Game extends Component {
     }
     this.setState({
       pixelScale : newScale,
-      width: this._canvas.hive.board.width * newScale,
-      height: this._canvas.hive.board.height * newScale
+      shouldRenderAll: true,
     });
-    this.updateCanvas(newScale);
   }
 
   incPixelScale = () => {
@@ -65,23 +75,21 @@ class Game extends Component {
     }
     this.setState({
       pixelScale : newScale,
-      width: this._canvas.hive.board.width * newScale,
-      height: this._canvas.hive.board.height * newScale
+      shouldRenderAll: true,
     });
-    this.updateCanvas(newScale);
   }
 
   render() {
     return (
       <div>
         <div>
-          <canvas 
+          <canvas
             ref={
               (c) => this._canvas = c
             }
-            className="game_board" 
-            width={ this.state.width } 
-            height={ this.state.height}>
+            className="game_board"
+            width={ this.state.width * this.state.pixelScale }
+            height={ this.state.height * this.state.pixelScale }>
           </canvas>
         </div>
         <div>

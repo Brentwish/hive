@@ -3,12 +3,11 @@ import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
 
-import { dirs } from "./constants.js";
-
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
   this.players = [];
   this.turn = 0;
+  this.toRender = [];
 }
 
 HiveGame.prototype.init = function() {
@@ -30,7 +29,7 @@ HiveGame.prototype.init = function() {
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
 
-    for (var j = 0; j < 5; j++) {
+    for (var j = 0; j < 5000; j++) {
       var worker = new Ant({
         type: 'worker',
         owner: this.players[i],
@@ -43,6 +42,7 @@ HiveGame.prototype.init = function() {
 }
 
 HiveGame.prototype.update = function() {
+  this.toRender = [];
   this.turn += 1;
   this.updatePlayers();
 }
@@ -52,7 +52,9 @@ HiveGame.prototype.updatePlayers = function() {
     this.players[i].hiveAction();
     for (var j = 0; j < this.players[i].ants.length; j++) {
       var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
+      this.toRender.push(this.players[i].ants[j].tile);
       this.performAction(this.players[i].ants[j], action);
+      this.toRender.push(this.players[i].ants[j].tile);
     }
   }
 }
