@@ -30,7 +30,7 @@ class Game extends Component {
   }
 
   renderUpdates(pixelScale) {
-    if (pixelScale == null) {
+    if (pixelScale === undefined) {
       pixelScale = this.state.pixelScale;
     }
     const ctx = this._canvas.getContext('2d');
@@ -44,7 +44,7 @@ class Game extends Component {
   }
 
   renderAll(pixelScale) {
-    if (pixelScale == null) {
+    if (pixelScale === undefined) {
       pixelScale = this.state.pixelScale;
     }
     const ctx = this._canvas.getContext('2d');

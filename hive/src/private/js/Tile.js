@@ -20,15 +20,15 @@ Tile.prototype.hasAnt = function() {
 }
 
 Tile.prototype.isWall = function() {
-  return this.type == "wall";
+  return this.type === "wall";
 }
 
 Tile.prototype.isEmpty = function() {
-  return this.type == "empty";
+  return this.type === "empty";
 }
 
 Tile.prototype.isFood = function() {
-  return this.type == "food";
+  return this.type === "food";
 }
 
 export default Tile;

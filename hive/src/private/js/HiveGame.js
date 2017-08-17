@@ -60,14 +60,14 @@ HiveGame.prototype.updatePlayers = function() {
 }
 
 HiveGame.prototype.performAction = function(entity, action) {
-  if (action.type == "move") {
+  if (action.type === "move") {
     if (this.isLegalMove(action.tile)) {
       entity.prevTile = entity.tile;
       entity.tile.ant = null;
       action.tile.ant = entity;
       entity.tile = action.tile;
     }
-  } else if (action.type == "gather") {
+  } else if (action.type === "gather") {
     if (this.isLegalGather(action.tile)) {
       action.tile.type = "empty";
     }

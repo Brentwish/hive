@@ -16,7 +16,7 @@ var playerGameActions = {
       if (antData.prevTile) {
         var copy = adjacentTiles;
         copy.forEach(function(tile, i) {
-          if (tile.x == antData.prevTile.x && tile.y == antData.prevTile.y) {
+          if (tile.x === antData.prevTile.x && tile.y === antData.prevTile.y) {
             adjacentTiles.splice(i, 1);
           }
         });
@@ -26,9 +26,9 @@ var playerGameActions = {
       action.tile = adjacentTiles[randomInt(adjacentTiles.length)];
     }
 
-    if (antData.type == "queen") {
+    if (antData.type === "queen") {
       moveRandom();
-    } else if (antData.type == "worker") {
+    } else if (antData.type === "worker") {
       if (adjacentFoodTiles.length > 0) {
         action.type = "gather";
         action.tile = adjacentFoodTiles[randomInt(adjacentFoodTiles.length)];
