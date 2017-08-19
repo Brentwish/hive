@@ -22,18 +22,20 @@ HiveGame.prototype.init = function() {
 
   for (var i = 0; i < this.players.length; i++) {
     var queen = new Ant({
+      id: 1,
       type: 'queen',
       owner: this.players[i],
-      tile: this.board.getRandomVacantTile()
+      tile: this.board.getRandomVacantTile(),
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
 
-    for (var j = 0; j < 50; j++) {
+    for (var j = 0; j < 1; j++) {
       var worker = new Ant({
+        id: i + 1,
         type: 'worker',
         owner: this.players[i],
-        tile: this.board.getRandomVacantTile()
+        tile: this.board.getRandomVacantTile(),
       });
       worker.tile.ant = worker;
       this.players[i].ants.push(worker);
@@ -61,6 +63,7 @@ HiveGame.prototype.performAction = function(entity, action) {
   if (action.type === "move") {
     if (this.isLegalMove(action.tile)) {
       this.toRender.push(entity.tile);
+      action.prevTile = entity.tile;
       entity.prevTile = entity.tile;
       entity.tile.ant = null;
       action.tile.ant = entity;
@@ -73,7 +76,18 @@ HiveGame.prototype.performAction = function(entity, action) {
       this.toRender.push(action.tile);
     }
   }
+  var prevTile = action.prevTile ? action.prevTile.str() : "";
+  this.log({
+    message: entity.type + entity.id + " " + action.type + ": " + prevTile + " -> " + action.tile.str(),
+    ant: entity,
+    action: action
+  });
 }
+
+HiveGame.prototype.log = function(data) {
+  console.log(data);
+}
+
 
 HiveGame.prototype.isLegalMove = function(tile) {
   return tile.isVacant();

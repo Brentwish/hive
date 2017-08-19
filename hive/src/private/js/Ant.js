@@ -1,4 +1,5 @@
 function Ant(props) {
+  this.id = props.id;
   this.type = props.type;
   this.owner = props.owner;
   this.tile = props.tile;

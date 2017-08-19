@@ -7,6 +7,10 @@ function Tile(props) {
   this.ant = props.ant;
 }
 
+Tile.prototype.str = function() {
+  return "{x: " + this.x + ", y: " + this.y + "}";
+}
+
 Tile.prototype.color = function() {
   return this.hasAnt() ? antColors[this.ant.type] : tileColors[this.type];
 }
