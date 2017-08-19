@@ -6,9 +6,9 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 1,
-      width: 1300,
-      height: 650,
+      pixelScale: 3,
+      width: 801 / 3,
+      height: 600 / 3,
       shouldRenderAll: true,
     };
   }
@@ -16,7 +16,7 @@ class Game extends Component {
   componentDidMount() {
     this._canvas.hive = new HiveGame(this.state);
     this._canvas.hive.init();
-    this._canvas.interval = setInterval(this.update, 48);
+    this._canvas.interval = setInterval(this.update, 42);
   }
 
   update = () => {
