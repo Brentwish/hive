@@ -27,16 +27,16 @@ Board.prototype.borderedBoard = function() {
 
 Board.prototype.addRandomFood = function() {
   var numFood = 1/10 * randomInt(this.width, this.width);
-	var t;
-	var adjacentEmptyTiles;
+  var t;
+  var adjacentEmptyTiles;
   for (var i = 0; i < numFood; i++) {
-		t = this.getRandomVacantTile();
+    t = this.getRandomVacantTile();
     for (var j = 0; j < 1/5 * this.width; j++) {
-			t.type = "food";
-			adjacentEmptyTiles = this.adjacentTiles(t, "empty");
-			if (adjacentEmptyTiles.length > 0) {
-				t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];
-			} else { continue; }
+      t.type = "food";
+      adjacentEmptyTiles = this.adjacentTiles(t, "empty");
+      if (adjacentEmptyTiles.length > 0) {
+        t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];
+      } else { continue; }
     }
   }
 }
@@ -63,17 +63,17 @@ Board.prototype.adjacentTiles = function(tile, type) {
     if (t) tiles.push(t);
   });
 
-	if (type === undefined) {
-		return tiles;
-	} else {
-		var tilesOfType = [];
-		for (var i = 0; i < tiles.length; i++) {
-			if (tiles[i].type === type) {
-				tilesOfType.push(tiles[i]);
-			}
-		}
-		return tilesOfType;
-	}
+  if (type === undefined) {
+    return tiles;
+  } else {
+    var tilesOfType = [];
+    for (var i = 0; i < tiles.length; i++) {
+      if (tiles[i].type === type) {
+        tilesOfType.push(tiles[i]);
+      }
+    }
+    return tilesOfType;
+  }
 }
 
 Board.prototype.isInBounds = function(x, y) {

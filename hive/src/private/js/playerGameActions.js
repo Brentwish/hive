@@ -2,7 +2,6 @@ import { randomInt } from "./constants.js";
 
 var playerGameActions = {
   hiveAction: function(antData) {
-		//
   },
 
   antAction: function(antData) {
