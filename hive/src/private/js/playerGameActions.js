@@ -9,7 +9,7 @@ var playerGameActions = {
     var action = {};
     var antTile = antData.board.tiles[antData.x][antData.y];
     var adjacentTiles = antData.board.adjacentTiles(antTile);
-    var adjacentFoodTiles = antData.board.adjacentFoodTiles(antTile);
+    var adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
 
     var moveRandom = function() {
       ////Removes the last tile it moved from to make movement look cleaner

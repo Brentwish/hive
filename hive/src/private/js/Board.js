@@ -1,6 +1,7 @@
 import Tile from "./Tile.js";
 import { dirs } from "./constants.js";
 import { randomInt } from "./constants.js";
+import { sig } from "./constants.js";
 
 function Board(width, height) {
   this.tiles = [[]];
@@ -13,22 +14,30 @@ Board.prototype.borderedBoard = function() {
   for (var i = 0; i < this.width; i++) {
     this.tiles[i] = [];
     for (var j = 0; j < this.height; j++) {
-      type = (i === 0 || i === this.width - 1 || j === 0 || j === this.height - 1) ? "wall" : "food";
+      type = (i === 0 || i === this.width - 1 || j === 0 || j === this.height - 1) ? "wall" : "empty";
       this.tiles[i][j] = new Tile({
         x: i,
         y: j,
         type: type,
-        ant: null
+        ant: null,
       });
     }
   }
 }
 
 Board.prototype.addRandomFood = function() {
-  var numFood = randomInt(this.width, this.width);
+  var numFood = 1/10 * randomInt(this.width, this.width);
+	var t;
+	var adjacentEmptyTiles;
   for (var i = 0; i < numFood; i++) {
-    var t = this.getRandomVacantTile();
-    t.type = "food";
+		t = this.getRandomVacantTile();
+    for (var j = 0; j < 1/5 * this.width; j++) {
+			t.type = "food";
+			adjacentEmptyTiles = this.adjacentTiles(t, "empty");
+			if (adjacentEmptyTiles.length > 0) {
+				t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];
+			} else { continue; }
+    }
   }
 }
 
@@ -47,24 +56,24 @@ Board.prototype.tileFromDirection = function(x, y, dir) {
   return this.isInBounds(x, y) ? this.tiles[x][y] : null;
 }
 
-Board.prototype.adjacentFoodTiles = function(tile) {
-  var tiles = this.adjacentTiles(tile);
-  var foodTiles = [];
-  for (var i = 0; i < tiles.length; i++) {
-    if (tiles[i].type === "food") {
-      foodTiles.push(tiles[i]);
-    }
-  }
-  return foodTiles;
-}
-
-Board.prototype.adjacentTiles = function(tile) {
+Board.prototype.adjacentTiles = function(tile, type) {
   var tiles = [];
   dirs.map((dir) => {
     let t = this.tileFromDirection(tile.x, tile.y, dir);
     if (t) tiles.push(t);
   });
-  return tiles;
+
+	if (type === undefined) {
+		return tiles;
+	} else {
+		var tilesOfType = [];
+		for (var i = 0; i < tiles.length; i++) {
+			if (tiles[i].type === type) {
+				tilesOfType.push(tiles[i]);
+			}
+		}
+		return tilesOfType;
+	}
 }
 
 Board.prototype.isInBounds = function(x, y) {

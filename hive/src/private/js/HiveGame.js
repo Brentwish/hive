@@ -12,12 +12,12 @@ function HiveGame(props) {
 
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
-  //this.board.addRandomFood();
+  this.board.addRandomFood();
   this.players.push(new Player({
     id: 'player_1',
     ants: [],
     board: this.board,
-    playerGameActions: playerGameActions
+    playerGameActions: playerGameActions,
   }));
 
   for (var i = 0; i < this.players.length; i++) {
@@ -80,7 +80,7 @@ HiveGame.prototype.performAction = function(entity, action) {
   this.log({
     message: entity.type + entity.id + " " + action.type + ": " + prevTile + " -> " + action.tile.str(),
     ant: entity,
-    action: action
+    action: action,
   });
 }
 
