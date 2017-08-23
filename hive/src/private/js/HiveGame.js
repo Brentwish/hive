@@ -2,7 +2,10 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
-import { MAXFOOD } from "./constants.js";
+import { randomInt } from "./constants.js";
+import { MAX_FOOD } from "./constants.js";
+import { NEW_ANT_COST } from "./constants.js";
+import { EGG_TIMER } from "./constants.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -21,28 +24,24 @@ HiveGame.prototype.init = function() {
     playerGameActions: playerGameActions,
   }));
 
+  this.players.push(new Player({
+    id: 'player_2',
+    ants: [],
+    board: this.board,
+    playerGameActions: playerGameActions,
+  }));
+
   for (var i = 0; i < this.players.length; i++) {
     var queen = new Ant({
       id: 1,
       type: 'queen',
       owner: this.players[i],
       tile: this.board.getRandomVacantTile(),
-      food: 0,
+      food: 35,
+      eggTimer: 0,
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
-
-    for (var j = 0; j < 150; j++) {
-      var worker = new Ant({
-        id: i + 1,
-        type: 'worker',
-        owner: this.players[i],
-        tile: this.board.getRandomVacantTile(),
-        food: 0,
-      });
-      worker.tile.ant = worker;
-      this.players[i].ants.push(worker);
-    }
   }
 }
 
@@ -56,8 +55,12 @@ HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
     this.players[i].hiveAction();
     for (var j = 0; j < this.players[i].ants.length; j++) {
-      var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
-      this.performAction(this.players[i].ants[j], action);
+      if (this.players[i].ants[j].eggTimer === 0) {
+        var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
+        this.performAction(this.players[i].ants[j], action);
+      } else {
+        this.players[i].ants[j].eggTimer -= 1;
+      }
     }
   }
 }
@@ -74,7 +77,7 @@ HiveGame.prototype.performAction = function(entity, action) {
       this.toRender.push(entity.tile);
     }
   } else if (action.type === "gather") {
-    if (this.isLegalGather(action.tile) && entity.food < MAXFOOD) {
+    if (this.isLegalGather(action.tile) && entity.food < MAX_FOOD) {
       action.tile.food -= 1;
       entity.food += 1;
       if (action.tile.food === 0) {
@@ -87,8 +90,10 @@ HiveGame.prototype.performAction = function(entity, action) {
     if (this.isLegalTransfer(action.from, action.to, action.amount)) {
       action.from.food -= action.amount;
       action.to.food += action.amount;
-      console.log(action.to.food);
-      console.log(action.to.food / this.turn);
+    }
+  } else if (action.type === "layEgg") {
+    if (this.canLayEgg(entity)) {
+      this.layEgg(entity);
     }
   }
   var prevTile = action.prevTile ? action.prevTile.str() : "";
@@ -97,6 +102,26 @@ HiveGame.prototype.performAction = function(entity, action) {
   //  ant: entity,
   //  action: action,
   //});
+}
+
+HiveGame.prototype.layEgg = function(ant) {
+  let emptyTiles = this.board.adjacentTiles(ant.tile).filter((t) => { return !t.hasAnt() });
+	if (emptyTiles.length === 0) {
+    return;
+  }
+  let tile = emptyTiles[randomInt(emptyTiles.length)];
+  let worker = new Ant({
+    id: ant.owner.ants.length + 2,
+    type: 'worker',
+    owner: ant.owner,
+    tile: tile,
+    food: 0,
+    eggTimer: EGG_TIMER,
+  });
+  tile.ant = worker;
+  ant.owner.ants.push(worker);
+  ant.food -= NEW_ANT_COST;
+  this.toRender.push(tile);
 }
 
 HiveGame.prototype.log = function(data) {
@@ -115,6 +140,10 @@ HiveGame.prototype.isLegalTransfer = function(from, to, amount) {
   //check from is adjacent to to
   //check from doesnt have an illegal amount of food
   return true;
+}
+
+HiveGame.prototype.canLayEgg = function(ant) {
+  return ant.type === "queen" && ant.food >= NEW_ANT_COST;
 }
 
 export default HiveGame;

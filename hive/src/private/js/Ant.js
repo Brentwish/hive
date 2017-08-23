@@ -5,6 +5,7 @@ function Ant(props) {
   this.tile = props.tile;
   this.prevTile = props.prevTile;
   this.food = props.food;
+  this.eggTimer = props.eggTimer;
 }
 
 Ant.prototype.toDataHash = function(dir) {

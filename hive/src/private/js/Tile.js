@@ -13,7 +13,7 @@ Tile.prototype.str = function() {
 }
 
 Tile.prototype.color = function() {
-  return this.hasAnt() ? antColors[this.ant.type] : tileColors[this.type];
+  return this.hasAnt() ? (this.ant.eggTimer > 0 ? antColors["egg"] : antColors[this.ant.type]) : tileColors[this.type];
 }
 
 Tile.prototype.isVacant = function() {

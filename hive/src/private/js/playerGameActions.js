@@ -1,6 +1,7 @@
 import { randomInt } from "./constants.js";
-import { MAXFOOD } from "./constants.js";
 import { distance } from "./constants.js";
+import { MAX_FOOD } from "./constants.js";
+import { NEW_ANT_COST } from "./constants.js";
 
 const getRandomMoveAction = function(board, tile) {
   let adjacentTiles = board.adjacentTiles(tile);
@@ -47,11 +48,17 @@ var playerGameActions = {
     let antTile = antData.board.tiles[antData.x][antData.y];
 
     if (antData.type === "queen") {
-      return getRandomMoveAction(antData.board, antTile);
+      if (antData.food >= NEW_ANT_COST) {
+        return {
+          type: "layEgg",
+        };
+      } else {
+        return getRandomMoveAction(antData.board, antTile);
+      }
     } else if (antData.type === "worker") {
 
       let adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
-      if (antData.food === MAXFOOD) {
+      if (antData.food === MAX_FOOD) {
         if (antData.board.adjacentTiles(antTile).filter((t) => { return t.hasAnt(); }).map((t) => { return t.ant.type; }).includes("queen")) {
           return getTransferFoodAction(antTile.ant, this.getQueenTile().ant);
         } else {

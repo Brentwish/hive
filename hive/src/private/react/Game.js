@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
+import { UPDATE_PERIOD } from "../js/constants.js";
 
 class Game extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 2,
+      pixelScale: 5,
       width: 180,
       height: 100,
       shouldRenderAll: true,
@@ -16,7 +17,7 @@ class Game extends Component {
   componentDidMount() {
     this._canvas.hive = new HiveGame(this.state);
     this._canvas.hive.init();
-    this._canvas.interval = setInterval(this.update, 60);
+    this._canvas.interval = setInterval(this.update, UPDATE_PERIOD);
   }
 
   update = () => {

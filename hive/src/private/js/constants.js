@@ -1,17 +1,21 @@
 export const dirs = ["left", "right", "up", "down"];
-export const MAXFOOD = 5;
+export const UPDATE_PERIOD = 42;
+export const MAX_FOOD = 5;
+export const NEW_ANT_COST = 25;
+export const EGG_TIMER = 100;
 export const tileColors = {
-  "empty": "#F6DDCC",
+  "empty": "#E4AF77",
   "wall": "#424949",
   "food": "#2ECC71",
-  "water": "#5DADE2"
+  "water": "#5DADE2",
 };
 
 export const antColors = {
   "queen": "#7D6608",
   "worker": "#0B5345",
   "scout": "#424949",
-  "fighter": "#C0392B"
+  "fighter": "#C0392B",
+  "egg": "#E8E5E1",
 };
 
 export function randomInt(upper = 1, lower = 0) {
