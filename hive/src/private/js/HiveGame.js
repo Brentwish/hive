@@ -11,7 +11,7 @@ function HiveGame(props) {
   this.board = new Board(props.width, props.height);
   this.players = [];
   this.turn = 0;
-  this.toRender = [];
+  this.coordsToRender = [];
 }
 
 HiveGame.prototype.init = function() {
@@ -38,7 +38,7 @@ HiveGame.prototype.init = function() {
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
   }
-  this.toRender = [];
+  this.coordsToRender = new Set();
 }
 
 HiveGame.prototype.update = function() {
@@ -46,14 +46,19 @@ HiveGame.prototype.update = function() {
   this.updatePlayers();
 }
 
+HiveGame.prototype.pushCoordToRender = function(coord) {
+  this.coordsToRender.add(JSON.stringify(coord));
+}
+
 HiveGame.prototype.getUpdatedTiles = function() {
-  return this.toRender.map((coords) => {
-    return this.board.getTileFromCoords(coords);
+  return [...this.coordsToRender].map((coordJson) => {
+    const coord = JSON.parse(coordJson);
+    return this.board.getTileFromCoords(coord);
   });
 }
 
 HiveGame.prototype.clearUpdatedTiles = function() {
-  this.toRender = [];
+  this.coordsToRender.clear();
 }
 
 HiveGame.prototype.updatePlayers = function() {
@@ -73,13 +78,13 @@ HiveGame.prototype.updatePlayers = function() {
 HiveGame.prototype.performAction = function(entity, action) {
   if (action.type === "move") {
     if (this.isLegalMove(action.tile)) {
-      this.toRender.push(entity.tile.coords());
+      this.pushCoordToRender(entity.tile.coords());
       action.prevTile = entity.tile;
       entity.prevTile = entity.tile;
       entity.tile.ant = null;
       action.tile.ant = entity;
       entity.tile = action.tile;
-      this.toRender.push(entity.tile.coords());
+      this.pushCoordToRender(entity.tile.coords());
     }
   } else if (action.type === "gather") {
     if (this.isLegalGather(action.tile) && entity.food < MAX_FOOD) {
@@ -88,7 +93,7 @@ HiveGame.prototype.performAction = function(entity, action) {
       if (action.tile.food === 0) {
         action.tile.type = "empty";
         action.tile.food = null;
-        this.toRender.push(action.tile.coords());
+        this.pushCoordToRender(action.tile.coords());
       }
     }
   } else if (action.type === "transfer") {
@@ -126,7 +131,7 @@ HiveGame.prototype.layEgg = function(ant) {
   tile.ant = worker;
   ant.owner.ants.push(worker);
   ant.food -= NEW_ANT_COST;
-  this.toRender.push(tile.coords());
+  this.pushCoordToRender(tile.coords());
 }
 
 HiveGame.prototype.log = function(data) {
