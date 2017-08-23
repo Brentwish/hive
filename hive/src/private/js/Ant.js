@@ -4,6 +4,7 @@ function Ant(props) {
   this.owner = props.owner;
   this.tile = props.tile;
   this.prevTile = props.prevTile;
+  this.food = props.food;
 }
 
 Ant.prototype.toDataHash = function(dir) {
@@ -12,7 +13,8 @@ Ant.prototype.toDataHash = function(dir) {
     y: this.tile.y,
     type: this.type,
     prevTile: this.prevTile,
-    board: this.owner.board
+    board: this.owner.board,
+    food: this.food,
   }
 }
 

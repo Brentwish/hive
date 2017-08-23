@@ -2,6 +2,7 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
+import { MAXFOOD } from "./constants.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -26,6 +27,7 @@ HiveGame.prototype.init = function() {
       type: 'queen',
       owner: this.players[i],
       tile: this.board.getRandomVacantTile(),
+      food: 0,
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
@@ -36,6 +38,7 @@ HiveGame.prototype.init = function() {
         type: 'worker',
         owner: this.players[i],
         tile: this.board.getRandomVacantTile(),
+        food: 0,
       });
       worker.tile.ant = worker;
       this.players[i].ants.push(worker);
@@ -71,9 +74,14 @@ HiveGame.prototype.performAction = function(entity, action) {
       this.toRender.push(entity.tile);
     }
   } else if (action.type === "gather") {
-    if (this.isLegalGather(action.tile)) {
-      action.tile.type = "empty";
-      this.toRender.push(action.tile);
+    if (this.isLegalGather(action.tile) && entity.food < MAXFOOD) {
+      action.tile.food -= 1;
+      entity.food += 1;
+      if (action.tile.food === 0) {
+        action.tile.type = "empty";
+        action.tile.food = null;
+        this.toRender.push(action.tile);
+      }
     }
   }
   var prevTile = action.prevTile ? action.prevTile.str() : "";
@@ -88,13 +96,12 @@ HiveGame.prototype.log = function(data) {
   console.log(data);
 }
 
-
 HiveGame.prototype.isLegalMove = function(tile) {
   return tile.isVacant();
 }
 
 HiveGame.prototype.isLegalGather = function(tile) {
-  return tile.isFood();
+  return tile.isFood() && tile.food > 0;
 }
 
 export default HiveGame;

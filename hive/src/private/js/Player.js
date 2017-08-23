@@ -8,4 +8,10 @@ function Player(props) {
   this.antAction = props.playerGameActions.antAction;
 }
 
+Player.prototype.getQueenTile = function() {
+  for (var i = 0; i < this.ants.length; i++) {
+    if (this.ants[i].type === "queen") { return this.ants[i].tile; }
+  }
+}
+
 export default Player;

@@ -1,41 +1,59 @@
 import { randomInt } from "./constants.js";
+import { MAXFOOD } from "./constants.js";
+import { distance } from "./constants.js";
+
+const getRandomMoveAction = function(board, tile) {
+  let adjacentTiles = board.adjacentTiles(tile);
+  return {
+    type: "move",
+    tile: adjacentTiles[randomInt(adjacentTiles.length)],
+  };
+}
+
+const getMoveTowardsQueenAction = function(board, tile, queenTile) {
+  let action = { type: "move" };
+  let adjacentTiles = board.adjacentTiles(tile);
+  let adjacentEmptyTiles = adjacentTiles.filter(function(t) {
+    return !t.hasAnt();
+  });
+  if (adjacentEmptyTiles.length === 0) {
+    action.tile = tile;
+    return action;
+  }
+  let closestTile = adjacentEmptyTiles[0];
+  for (var i = 0; i < adjacentEmptyTiles.length; i++) {
+    if (distance(adjacentEmptyTiles[i], queenTile) < distance(closestTile, queenTile)) {
+      closestTile = adjacentEmptyTiles[i];
+    }
+  }
+  action.tile = closestTile;
+  return action;
+}
 
 var playerGameActions = {
   hiveAction: function(antData) {
   },
 
   antAction: function(antData) {
-    var action = {};
-    var antTile = antData.board.tiles[antData.x][antData.y];
-    var adjacentTiles = antData.board.adjacentTiles(antTile);
-    var adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
-
-    var moveRandom = function() {
-      ////Removes the last tile it moved from to make movement look cleaner
-      if (antData.prevTile) {
-        var copy = adjacentTiles;
-        copy.forEach(function(tile, i) {
-          if (tile.x === antData.prevTile.x && tile.y === antData.prevTile.y) {
-            adjacentTiles.splice(i, 1);
-          }
-        });
-      }
-      ////
-      action.type = "move";
-      action.tile = adjacentTiles[randomInt(adjacentTiles.length)];
-    }
+    let antTile = antData.board.tiles[antData.x][antData.y];
 
     if (antData.type === "queen") {
-      moveRandom();
+      return getRandomMoveAction(antData.board, antTile);
     } else if (antData.type === "worker") {
-      if (adjacentFoodTiles.length > 0) {
-        action.type = "gather";
-        action.tile = adjacentFoodTiles[randomInt(adjacentFoodTiles.length)];
+
+      let adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
+      if (antData.food === MAXFOOD) {
+        return getMoveTowardsQueenAction(antData.board, antTile, this.getQueenTile());
+      } else if (adjacentFoodTiles.length > 0) {
+        return {
+          type: "gather",
+          tile: adjacentFoodTiles[randomInt(adjacentFoodTiles.length)],
+        }
       } else {
-        moveRandom();
+        return getRandomMoveAction(antData.board, antTile);
       }
+
     }
-    return action;
   }
 }
 

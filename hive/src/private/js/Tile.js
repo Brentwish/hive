@@ -5,7 +5,7 @@ function Tile(props) {
   this.y = props.y;
   this.type = props.type;
   this.ant = props.ant;
-  this.value = props.value;
+  this.food = props.food;
 }
 
 Tile.prototype.str = function() {

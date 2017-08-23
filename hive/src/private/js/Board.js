@@ -20,6 +20,7 @@ Board.prototype.borderedBoard = function() {
         y: j,
         type: type,
         ant: null,
+        food: null,
       });
     }
   }
@@ -33,6 +34,7 @@ Board.prototype.addRandomFood = function() {
     t = this.getRandomVacantTile();
     for (var j = 0; j < 1/5 * this.width; j++) {
       t.type = "food";
+      t.food = randomInt(5, 5);
       adjacentEmptyTiles = this.adjacentTiles(t, "empty");
       if (adjacentEmptyTiles.length > 0) {
         t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];
