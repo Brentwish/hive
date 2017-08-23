@@ -1,5 +1,5 @@
 export const dirs = ["left", "right", "up", "down"];
-export const MAXFOOD = 15;
+export const MAXFOOD = 5;
 export const tileColors = {
   "empty": "#F6DDCC",
   "wall": "#424949",

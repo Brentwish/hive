@@ -1,7 +1,6 @@
 import Tile from "./Tile.js";
 import { dirs } from "./constants.js";
 import { randomInt } from "./constants.js";
-import { sig } from "./constants.js";
 
 function Board(width, height) {
   this.tiles = [[]];
@@ -27,14 +26,14 @@ Board.prototype.borderedBoard = function() {
 }
 
 Board.prototype.addRandomFood = function() {
-  var numFood = 1/10 * randomInt(this.width, this.width);
+  var numFood = randomInt(this.width, this.width);
   var t;
   var adjacentEmptyTiles;
   for (var i = 0; i < numFood; i++) {
     t = this.getRandomVacantTile();
-    for (var j = 0; j < 1/5 * this.width; j++) {
+    for (var j = 0; j < 1/15 * this.width; j++) {
       t.type = "food";
-      t.food = randomInt(5, 5);
+      t.food = randomInt(2, 2);
       adjacentEmptyTiles = this.adjacentTiles(t, "empty");
       if (adjacentEmptyTiles.length > 0) {
         t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];

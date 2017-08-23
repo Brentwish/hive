@@ -30,6 +30,15 @@ const getMoveTowardsQueenAction = function(board, tile, queenTile) {
   return action;
 }
 
+const getTransferFoodAction = function(ant, queenAnt) {
+  return {
+    type: "transfer",
+    from: ant,
+    to: queenAnt,
+    amount: ant.food,
+  };
+}
+
 var playerGameActions = {
   hiveAction: function(antData) {
   },
@@ -43,7 +52,11 @@ var playerGameActions = {
 
       let adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
       if (antData.food === MAXFOOD) {
-        return getMoveTowardsQueenAction(antData.board, antTile, this.getQueenTile());
+        if (antData.board.adjacentTiles(antTile).filter((t) => { return t.hasAnt(); }).map((t) => { return t.ant.type; }).includes("queen")) {
+          return getTransferFoodAction(antTile.ant, this.getQueenTile().ant);
+        } else {
+          return getMoveTowardsQueenAction(antData.board, antTile, this.getQueenTile());
+        }
       } else if (adjacentFoodTiles.length > 0) {
         return {
           type: "gather",

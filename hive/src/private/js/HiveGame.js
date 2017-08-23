@@ -32,7 +32,7 @@ HiveGame.prototype.init = function() {
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
 
-    for (var j = 0; j < 1; j++) {
+    for (var j = 0; j < 150; j++) {
       var worker = new Ant({
         id: i + 1,
         type: 'worker',
@@ -83,13 +83,20 @@ HiveGame.prototype.performAction = function(entity, action) {
         this.toRender.push(action.tile);
       }
     }
+  } else if (action.type === "transfer") {
+    if (this.isLegalTransfer(action.from, action.to, action.amount)) {
+      action.from.food -= action.amount;
+      action.to.food += action.amount;
+      console.log(action.to.food);
+      console.log(action.to.food / this.turn);
+    }
   }
   var prevTile = action.prevTile ? action.prevTile.str() : "";
-  this.log({
-    message: entity.type + entity.id + " " + action.type + ": " + prevTile + " -> " + action.tile.str(),
-    ant: entity,
-    action: action,
-  });
+  //this.log({
+  //  message: entity.type + entity.id + " " + action.type + ": " + prevTile + " -> " + action.tile.str(),
+  //  ant: entity,
+  //  action: action,
+  //});
 }
 
 HiveGame.prototype.log = function(data) {
@@ -102,6 +109,12 @@ HiveGame.prototype.isLegalMove = function(tile) {
 
 HiveGame.prototype.isLegalGather = function(tile) {
   return tile.isFood() && tile.food > 0;
+}
+
+HiveGame.prototype.isLegalTransfer = function(from, to, amount) {
+  //check from is adjacent to to
+  //check from doesnt have an illegal amount of food
+  return true;
 }
 
 export default HiveGame;
