@@ -7,6 +7,7 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      updatesPerTick: 1,
       pixelScale: 1,
       width: 900,
       height: 600,
@@ -21,7 +22,9 @@ class Game extends Component {
   }
 
   update = () => {
-    this._canvas.hive.update();
+    for (let i = 0; i < this.state.updatesPerTick; i++) {
+      this._canvas.hive.update();
+    }
     if (this.state.shouldRenderAll) {
       this.renderAll();
       this.setState({ shouldRenderAll: false });
@@ -30,17 +33,17 @@ class Game extends Component {
     }
   }
 
-  renderUpdates(pixelScale) {
-    if (pixelScale === undefined) {
-      pixelScale = this.state.pixelScale;
-    }
+  renderUpdates() {
+    const pixelScale = this.state.pixelScale;
     const ctx = this._canvas.getContext('2d');
-    if (this._canvas.hive.toRender.length > 0) {
-      this._canvas.hive.toRender.forEach(function(tile) {
+    const updatedTiles = this._canvas.hive.getUpdatedTiles();
+    if (updatedTiles.length > 0) {
+      updatedTiles.forEach(function(tile) {
         ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
         ctx.fillStyle = tile.color();
         ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
       });
+      this._canvas.hive.clearUpdatedTiles();
     }
   }
 
@@ -58,26 +61,14 @@ class Game extends Component {
     }
   }
 
-  decPixelScale = () => {
-    var newScale = this.state.pixelScale - 1;
-    if (newScale < 1) {
-      newScale = 1;
-    }
+  handlePixelScaleChange = (evt) => {
     this.setState({
-      pixelScale : newScale,
+      pixelScale : parseInt(evt.target.value),
       shouldRenderAll: true,
     });
   }
-
-  incPixelScale = () => {
-    var newScale = this.state.pixelScale + 1;
-    if (newScale > 10) {
-      newScale = 10;
-    }
-    this.setState({
-      pixelScale : newScale,
-      shouldRenderAll: true,
-    });
+  handleUpdatesPerTickChange = (evt) => {
+    this.setState({ updatesPerTick: parseInt(evt.target.value) });
   }
 
   render() {
@@ -94,9 +85,14 @@ class Game extends Component {
           </canvas>
         </div>
         <div>
-          <button onClick={ this.decPixelScale }>Decrement</button>
-          <span>{ this.state.pixelScale }</span>
-          <button onClick={ this.incPixelScale }>Increment</button>
+          <div>
+            Pixel Scale: { this.state.pixelScale }
+            <input type="range" min="1" max="10" step="1" value={ this.state.pixelScale.toString() || "1" } onChange={ this.handlePixelScaleChange } />
+          </div>
+          <div>
+            Updates per tick: { this.state.updatesPerTick }
+            <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerTick.toString() || "1" } onChange={ this.handleUpdatesPerTickChange } />
+          </div>
         </div>
       </div>
     );

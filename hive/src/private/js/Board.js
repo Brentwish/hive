@@ -8,6 +8,10 @@ function Board(width, height) {
   this.height = height;
 }
 
+Board.prototype.getTileFromCoords = function(coords) {
+  return this.tiles[coords.x][coords.y];
+}
+
 Board.prototype.borderedBoard = function() {
   var type;
   for (var i = 0; i < this.width; i++) {

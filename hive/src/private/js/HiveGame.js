@@ -38,12 +38,22 @@ HiveGame.prototype.init = function() {
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
   }
+  this.toRender = [];
 }
 
 HiveGame.prototype.update = function() {
-  this.toRender = [];
   this.turn += 1;
   this.updatePlayers();
+}
+
+HiveGame.prototype.getUpdatedTiles = function() {
+  return this.toRender.map((coords) => {
+    return this.board.getTileFromCoords(coords);
+  });
+}
+
+HiveGame.prototype.clearUpdatedTiles = function() {
+  this.toRender = [];
 }
 
 HiveGame.prototype.updatePlayers = function() {
@@ -63,13 +73,13 @@ HiveGame.prototype.updatePlayers = function() {
 HiveGame.prototype.performAction = function(entity, action) {
   if (action.type === "move") {
     if (this.isLegalMove(action.tile)) {
-      this.toRender.push(entity.tile);
+      this.toRender.push(entity.tile.coords());
       action.prevTile = entity.tile;
       entity.prevTile = entity.tile;
       entity.tile.ant = null;
       action.tile.ant = entity;
       entity.tile = action.tile;
-      this.toRender.push(entity.tile);
+      this.toRender.push(entity.tile.coords());
     }
   } else if (action.type === "gather") {
     if (this.isLegalGather(action.tile) && entity.food < MAX_FOOD) {
@@ -78,7 +88,7 @@ HiveGame.prototype.performAction = function(entity, action) {
       if (action.tile.food === 0) {
         action.tile.type = "empty";
         action.tile.food = null;
-        this.toRender.push(action.tile);
+        this.toRender.push(action.tile.coords());
       }
     }
   } else if (action.type === "transfer") {
@@ -116,7 +126,7 @@ HiveGame.prototype.layEgg = function(ant) {
   tile.ant = worker;
   ant.owner.ants.push(worker);
   ant.food -= NEW_ANT_COST;
-  this.toRender.push(tile);
+  this.toRender.push(tile.coords());
 }
 
 HiveGame.prototype.log = function(data) {

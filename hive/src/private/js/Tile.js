@@ -36,4 +36,8 @@ Tile.prototype.isFood = function() {
   return this.type === "food";
 }
 
+Tile.prototype.coords = function() {
+  return { x: this.x, y: this.y };
+}
+
 export default Tile;
