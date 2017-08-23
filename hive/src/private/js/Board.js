@@ -31,7 +31,7 @@ Board.prototype.addRandomFood = function() {
   var adjacentEmptyTiles;
   for (var i = 0; i < numFood; i++) {
     t = this.getRandomVacantTile();
-    for (var j = 0; j < 1/15 * this.width; j++) {
+    for (var j = 0; j < this.width; j++) {
       t.type = "food";
       t.food = randomInt(2, 2);
       adjacentEmptyTiles = this.adjacentTiles(t, "empty");

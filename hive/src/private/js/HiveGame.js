@@ -17,19 +17,14 @@ function HiveGame(props) {
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
   this.board.addRandomFood();
-  this.players.push(new Player({
-    id: 'player_1',
-    ants: [],
-    board: this.board,
-    playerGameActions: playerGameActions,
-  }));
-
-  this.players.push(new Player({
-    id: 'player_2',
-    ants: [],
-    board: this.board,
-    playerGameActions: playerGameActions,
-  }));
+  for (let i = 0; i < 5; i++) {
+    this.players.push(new Player({
+      id: 'player_' + (i + 1),
+      ants: [],
+      board: this.board,
+      playerGameActions: playerGameActions,
+    }));
+  }
 
   for (var i = 0; i < this.players.length; i++) {
     var queen = new Ant({
@@ -111,7 +106,7 @@ HiveGame.prototype.layEgg = function(ant) {
   }
   let tile = emptyTiles[randomInt(emptyTiles.length)];
   let worker = new Ant({
-    id: ant.owner.ants.length + 2,
+    id: ant.owner.ants.length + 1,
     type: 'worker',
     owner: ant.owner,
     tile: tile,

@@ -7,9 +7,9 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pixelScale: 5,
-      width: 180,
-      height: 100,
+      pixelScale: 1,
+      width: 900,
+      height: 600,
       shouldRenderAll: true,
     };
   }
