@@ -12,6 +12,7 @@ class Game extends Component {
       width: 900,
       height: 600,
       shouldRenderAll: true,
+      players: [],
     };
   }
 
@@ -22,15 +23,24 @@ class Game extends Component {
   }
 
   update = () => {
+    const newState = {};
     for (let i = 0; i < this.state.updatesPerTick; i++) {
       this._canvas.hive.update();
     }
     if (this.state.shouldRenderAll) {
       this.renderAll();
-      this.setState({ shouldRenderAll: false });
+      newState.shouldRenderAll = false;
     } else {
       this.renderUpdates();
     }
+    newState.players = this._canvas.hive.players.map((p) => {
+      return {
+        id: p.id,
+        antCount: p.ants.length,
+        color: p.color,
+      };
+    });
+    this.setState(newState);
   }
 
   renderUpdates() {
@@ -72,9 +82,13 @@ class Game extends Component {
   }
 
   render() {
+    let players = this.state.players.map((p) => {
+      return <div style={ { color: p.color } } key={ p.id }>Player { p.id }: { p.antCount } ants</div>;
+    });
     return (
       <div>
         <div>
+          { players }
           <canvas
             ref={
               (c) => this._canvas = c

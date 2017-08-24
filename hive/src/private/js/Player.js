@@ -6,6 +6,7 @@ function Player(props) {
   this.board = props.board;
   this.hiveAction = props.playerGameActions.hiveAction;
   this.antAction = props.playerGameActions.antAction;
+  this.color = props.color;
 }
 
 Player.prototype.getQueenTile = function() {

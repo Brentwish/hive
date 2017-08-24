@@ -2,10 +2,7 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
-import { randomInt } from "./constants.js";
-import { MAX_FOOD } from "./constants.js";
-import { NEW_ANT_COST } from "./constants.js";
-import { EGG_TIMER } from "./constants.js";
+import { randomInt, playerColors, MAX_FOOD, NEW_ANT_COST, EGG_TIMER } from "./constants.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -19,7 +16,8 @@ HiveGame.prototype.init = function() {
   this.board.addRandomFood();
   for (let i = 0; i < 5; i++) {
     this.players.push(new Player({
-      id: 'player_' + (i + 1),
+      id: i + 1,
+      color: playerColors[i],
       ants: [],
       board: this.board,
       playerGameActions: playerGameActions,

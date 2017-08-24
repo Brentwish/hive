@@ -18,6 +18,14 @@ export const antColors = {
   "egg": "#E8E5E1",
 };
 
+export const playerColors = [
+  "red",
+  "blue",
+  "yellow",
+  "black",
+  "purple",
+];
+
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }
