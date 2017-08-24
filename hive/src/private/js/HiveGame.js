@@ -2,7 +2,7 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
-import { randomInt, playerColors, MAX_FOOD, NEW_ANT_COST, EGG_TIMER } from "./constants.js";
+import { randomInt, playerColors, dirs, MAX_FOOD, NEW_ANT_COST, EGG_TIMER } from "./constants.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -32,6 +32,12 @@ HiveGame.prototype.init = function() {
       tile: this.board.getRandomVacantTile(),
       food: 35,
       eggTimer: 0,
+      moves: {
+        left: 0,
+        right: 0,
+        up: 0,
+        down: 0,
+      },
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
@@ -61,7 +67,6 @@ HiveGame.prototype.clearUpdatedTiles = function() {
 
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
-    this.players[i].hiveAction();
     for (var j = 0; j < this.players[i].ants.length; j++) {
       if (this.players[i].ants[j].eggTimer === 0) {
         var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
@@ -73,85 +78,91 @@ HiveGame.prototype.updatePlayers = function() {
   }
 }
 
+HiveGame.prototype.isLegalAction = function(entity, action) {
+  let targetTile;
+  if (action.direction && dirs.includes(action.direction)) {
+    targetTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.direction);
+    if (!targetTile) return false;
+  } else {
+    return false;
+  }
+  switch (action.type) {
+    case "move":
+      return targetTile.isVacant();
+    case "gather":
+      return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
+    case "transfer":
+      return targetTile.hasAnt() && entity.food >= action.amount;
+    case "layEgg":
+      return targetTile.isVacant() && entity.type === "queen" && entity.food > NEW_ANT_COST;
+    default:
+      return false;
+  }
+}
+
 HiveGame.prototype.performAction = function(entity, action) {
-  if (action.type === "move") {
-    if (this.isLegalMove(action.tile)) {
-      this.pushCoordToRender(entity.tile.coords());
-      action.prevTile = entity.tile;
-      entity.prevTile = entity.tile;
-      entity.tile.ant = null;
-      action.tile.ant = entity;
-      entity.tile = action.tile;
-      this.pushCoordToRender(entity.tile.coords());
+  if (this.isLegalAction(entity, action)) {
+    let targetTile;
+    if (action.direction) {
+      targetTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.direction);
     }
-  } else if (action.type === "gather") {
-    if (this.isLegalGather(action.tile) && entity.food < MAX_FOOD) {
-      action.tile.food -= 1;
-      entity.food += 1;
-      if (action.tile.food === 0) {
-        action.tile.type = "empty";
-        action.tile.food = null;
-        this.pushCoordToRender(action.tile.coords());
-      }
-    }
-  } else if (action.type === "transfer") {
-    if (this.isLegalTransfer(action.from, action.to, action.amount)) {
-      action.from.food -= action.amount;
-      action.to.food += action.amount;
-    }
-  } else if (action.type === "layEgg") {
-    if (this.canLayEgg(entity)) {
-      this.layEgg(entity);
+    switch (action.type) {
+      case "move":
+        this.pushCoordToRender(entity.tile.coords());
+        entity.moves[action.direction] += 1;
+        entity.tile.ant = null;
+        targetTile.ant = entity;
+        entity.tile = targetTile;
+        this.pushCoordToRender(targetTile.coords());
+        break;
+      case "gather":
+        targetTile.food -= 1;
+        entity.food += 1;
+        if (targetTile.food === 0) {
+          targetTile.type = "empty";
+          targetTile.food = null;
+          this.pushCoordToRender(targetTile.coords());
+        }
+        break;
+      case "transfer":
+        const quantToTransfer = targetTile.ant.type === "queen" ? action.amount : Math.min(MAX_FOOD - targetTile.ant.food, action.amount);
+        entity.food -= quantToTransfer;
+        targetTile.ant.food += quantToTransfer;
+        if (action.resetMoves) {
+          entity.moves = {
+            left: 0,
+            right: 0,
+            up: 0,
+            down: 0,
+          };
+        }
+        break;
+      case "layEgg":
+        const worker = new Ant({
+          id: entity.owner.ants.length + 1,
+          type: 'worker',
+          owner: entity.owner,
+          tile: entity.tile,
+          food: 0,
+          eggTimer: EGG_TIMER,
+          moves: {
+            left: 0,
+            right: 0,
+            up: 0,
+            down: 0,
+          },
+        });
+        entity.moves[action.direction] += 1;
+        entity.owner.ants.push(worker);
+        entity.tile.ant = worker;
+        this.pushCoordToRender(worker.tile.coords());
+        entity.food -= NEW_ANT_COST;
+        targetTile.ant = entity;
+        entity.tile = targetTile;
+        this.pushCoordToRender(entity.tile.coords());
+        break;
     }
   }
-  var prevTile = action.prevTile ? action.prevTile.str() : "";
-  //this.log({
-  //  message: entity.type + entity.id + " " + action.type + ": " + prevTile + " -> " + action.tile.str(),
-  //  ant: entity,
-  //  action: action,
-  //});
-}
-
-HiveGame.prototype.layEgg = function(ant) {
-  let emptyTiles = this.board.adjacentTiles(ant.tile).filter((t) => { return !t.hasAnt() });
-	if (emptyTiles.length === 0) {
-    return;
-  }
-  let tile = emptyTiles[randomInt(emptyTiles.length)];
-  let worker = new Ant({
-    id: ant.owner.ants.length + 1,
-    type: 'worker',
-    owner: ant.owner,
-    tile: tile,
-    food: 0,
-    eggTimer: EGG_TIMER,
-  });
-  tile.ant = worker;
-  ant.owner.ants.push(worker);
-  ant.food -= NEW_ANT_COST;
-  this.pushCoordToRender(tile.coords());
-}
-
-HiveGame.prototype.log = function(data) {
-  console.log(data);
-}
-
-HiveGame.prototype.isLegalMove = function(tile) {
-  return tile.isVacant();
-}
-
-HiveGame.prototype.isLegalGather = function(tile) {
-  return tile.isFood() && tile.food > 0;
-}
-
-HiveGame.prototype.isLegalTransfer = function(from, to, amount) {
-  //check from is adjacent to to
-  //check from doesnt have an illegal amount of food
-  return true;
-}
-
-HiveGame.prototype.canLayEgg = function(ant) {
-  return ant.type === "queen" && ant.food >= NEW_ANT_COST;
 }
 
 export default HiveGame;

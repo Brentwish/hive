@@ -12,6 +12,14 @@ Tile.prototype.str = function() {
   return "{x: " + this.x + ", y: " + this.y + "}";
 }
 
+Tile.prototype.toDataHash = function() {
+  return {
+    type: this.type,
+    food: this.food,
+    ant: this.hasAnt() ? this.ant.simpleDataHash() : null,
+  }
+}
+
 Tile.prototype.color = function() {
   let color;
   if (this.hasAnt()) {

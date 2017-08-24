@@ -47,18 +47,20 @@ Board.prototype.addRandomFood = function() {
 }
 
 Board.prototype.tileFromDirection = function(x, y, dir) {
+  let u = x;
+  let v = y;
   if (dir === "left") {
-    x -= 1;
+    u -= 1;
   } else if (dir === "right") {
-    x += 1;
+    u += 1;
   } else if (dir === "up") {
-    y -= 1;
+    v -= 1;
   } else if (dir === "down") {
-    y += 1;
+    v += 1;
   } else {
     return null;
   }
-  return this.isInBounds(x, y) ? this.tiles[x][y] : null;
+  return this.isInBounds(u, v) ? this.tiles[u][v] : null;
 }
 
 Board.prototype.adjacentTiles = function(tile, type) {
@@ -82,7 +84,7 @@ Board.prototype.adjacentTiles = function(tile, type) {
 }
 
 Board.prototype.isInBounds = function(x, y) {
-  return (x > 0) && (x < this.width - 1) && (y > 0) && (y < this.height - 1);
+  return (x >= 0) && (x < this.width) && (y >= 0) && (y < this.height);
 }
 
 Board.prototype.getRandomVacantTile = function() {

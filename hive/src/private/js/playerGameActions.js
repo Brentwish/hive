@@ -1,78 +1,77 @@
-import { randomInt } from "./constants.js";
-import { distance } from "./constants.js";
-import { MAX_FOOD } from "./constants.js";
-import { NEW_ANT_COST } from "./constants.js";
+import { randomInt, randomArrayElement, distance, sample, findKey } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, dirs } from "./constants.js";
 
-const getRandomMoveAction = function(board, tile) {
-  let adjacentTiles = board.adjacentTiles(tile);
-  return {
-    type: "move",
-    tile: adjacentTiles[randomInt(adjacentTiles.length)],
-  };
-}
-
-const getMoveTowardsQueenAction = function(board, tile, queenTile) {
-  let action = { type: "move" };
-  let adjacentTiles = board.adjacentTiles(tile);
-  let adjacentEmptyTiles = adjacentTiles.filter(function(t) {
-    return !t.hasAnt();
-  });
-  if (adjacentEmptyTiles.length === 0) {
-    action.tile = tile;
-    return action;
+const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
+  let toGo = [];
+  if (moves.left > moves.right) {
+    toGo.push("right");
+  } else if (moves.left < moves.right) {
+    toGo.push("left");
   }
-  let closestTile = adjacentEmptyTiles[0];
-  for (var i = 0; i < adjacentEmptyTiles.length; i++) {
-    if (distance(adjacentEmptyTiles[i], queenTile) < distance(closestTile, queenTile)) {
-      closestTile = adjacentEmptyTiles[i];
-    }
+  if (moves.up > moves.down) {
+    toGo.push("down");
+  } else if (moves.up < moves.down) {
+    toGo.push("up");
   }
-  action.tile = closestTile;
-  return action;
-}
 
-const getTransferFoodAction = function(ant, queenAnt) {
-  return {
-    type: "transfer",
-    from: ant,
-    to: queenAnt,
-    amount: ant.food,
-  };
+  let closestEmptyTiles = toGo.filter((dir) => { return !adjacentTilesHash[dir].ant && adjacentTilesHash[dir].type !== "wall"; });
+  if (closestEmptyTiles.length === 0 && makeRandomMove) {
+		closestEmptyTiles = dirs.filter((dir) => { return toGo.indexOf(dir) === -1 });
+  }
+  return sample(closestEmptyTiles);
 }
 
 var playerGameActions = {
-  hiveAction: function(antData) {
-  },
-
   antAction: function(antData) {
-    let antTile = antData.board.tiles[antData.x][antData.y];
+    const adjacentTiles = Object.values(antData.adjacentTiles);
+    const emptyTiles = adjacentTiles.filter((t) => { return !t.ant; });
 
     if (antData.type === "queen") {
-      if (antData.food >= NEW_ANT_COST) {
+      if (antData.carryingAmount >= NEW_ANT_COST) {
         return {
           type: "layEgg",
+          direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
         };
-      } else {
-        return getRandomMoveAction(antData.board, antTile);
+      } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
+        return {
+          type: "move",
+          direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves, false),
+        };
+			} else {
+        return {
+          type: "none",
+        };
       }
     } else if (antData.type === "worker") {
+      const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
 
-      let adjacentFoodTiles = antData.board.adjacentTiles(antTile, "food");
-      if (antData.food === MAX_FOOD) {
-        if (antData.board.adjacentTiles(antTile).filter((t) => { return t.hasAnt(); }).map((t) => { return t.ant.type; }).includes("queen")) {
-          return getTransferFoodAction(antTile.ant, this.getQueenTile().ant);
+      if (antData.carryingAmount === MAX_FOOD) {
+        const queenTile = adjacentTiles.filter((t) => { return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId; })[0];
+        if (queenTile) {
+          return {
+            type: "transfer",
+            direction: findKey(antData.adjacentTiles, queenTile),
+            amount: antData.carryingAmount,
+            resetMoves: true,
+          };
         } else {
-          return getMoveTowardsQueenAction(antData.board, antTile, this.getQueenTile());
+          //Move towards queen
+          return {
+            type: "move",
+            direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
+          };
         }
       } else if (adjacentFoodTiles.length > 0) {
         return {
           type: "gather",
-          tile: adjacentFoodTiles[randomInt(adjacentFoodTiles.length)],
+          direction: findKey(antData.adjacentTiles, sample(adjacentFoodTiles)),
         }
       } else {
-        return getRandomMoveAction(antData.board, antTile);
+        return {
+          type: "move",
+          direction: findKey(antData.adjacentTiles, sample(emptyTiles)),
+        };
       }
-
     }
   }
 }

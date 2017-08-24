@@ -8,9 +8,9 @@ class Game extends Component {
     super(props);
     this.state = {
       updatesPerTick: 1,
-      pixelScale: 1,
-      width: 900,
-      height: 600,
+      pixelScale: 3,
+      width: 400,
+      height: 200,
       shouldRenderAll: true,
       players: [],
     };
