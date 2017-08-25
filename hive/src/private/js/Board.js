@@ -115,13 +115,13 @@ Board.prototype.updateTrails = function() {
         }
       });
       if (Object.keys(tile.trails).length === 0) {
-        this.trailCoords = this.trailCoords.filter((trailCoord) => {
-          return trailCoord.x !== coord.x && trailCoord.y !== coord.y;
-        });
         tile.trails = null;
         trailsToRender.push(coord);
       }
     }
+  });
+  this.trailCoords = this.trailCoords.filter((coord) => {
+    return this.getTileFromCoords(coord).trails;
   });
   return trailsToRender;
 }
