@@ -1,7 +1,8 @@
-import { randomInt, randomArrayElement, distance, sample, findKey } from "./constants.js";
+import { randomInt, distance, sample, findKey } from "./constants.js";
 import { MAX_FOOD, NEW_ANT_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
+import _ from "lodash";
 
-const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
+const getDirsTowardsQueen = function(adjacentTilesHash, moves) {
   let toGo = [];
   if (moves.left > moves.right) {
     toGo.push("right");
@@ -13,24 +14,43 @@ const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMo
   } else if (moves.up < moves.down) {
     toGo.push("up");
   }
+  return toGo;
+}
 
+const getDirsAwayFromQueen = function(adjacentTilesHash, moves) {
+  return _.difference(dirs, getDirsTowardsQueen(adjacentTilesHash, moves));
+}
+
+const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
+  const toGo = getDirsTowardsQueen(adjacentTilesHash, moves);
   let closestEmptyTiles = toGo.filter((dir) => { return !adjacentTilesHash[dir].ant && adjacentTilesHash[dir].type !== "wall"; });
   if (closestEmptyTiles.length === 0 && makeRandomMove) {
-		closestEmptyTiles = dirs.filter((dir) => { return toGo.indexOf(dir) === -1 });
+		closestEmptyTiles = _.difference(dirs, toGo);
   }
   return sample(closestEmptyTiles);
 }
 
-const getDirOfStrongestTrail = function(adjacentTrailsHash) {
-  let age = 0;
-  let oldestDir = null;
-  Object.keys(adjacentTrailsHash).forEach((dir) => {
-    if (age < Math.max(...Object.values(adjacentTrailsHash[dir]))) {
-      oldestDir = dir;
-      age = Math.min(...Object.values(adjacentTrailsHash[dir]));
-    }
-  });
-  return oldestDir;
+const getOpenTiles = function(tiles) {
+	return _.pick(tiles, (tile) => {
+		return !tile.ant && tile.type !== "wall";
+	});
+}
+
+const getTilesWithTrails = function(tiles) {
+	return _.pick(tiles, (tile) => {
+		return !_.isEmpty(tile.trails);
+	});
+}
+
+const getForagingDir = function(antData) {
+	const openTiles = getOpenTiles(antData.adjacentTiles);
+	const tilesWithTrails = getTilesWithTrails(openTiles);
+	const dirsAwayFromQueen = getDirsAwayFromQueen(antData.adjacentTiles, antData.moves);
+	let possibleDirs = _.union(_.keys(tilesWithTrails), dirsAwayFromQueen);
+	if (_.isEmpty(possibleDirs)) {
+		possibleDirs = _.keys(openTiles);
+	}
+	return sample(possibleDirs);
 }
 
 var playerGameActions = {
@@ -56,13 +76,6 @@ var playerGameActions = {
       }
     } else if (antData.type === "worker") {
       const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
-      let adjacentTrailsHash = {};
-      dirs.forEach((dir) => {
-        if (antData.adjacentTiles[dir].trails) {
-          adjacentTrailsHash[dir] = antData.adjacentTiles[dir].trails;
-        }
-      });
-      const adjacentTrails = Object.values(adjacentTrailsHash);
 
       if (antData.carryingAmount === MAX_FOOD) {
         const queenTile = adjacentTiles.filter((t) => { return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId; })[0];
@@ -87,15 +100,10 @@ var playerGameActions = {
           type: "gather",
           direction: findKey(antData.adjacentTiles, sample(adjacentFoodTiles)),
         }
-      } else if (adjacentTrails.length > 0) {
-        return {
-          type: "move",
-          direction: getDirOfStrongestTrail(adjacentTrailsHash),
-        };
       } else {
         return {
           type: "move",
-          direction: findKey(antData.adjacentTiles, sample(emptyTiles)),
+          direction: getForagingDir(antData),
         };
       }
     }

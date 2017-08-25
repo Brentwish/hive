@@ -105,18 +105,20 @@ Board.prototype.pushNewTrailCoord = function(coord) {
 
 Board.prototype.updateTrails = function() {
   this.trailCoords.forEach((coord) => {
-    let tileTrails = this.getTileFromCoords(coord).trails;
-    Object.keys(tileTrails).forEach((trail) => {
-      tileTrails[trail] -= 1;
-      if (tileTrails[trail] === 0) {
-        delete tileTrails[trail];
-      }
-    });
-    if (Object.keys(tileTrails).length === 0) {
-      this.trailCoords = this.trailCoords.filter((trailCoord) => {
-        return trailCoord.x !== coord.x && trailCoord.y !== coord.y;
+    let tile = this.getTileFromCoords(coord);
+    if (tile.trails) {
+      Object.keys(tile.trails).forEach((trail) => {
+        tile.trails[trail] -= 1;
+        if (tile.trails[trail] === 0) {
+          delete tile.trails[trail];
+        }
       });
-      tileTrails = null;
+      if (Object.keys(tile.trails).length === 0) {
+        this.trailCoords = this.trailCoords.filter((trailCoord) => {
+          return trailCoord.x !== coord.x && trailCoord.y !== coord.y;
+        });
+        tile.trails = null;
+      }
     }
   });
 }
