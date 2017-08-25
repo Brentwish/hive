@@ -2,7 +2,8 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
-import { randomInt, playerColors, dirs, MAX_FOOD, NEW_ANT_COST, EGG_TIMER } from "./constants.js";
+import { randomInt, playerColors, dirs } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, EGG_TIMER, STARTING_TRAIL_TIMER } from "./constants.js";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
@@ -48,6 +49,7 @@ HiveGame.prototype.init = function() {
 HiveGame.prototype.update = function() {
   this.turn += 1;
   this.updatePlayers();
+  this.board.updateTrails();
 }
 
 HiveGame.prototype.pushCoordToRender = function(coord) {
@@ -95,6 +97,8 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       return targetTile.hasAnt() && entity.food >= action.amount;
     case "layEgg":
       return targetTile.isVacant() && entity.type === "queen" && entity.food > NEW_ANT_COST;
+    case "layTrail":
+      return targetTile.isVacant();
     default:
       return false;
   }
@@ -108,12 +112,7 @@ HiveGame.prototype.performAction = function(entity, action) {
     }
     switch (action.type) {
       case "move":
-        this.pushCoordToRender(entity.tile.coords());
-        entity.moves[action.direction] += 1;
-        entity.tile.ant = null;
-        targetTile.ant = entity;
-        entity.tile = targetTile;
-        this.pushCoordToRender(targetTile.coords());
+        this.move(entity, targetTile, action.direction, null);
         break;
       case "gather":
         targetTile.food -= 1;
@@ -152,17 +151,40 @@ HiveGame.prototype.performAction = function(entity, action) {
             down: 0,
           },
         });
-        entity.moves[action.direction] += 1;
         entity.owner.ants.push(worker);
-        entity.tile.ant = worker;
-        this.pushCoordToRender(worker.tile.coords());
         entity.food -= NEW_ANT_COST;
+        this.pushCoordToRender(entity.tile.coords());
+        entity.moves[action.direction] += 1;
+        entity.tile.ant = worker; //lay is either null or a new worker
         targetTile.ant = entity;
         entity.tile = targetTile;
+        this.pushCoordToRender(targetTile.coords());
+        break;
+      case "layTrail":
+        if (!entity.tile.trails) {
+          entity.tile.trails = {};
+          entity.tile.trails[action.trailKey] = 0;
+          this.board.pushNewTrailCoord(entity.tile.coords());
+        }
+        entity.tile.trails[action.trailKey] += action.trailStrength;
         this.pushCoordToRender(entity.tile.coords());
+        entity.moves[action.direction] += 1;
+        entity.tile.ant = null; //lay is either null or a new worker
+        targetTile.ant = entity;
+        entity.tile = targetTile;
+        this.pushCoordToRender(targetTile.coords());
         break;
     }
   }
+}
+
+HiveGame.prototype.move = function(entity, targetTile, direction, lay) {
+  this.pushCoordToRender(entity.tile.coords());
+  entity.moves[direction] += 1;
+  entity.tile.ant = lay; //lay is either null or a new worker
+  targetTile.ant = entity;
+  entity.tile = targetTile;
+  this.pushCoordToRender(targetTile.coords());
 }
 
 export default HiveGame;

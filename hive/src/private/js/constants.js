@@ -3,6 +3,7 @@ export const UPDATE_PERIOD = 42;
 export const MAX_FOOD = 5;
 export const NEW_ANT_COST = 25;
 export const EGG_TIMER = 100;
+export const STARTING_TRAIL_TIMER = 1000;
 export const tileColors = {
   "empty": "#E4AF77",
   "wall": "#424949",

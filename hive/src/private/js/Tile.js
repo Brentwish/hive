@@ -6,6 +6,7 @@ function Tile(props) {
   this.type = props.type;
   this.ant = props.ant;
   this.food = props.food;
+  this.trails = props.trails;
 }
 
 Tile.prototype.str = function() {
@@ -16,6 +17,7 @@ Tile.prototype.toDataHash = function() {
   return {
     type: this.type,
     food: this.food,
+    trails: this.trails ? Object.assign({}, this.trails) : null,
     ant: this.hasAnt() ? this.ant.simpleDataHash() : null,
   }
 }
@@ -36,6 +38,10 @@ Tile.prototype.isVacant = function() {
 
 Tile.prototype.hasAnt = function() {
   return this.ant;
+}
+
+Tile.prototype.hasTrail = function() {
+  return this.trail;
 }
 
 Tile.prototype.isWall = function() {

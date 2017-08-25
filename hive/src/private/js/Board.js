@@ -6,6 +6,7 @@ function Board(width, height) {
   this.tiles = [[]];
   this.width = width;
   this.height = height;
+  this.trailCoords = [];
 }
 
 Board.prototype.getTileFromCoords = function(coords) {
@@ -24,6 +25,7 @@ Board.prototype.borderedBoard = function() {
         type: type,
         ant: null,
         food: null,
+        trail: null,
       });
     }
   }
@@ -95,6 +97,28 @@ Board.prototype.getRandomVacantTile = function() {
       return tile;
     }
   }
+}
+
+Board.prototype.pushNewTrailCoord = function(coord) {
+  this.trailCoords.push(coord);
+}
+
+Board.prototype.updateTrails = function() {
+  this.trailCoords.forEach((coord) => {
+    let tileTrails = this.getTileFromCoords(coord).trails;
+    Object.keys(tileTrails).forEach((trail) => {
+      tileTrails[trail] -= 1;
+      if (tileTrails[trail] === 0) {
+        delete tileTrails[trail];
+      }
+    });
+    if (Object.keys(tileTrails).length === 0) {
+      this.trailCoords = this.trailCoords.filter((trailCoord) => {
+        return trailCoord.x !== coord.x && trailCoord.y !== coord.y;
+      });
+      tileTrails = null;
+    }
+  });
 }
 
 export default Board;

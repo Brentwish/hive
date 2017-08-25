@@ -1,5 +1,5 @@
 import { randomInt, randomArrayElement, distance, sample, findKey } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, dirs } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
 
 const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
   let toGo = [];
@@ -19,6 +19,18 @@ const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMo
 		closestEmptyTiles = dirs.filter((dir) => { return toGo.indexOf(dir) === -1 });
   }
   return sample(closestEmptyTiles);
+}
+
+const getDirOfStrongestTrail = function(adjacentTrailsHash) {
+  let age = 0;
+  let oldestDir = null;
+  Object.keys(adjacentTrailsHash).forEach((dir) => {
+    if (age < Math.max(...Object.values(adjacentTrailsHash[dir]))) {
+      oldestDir = dir;
+      age = Math.min(...Object.values(adjacentTrailsHash[dir]));
+    }
+  });
+  return oldestDir;
 }
 
 var playerGameActions = {
@@ -44,6 +56,13 @@ var playerGameActions = {
       }
     } else if (antData.type === "worker") {
       const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
+      let adjacentTrailsHash = {};
+      dirs.forEach((dir) => {
+        if (antData.adjacentTiles[dir].trails) {
+          adjacentTrailsHash[dir] = antData.adjacentTiles[dir].trails;
+        }
+      });
+      const adjacentTrails = Object.values(adjacentTrailsHash);
 
       if (antData.carryingAmount === MAX_FOOD) {
         const queenTile = adjacentTiles.filter((t) => { return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId; })[0];
@@ -57,8 +76,10 @@ var playerGameActions = {
         } else {
           //Move towards queen
           return {
-            type: "move",
+            type: "layTrail",
             direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
+            trailKey: "food" + antData.ownerId,
+            trailStrength: 10,
           };
         }
       } else if (adjacentFoodTiles.length > 0) {
@@ -66,6 +87,11 @@ var playerGameActions = {
           type: "gather",
           direction: findKey(antData.adjacentTiles, sample(adjacentFoodTiles)),
         }
+      } else if (adjacentTrails.length > 0) {
+        return {
+          type: "move",
+          direction: getDirOfStrongestTrail(adjacentTrailsHash),
+        };
       } else {
         return {
           type: "move",
