@@ -31,13 +31,13 @@ const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMo
 }
 
 const getOpenTiles = function(tiles) {
-	return _.pick(tiles, (tile) => {
+	return _.pickBy(tiles, (tile) => {
 		return !tile.ant && tile.type !== "wall";
 	});
 }
 
 const getTilesWithTrails = function(tiles) {
-	return _.pick(tiles, (tile) => {
+	return _.pickBy(tiles, (tile) => {
 		return !_.isEmpty(tile.trails);
 	});
 }
@@ -46,7 +46,7 @@ const getForagingDir = function(antData) {
 	const openTiles = getOpenTiles(antData.adjacentTiles);
 	const tilesWithTrails = getTilesWithTrails(openTiles);
 	const dirsAwayFromQueen = getDirsAwayFromQueen(antData.adjacentTiles, antData.moves);
-	let possibleDirs = _.union(_.keys(tilesWithTrails), dirsAwayFromQueen);
+	let possibleDirs = _.intersection(_.keys(tilesWithTrails), dirsAwayFromQueen);
 	if (_.isEmpty(possibleDirs)) {
 		possibleDirs = _.keys(openTiles);
 	}
