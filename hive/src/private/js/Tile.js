@@ -26,6 +26,8 @@ Tile.prototype.color = function() {
   let color;
   if (this.hasAnt()) {
     color = (this.ant.eggTimer > 0 ? antColors["egg"] : this.ant.owner.color);
+  } else if (this.type === "empty" && this.trails) {
+		color = "white";
   } else {
     color = tileColors[this.type];
   }

@@ -104,6 +104,7 @@ Board.prototype.pushNewTrailCoord = function(coord) {
 }
 
 Board.prototype.updateTrails = function() {
+  const trailsToRender = [];
   this.trailCoords.forEach((coord) => {
     let tile = this.getTileFromCoords(coord);
     if (tile.trails) {
@@ -118,9 +119,11 @@ Board.prototype.updateTrails = function() {
           return trailCoord.x !== coord.x && trailCoord.y !== coord.y;
         });
         tile.trails = null;
+        trailsToRender.push(coord);
       }
     }
   });
+  return trailsToRender;
 }
 
 export default Board;

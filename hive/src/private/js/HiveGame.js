@@ -49,7 +49,10 @@ HiveGame.prototype.init = function() {
 HiveGame.prototype.update = function() {
   this.turn += 1;
   this.updatePlayers();
-  this.board.updateTrails();
+  const trailsToRender = this.board.updateTrails();
+  trailsToRender.forEach((coord) => {
+    this.pushCoordToRender(coord);
+  });
 }
 
 HiveGame.prototype.pushCoordToRender = function(coord) {
