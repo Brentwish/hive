@@ -1,12 +1,13 @@
 import Tile from "./Tile.js";
 import { dirs } from "./constants.js";
 import { randomInt } from "./constants.js";
+import _ from "lodash";
 
 function Board(width, height) {
   this.tiles = [[]];
   this.width = width;
   this.height = height;
-  this.trailCoords = [];
+  this.trailCoords = new Set();
 }
 
 Board.prototype.getTileFromCoords = function(coords) {
@@ -99,29 +100,22 @@ Board.prototype.getRandomVacantTile = function() {
   }
 }
 
-Board.prototype.pushNewTrailCoord = function(coord) {
-  this.trailCoords.push(coord);
+Board.prototype.pushNewTrailCoord = function(tile) {
+  this.trailCoords.add(tile);
 }
 
 Board.prototype.updateTrails = function() {
-  const trailsToRender = [];
-  this.trailCoords.forEach((coord) => {
-    let tile = this.getTileFromCoords(coord);
+  const trailsToRender = new Set();
+  this.trailCoords.forEach((tile) => {
     if (tile.trails) {
-      Object.keys(tile.trails).forEach((trail) => {
-        tile.trails[trail] -= 1;
-        if (tile.trails[trail] === 0) {
-          delete tile.trails[trail];
-        }
-      });
+      tile.trails = _.mapValues(tile.trails, (v) => { return v - 1; });
+      tile.trails = _.omitBy(tile.trails, (trailVal) => { return trailVal <= 0; });
       if (Object.keys(tile.trails).length === 0) {
         tile.trails = null;
-        trailsToRender.push(coord);
+        trailsToRender.add(tile);
+        this.trailCoords.delete(tile);
       }
     }
-  });
-  this.trailCoords = this.trailCoords.filter((coord) => {
-    return this.getTileFromCoords(coord).trails;
   });
   return trailsToRender;
 }

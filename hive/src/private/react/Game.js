@@ -1,6 +1,20 @@
 import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD } from "../js/constants.js";
+import _ from "lodash";
+
+const logTime = function(updateTime, renderTime) {
+  const goodCss = "";
+  const badCss = 'background: #222; color: #bada55';
+  const totalTime = updateTime + renderTime;
+  console.log(
+    "%cTotal time: %s, Update time: %s, Render time: %s",
+    totalTime < UPDATE_PERIOD ? goodCss : badCss,
+    totalTime.toString(),
+    updateTime.toString(),
+    renderTime.toString()
+  )
+}
 
 class Game extends Component {
 
@@ -8,31 +22,44 @@ class Game extends Component {
     super(props);
     this.state = {
       updatesPerTick: 1,
-      pixelScale: 3,
-      width: 400,
-      height: 200,
+      pixelScale: 5,
+      width: 200,
+      height: 100,
       shouldRenderAll: true,
       players: [],
     };
+  }
+
+  onMouseOver = (e) => {
+    let x = Math.floor(e.offsetX / this.state.pixelScale);
+    let y = Math.floor(e.offsetY / this.state.pixelScale);
+    console.log(this._canvas.hive.board.tiles[x][y]);
+    this.setState({ watchTile: [x, y] });
   }
 
   componentDidMount() {
     this._canvas.hive = new HiveGame(this.state);
     this._canvas.hive.init();
     this._canvas.interval = setInterval(this.update, UPDATE_PERIOD);
+    this._canvas.onmousedown = this.onMouseOver.bind(this);
   }
 
   update = () => {
     const newState = {};
+    const updateStartTime = new Date().getTime();
     for (let i = 0; i < this.state.updatesPerTick; i++) {
       this._canvas.hive.update();
     }
+    const updateTime = (new Date().getTime()) - updateStartTime;
+    const renderStartTime = new Date().getTime();
     if (this.state.shouldRenderAll) {
       this.renderAll();
       newState.shouldRenderAll = false;
     } else {
       this.renderUpdates();
     }
+    const renderTime = (new Date().getTime()) - renderStartTime;
+    //logTime(updateTime, renderTime);
     newState.players = this._canvas.hive.players.map((p) => {
       return {
         id: p.id,
@@ -82,6 +109,12 @@ class Game extends Component {
   }
 
   render() {
+    let watchTile;
+    if (this._canvas && this.state.watchTile) {
+      const tileCoords = this.state.watchTile;
+      const tile = this._canvas.hive.board.tiles[tileCoords[0]][tileCoords[1]]
+      watchTile = <div>{ JSON.stringify(_.omitBy(tile.toDataHash(), (v) => _.isNull(v))) }</div>;
+    }
     let players = this.state.players.map((p) => {
       return <div style={ { color: p.color } } key={ p.id }>Player { p.id }: { p.antCount } ants</div>;
     });
@@ -108,6 +141,7 @@ class Game extends Component {
             <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerTick.toString() || "1" } onChange={ this.handleUpdatesPerTickChange } />
           </div>
         </div>
+        { watchTile }
       </div>
     );
   }

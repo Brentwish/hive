@@ -92,7 +92,7 @@ var playerGameActions = {
             type: "layTrail",
             direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
             trailKey: "food" + antData.ownerId,
-            trailStrength: 100,
+            trailStrength: 40,
           };
         }
       } else if (adjacentFoodTiles.length > 0) {
