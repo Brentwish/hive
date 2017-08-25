@@ -21,6 +21,11 @@ const getDirsAwayFromQueen = function(adjacentTilesHash, moves) {
   return _.difference(dirs, getDirsTowardsQueen(adjacentTilesHash, moves));
 }
 
+const distFromQueen = function(antData) {
+	const m = antData.moves;
+	return Math.abs(m.up - m.down) + Math.abs(m.left - m.right);
+}
+
 const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
   const toGo = getDirsTowardsQueen(adjacentTilesHash, moves);
   let closestEmptyTiles = toGo.filter((dir) => { return !adjacentTilesHash[dir].ant && adjacentTilesHash[dir].type !== "wall"; });
@@ -92,7 +97,7 @@ var playerGameActions = {
             type: "layTrail",
             direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
             trailKey: "food" + antData.ownerId,
-            trailStrength: 40,
+            trailStrength: distFromQueen(antData) + 100,
           };
         }
       } else if (adjacentFoodTiles.length > 0) {
