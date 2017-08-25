@@ -23,7 +23,7 @@ export const antColors = {
 export const playerColors = [
   "red",
   "blue",
-  "yellow",
+  "teal",
   "black",
   "purple",
 ];
