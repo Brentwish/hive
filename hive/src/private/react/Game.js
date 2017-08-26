@@ -26,6 +26,7 @@ class Game extends Component {
       width: 200,
       height: 100,
       shouldRenderAll: true,
+      shouldRenderTrails: false,
       players: [],
       paused: false,
     };
@@ -79,9 +80,9 @@ class Game extends Component {
     const ctx = this._canvas.getContext('2d');
     const updatedTiles = this._canvas.hive.getUpdatedTiles();
     if (updatedTiles.length > 0) {
-      updatedTiles.forEach(function(tile) {
+      updatedTiles.forEach((tile) => {
         ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
-        ctx.fillStyle = tile.color();
+        ctx.fillStyle = tile.color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
       });
       this._canvas.hive.clearUpdatedTiles();
@@ -93,7 +94,7 @@ class Game extends Component {
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     for (var i = 0; i < this._canvas.hive.board.width; i++) {
       for (var j = 0; j < this._canvas.hive.board.height; j++) {
-        ctx.fillStyle = this._canvas.hive.board.tiles[i][j].color();
+        ctx.fillStyle = this._canvas.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
     }
@@ -121,6 +122,10 @@ class Game extends Component {
       setTimeout(this.step, 10);
     }
   }
+  handleRenderTrails = (evt) => {
+    this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
+    setTimeout(this.renderAll, 50, this.state.pixelScale);
+  }
   render() {
     let watchTile;
     if (this._canvas && this.state.watchTile) {
@@ -145,6 +150,8 @@ class Game extends Component {
         </div>
         <button onClick={ this.handlePause }>{ this.state.isPaused ? "Run" : "Pause" }</button>
         <button onClick={ this.handleStep }>Step</button>
+        <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
+        <label for="renderTrails">Render Trails</label>
         <div>
           <canvas
             ref={ (c) => this._canvas = c }

@@ -22,11 +22,11 @@ Tile.prototype.toDataHash = function() {
   }
 }
 
-Tile.prototype.color = function() {
+Tile.prototype.color = function(shouldRenderTrails) {
   let color;
   if (this.hasAnt()) {
     color = (this.ant.eggTimer > 0 ? antColors["egg"] : this.ant.owner.color);
-  } else if (this.type === "empty" && this.trails) {
+  } else if (shouldRenderTrails && this.type === "empty" && this.trails) {
 		color = "white";
   } else {
     color = tileColors[this.type];
