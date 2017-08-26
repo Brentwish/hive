@@ -42,7 +42,7 @@ class Game extends Component {
   componentDidMount() {
     this._canvas.hive = new HiveGame(this.state);
     this._canvas.hive.init();
-    setTimeout(this.step, 100);
+    this.stepTimeout = setTimeout(this.step, 100);
     this._canvas.onmousedown = this.onMouseOver.bind(this);
   }
 
@@ -73,7 +73,7 @@ class Game extends Component {
 
     // Schedule next step
     if (!this.state.isPaused) {
-      setTimeout(this.step, 10);
+      this.stepTimeout = setTimeout(this.step, 10);
     }
   }
   renderUpdates(pixelScale) {
@@ -105,7 +105,7 @@ class Game extends Component {
       shouldRenderAll: true,
     });
     if (this.state.isPaused) {
-      setTimeout(this.renderAll, 50, parseInt(evt.target.value));
+      this.stepTimeout = setTimeout(this.renderAll, 50, parseInt(evt.target.value));
     }
   }
   handleUpdatesPerStepChange = (evt) => {
@@ -113,18 +113,26 @@ class Game extends Component {
   }
   handlePause = () => {
     if (this.state.isPaused) {
-      setTimeout(this.step, 50);
+      this.stepTimeout = setTimeout(this.step, 50);
     }
     this.setState({ isPaused: !this.state.isPaused });
   }
   handleStep = () => {
     if (this.state.isPaused) {
-      setTimeout(this.step, 10);
+      this.stepTimeout = setTimeout(this.step, 10);
     }
   }
   handleRenderTrails = (evt) => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
-    setTimeout(this.renderAll, 50, this.state.pixelScale);
+    this.stepTimeout = setTimeout(this.renderAll, 50, this.state.pixelScale);
+  }
+  handleNewGame = () => {
+    clearTimeout(this.stepTimeout);
+    delete this._canvas.hive;
+    this._canvas.hive = new HiveGame(this.state);
+    this._canvas.hive.init();
+    this.setState({ shouldRenderAll: true, isPaused: false });
+    this.stepTimeout = setTimeout(this.step, 100);
   }
   render() {
     let watchTile;
@@ -148,6 +156,7 @@ class Game extends Component {
             <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
           </div>
         </div>
+        <button onClick={ this.handleNewGame }>New Game</button>
         <button onClick={ this.handlePause }>{ this.state.isPaused ? "Run" : "Pause" }</button>
         <button onClick={ this.handleStep }>Step</button>
         <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
