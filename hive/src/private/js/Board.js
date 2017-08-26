@@ -1,11 +1,13 @@
 import Tile from "./Tile.js";
 import { dirs } from "./constants.js";
 import { randomInt } from "./constants.js";
+import _ from "lodash";
 
 function Board(width, height) {
   this.tiles = [[]];
   this.width = width;
   this.height = height;
+  this.trailCoords = new Set();
 }
 
 Board.prototype.getTileFromCoords = function(coords) {
@@ -24,6 +26,7 @@ Board.prototype.borderedBoard = function() {
         type: type,
         ant: null,
         food: null,
+        trail: null,
       });
     }
   }
@@ -95,6 +98,26 @@ Board.prototype.getRandomVacantTile = function() {
       return tile;
     }
   }
+}
+
+Board.prototype.pushNewTrailCoord = function(tile) {
+  this.trailCoords.add(tile);
+}
+
+Board.prototype.updateTrails = function() {
+  const trailsToRender = new Set();
+  this.trailCoords.forEach((tile) => {
+    if (tile.trails) {
+      tile.trails = _.mapValues(tile.trails, (v) => { return v - 1; });
+      tile.trails = _.omitBy(tile.trails, (trailVal) => { return trailVal <= 0; });
+      if (Object.keys(tile.trails).length === 0) {
+        tile.trails = null;
+        trailsToRender.add(tile);
+        this.trailCoords.delete(tile);
+      }
+    }
+  });
+  return trailsToRender;
 }
 
 export default Board;
