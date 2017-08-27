@@ -8,6 +8,7 @@ function Ant(props) {
   this.food = props.food;
   this.eggTimer = props.eggTimer;
   this.moves = props.moves;
+  this.health = props.health;
 }
 
 Ant.prototype.toDataHash = function() {
@@ -28,6 +29,7 @@ Ant.prototype.toDataHash = function() {
     },
     adjacentTiles: tiles,
     moves: this.moves,
+    health: this.health,
   }
 }
 
@@ -37,6 +39,7 @@ Ant.prototype.simpleDataHash = function() {
     type: this.type,
     carrying: this.food > 0 ? "food" : null,
     carryingAmount: this.food,
+    health: this.health,
   }
 }
 

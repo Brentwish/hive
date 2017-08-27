@@ -3,7 +3,7 @@ import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
 import { randomInt, playerColors, dirs } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, EGG_TIMER, STARTING_TRAIL_TIMER, MAX_TRAIL } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
 import _ from "lodash";
 
 function HiveGame(props) {
@@ -33,6 +33,7 @@ HiveGame.prototype.init = function() {
       tile: this.board.getRandomVacantTile(),
       food: 35,
       eggTimer: 0,
+      health: QUEEN_HEALTH,
       moves: {
         left: 0,
         right: 0,
@@ -102,6 +103,8 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       return targetTile.isVacant() && entity.type === "queen" && entity.food > NEW_ANT_COST;
     case "layTrail":
       return targetTile.isVacant();
+    case "attack":
+      return targetTile.ant;
     default:
       return false;
   }
@@ -147,6 +150,7 @@ HiveGame.prototype.performAction = function(entity, action) {
           tile: entity.tile,
           food: 0,
           eggTimer: EGG_TIMER,
+          health: ANT_HEALTH,
           moves: {
             left: 0,
             right: 0,
@@ -180,8 +184,19 @@ HiveGame.prototype.performAction = function(entity, action) {
         entity.tile = targetTile;
         this.pushCoordToRender(targetTile.coords());
         break;
+      case "attack":
+        targetTile.ant.health -= ANT_ATTACK_POWER;
+        if (targetTile.ant.health <= 0) {
+          targetTile.ant.owner.ants.splice(_.indexOf(targetTile.ant.owner.ants, targetTile.ant), 1);
+          delete targetTile.ant;
+          this.pushCoordToRender(targetTile.coords());
+        }
+        break;
     }
   }
+}
+
+HiveGame.prototype.killAnt = function(ant) {
 }
 
 HiveGame.prototype.move = function(entity, targetTile, direction, lay) {

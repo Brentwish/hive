@@ -81,6 +81,7 @@ var playerGameActions = {
       }
     } else if (antData.type === "worker") {
       const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
+      const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
 
       if (antData.carryingAmount === MAX_FOOD) {
         const queenTile = adjacentTiles.filter((t) => { return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId; })[0];
@@ -99,6 +100,11 @@ var playerGameActions = {
             trailKey: "food" + antData.ownerId,
             trailStrength: distFromQueen(antData) + 100,
           };
+        }
+      } else if (adjacentEnemies.length > 0) {
+        return {
+          type: "attack",
+          direction: findKey(antData.adjacentTiles, sample(adjacentEnemies)),
         }
       } else if (adjacentFoodTiles.length > 0) {
         return {
