@@ -98,7 +98,11 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       if (action.trail) {
         trailCond = action.trail.name.length > 1 && _.isInteger(action.trail.strength);
       }
-      return targetTile.isVacant() && trailCond;
+      let eggCond = true;
+      if (action.layEgg) {
+        eggCond = entity.type === "queen" && entity.food >= NEW_ANT_COST;
+      }
+      return targetTile.isVacant() && trailCond && eggCond;
     case "gather":
       return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
     case "transfer":
@@ -125,7 +129,11 @@ HiveGame.prototype.performAction = function(entity, action) {
         if (action.trail) {
           this.layTrailOnTile(entity, action.trail.name, action.trail.strength);
         }
+        const previousTile = entity.tile;
         this.move(entity, targetTile, action.direction, null);
+        if (action.layEgg) {
+          this.layEggOnTile(entity, previousTile);
+        }
         break;
       case "gather":
         targetTile.food -= 1;
