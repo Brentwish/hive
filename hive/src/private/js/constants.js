@@ -7,6 +7,12 @@ export const EGG_TIMER = 100;
 export const ANT_ATTACK_POWER = 10;
 export const ANT_HEALTH = 100;
 export const QUEEN_HEALTH = 500;
+export const MIN_BOARD_WIDTH = 20;
+export const MAX_BOARD_WIDTH = 800;
+export const MIN_BOARD_HEIGHT = 20;
+export const MAX_BOARD_HEIGHT = 600;
+export const MIN_NUM_PLAYERS = 1;
+export const MAX_NUM_PLAYERS = 10;
 export const tileColors = {
   "empty": "#E4AF77",
   "wall": "#424949",
@@ -25,9 +31,14 @@ export const antColors = {
 export const playerColors = [
   "red",
   "blue",
+  "cyan",
+  "magenta",
   "teal",
   "black",
   "purple",
+  "maroon",
+  "chocolate",
+  "darkgreen",
 ];
 
 export function randomInt(upper = 1, lower = 0) {

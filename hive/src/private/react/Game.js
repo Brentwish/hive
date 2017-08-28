@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD } from "../js/constants.js";
+import {
+  MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
+  MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
+} from "../js/constants.js";
 import _ from "lodash";
 
 const logTime = function(updateTime, renderTime) {
@@ -27,6 +31,7 @@ class Game extends Component {
       height: 100,
       shouldRenderAll: true,
       shouldRenderTrails: false,
+      numPlayers: 5,
       players: [],
       paused: false,
       newGame: false,
@@ -131,10 +136,31 @@ class Game extends Component {
     }
   }
   handleWidthChange = (e) => {
-    this.setState({ width: e.target.value });
+    let width = e.target.value;
+    if (width > MAX_BOARD_WIDTH) {
+      width = MAX_BOARD_WIDTH;
+    } else if (width < MIN_BOARD_WIDTH) {
+      width = MIN_BOARD_WIDTH;
+    }
+    this.setState({ width });
   }
   handleHeightChange = (e) => {
-    this.setState({ height: e.target.value });
+    let height = e.target.value;
+    if (height > MAX_BOARD_HEIGHT) {
+      height = MAX_BOARD_HEIGHT;
+    } else if (height < MIN_BOARD_HEIGHT) {
+      height = MIN_BOARD_HEIGHT;
+    }
+    this.setState({ height });
+  }
+  handleNumberOfPlayersChange = (e) => {
+    let numPlayers = e.target.value;
+    if (numPlayers > MAX_NUM_PLAYERS) {
+      numPlayers = MAX_NUM_PLAYERS;
+    } else if (numPlayers < MIN_NUM_PLAYERS) {
+      numPlayers = MIN_NUM_PLAYERS;
+    }
+    this.setState({ numPlayers });
   }
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
@@ -166,11 +192,15 @@ class Game extends Component {
         <div>
           <div>
             <label>Width: </label>
-            <input type="number" value={ this.state.width } onChange={ this.handleWidthChange }/>
+            <input type="number" min={ MIN_BOARD_WIDTH } max={ MAX_BOARD_WIDTH } value={ this.state.width } onChange={ this.handleWidthChange }/>
           </div>
           <div>
             <label>Height: </label>
-            <input type="number" value={ this.state.height } onChange={ this.handleHeightChange }/>
+            <input type="number" min={ MIN_BOARD_HEIGHT } max={ MAX_BOARD_HEIGHT } value={ this.state.height } onChange={ this.handleHeightChange }/>
+          </div>
+          <div>
+            <label>Number of Players: </label>
+            <input type="number" min={ MIN_NUM_PLAYERS } max={ MAX_NUM_PLAYERS } value={ this.state.numPlayers } onChange={ this.handleNumberOfPlayersChange }/>
           </div>
         </div>
       );
