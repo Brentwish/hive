@@ -29,28 +29,30 @@ class Game extends Component {
       shouldRenderTrails: false,
       players: [],
       paused: false,
+      newGame: false,
     };
   }
 
-  onMouseOver = (e) => {
-    let x = Math.floor(e.offsetX / this.state.pixelScale);
-    let y = Math.floor(e.offsetY / this.state.pixelScale);
-    console.log(this._canvas.hive.board.tiles[x][y]);
+  onMouseDown = (e) => {
+    let x = Math.floor(e.nativeEvent.offsetX / this.state.pixelScale);
+    let y = Math.floor(e.nativeEvent.offsetY / this.state.pixelScale);
+    console.log(this._gameDiv.hive.board.tiles[x][y]);
     this.setState({ watchTile: [x, y] });
   }
 
   componentDidMount() {
-    this._canvas.hive = new HiveGame(this.state);
-    this._canvas.hive.init();
-    this.stepTimeout = setTimeout(this.step, 100);
-    this._canvas.onmousedown = this.onMouseOver.bind(this);
+    if (!this.state.newGame) {
+      this._gameDiv.hive = new HiveGame(this.state);
+      this._gameDiv.hive.init();
+      this.stepTimeout = setTimeout(this.step, 100);
+    }
   }
 
   step = () => {
     const newState = {};
     const updateStartTime = new Date().getTime();
     for (let i = 0; i < this.state.updatesPerStep; i++) {
-      this._canvas.hive.update();
+      this._gameDiv.hive.update();
     }
     const updateTime = (new Date().getTime()) - updateStartTime;
     const renderStartTime = new Date().getTime();
@@ -62,7 +64,7 @@ class Game extends Component {
     }
     const renderTime = (new Date().getTime()) - renderStartTime;
     //logTime(updateTime, renderTime);
-    newState.players = this._canvas.hive.players.map((p) => {
+    newState.players = this._gameDiv.hive.players.map((p) => {
       return {
         id: p.id,
         antCount: p.ants.length,
@@ -78,23 +80,23 @@ class Game extends Component {
   }
   renderUpdates(pixelScale) {
     const ctx = this._canvas.getContext('2d');
-    const updatedTiles = this._canvas.hive.getUpdatedTiles();
+    const updatedTiles = this._gameDiv.hive.getUpdatedTiles();
     if (updatedTiles.length > 0) {
       updatedTiles.forEach((tile) => {
         ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
         ctx.fillStyle = tile.color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
       });
-      this._canvas.hive.clearUpdatedTiles();
+      this._gameDiv.hive.clearUpdatedTiles();
     }
   }
   renderAll = (pixelScale) => {
     pixelScale = this.state.pixelScale;
     const ctx = this._canvas.getContext('2d');
-    ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-    for (var i = 0; i < this._canvas.hive.board.width; i++) {
-      for (var j = 0; j < this._canvas.hive.board.height; j++) {
-        ctx.fillStyle = this._canvas.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
+    ctx.clearRect(0, 0, this._gameDiv.width, this._gameDiv.height);
+    for (var i = 0; i < this._gameDiv.hive.board.width; i++) {
+      for (var j = 0; j < this._gameDiv.hive.board.height; j++) {
+        ctx.fillStyle = this._gameDiv.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
     }
@@ -112,33 +114,44 @@ class Game extends Component {
     this.setState({ updatesPerStep: parseInt(evt.target.value) });
   }
   handlePause = () => {
-    if (this.state.isPaused) {
+    if (!this.state.newGame && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 50);
     }
     this.setState({ isPaused: !this.state.isPaused });
   }
   handleStep = () => {
-    if (this.state.isPaused) {
+    if (!this.state.newGame && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 10);
     }
   }
-  handleRenderTrails = (evt) => {
+  handleRenderTrails = () => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
-    this.stepTimeout = setTimeout(this.renderAll, 50, this.state.pixelScale);
+    if (!this.state.newGame) {
+      this.stepTimeout = setTimeout(this.renderAll, 50, this.state.pixelScale);
+    }
   }
-  handleNewGame = () => {
+  handleWidthChange = (e) => {
+    this.setState({ width: e.target.value });
+  }
+  handleHeightChange = (e) => {
+    this.setState({ height: e.target.value });
+  }
+  handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
-    delete this._canvas.hive;
-    this._canvas.hive = new HiveGame(this.state);
-    this._canvas.hive.init();
-    this.setState({ shouldRenderAll: true, isPaused: false });
+    delete this._gameDiv.hive;
+    this.setState({ newGame: true, watchTile: null });
+  }
+  handleStart = () => {
+    this._gameDiv.hive = new HiveGame(this.state);
+    this._gameDiv.hive.init();
+    this.setState({ newGame: false, shouldRenderAll: true });
     this.stepTimeout = setTimeout(this.step, 100);
   }
   render() {
     let watchTile;
-    if (this._canvas && this.state.watchTile) {
+    if (this._gameDiv && this.state.watchTile) {
       const tileCoords = this.state.watchTile;
-      const tile = this._canvas.hive.board.tiles[tileCoords[0]][tileCoords[1]]
+      const tile = this._gameDiv.hive.board.tiles[tileCoords[0]][tileCoords[1]]
       watchTile = (<div style={ { 'text-align': "left", width: "150px", margin: "auto" } }>
         <pre>{ JSON.stringify(_.omitBy(_.omit(tile.toDataHash(), "ant"), (v) => _.isNull(v)), undefined, 2) }</pre>
         <pre>{ tile.ant ? JSON.stringify(_.omitBy(_.omit(tile.ant.toDataHash(), ['adjacentTiles', 'currentTile']), (v) => _.isNull(v)), undefined, 2) : "" }</pre>
@@ -147,8 +160,36 @@ class Game extends Component {
     let players = this.state.players.map((p) => {
       return <div style={ { color: p.color } } key={ p.id }>Player { p.id }: { p.antCount } ants</div>;
     });
+    let gameArea;
+    if (this.state.newGame) {
+      gameArea = (
+        <div>
+          <div>
+            <label>Width: </label>
+            <input type="number" value={ this.state.width } onChange={ this.handleWidthChange }/>
+          </div>
+          <div>
+            <label>Height: </label>
+            <input type="number" value={ this.state.height } onChange={ this.handleHeightChange }/>
+          </div>
+        </div>
+      );
+    } else {
+      gameArea = (
+        <div>
+          <canvas
+            ref={ (c) => this._canvas = c }
+            className="game_board"
+            onMouseDown={ this.onMouseDown }
+            width={ this.state.width * this.state.pixelScale }
+            height={ this.state.height * this.state.pixelScale }>
+          </canvas>
+          { players }
+        </div>
+      );
+    }
     return (
-      <div>
+      <div ref={ (d) => this._gameDiv = d }>
         <div>
           <div>
             Pixel Scale: { this.state.pixelScale }
@@ -159,20 +200,12 @@ class Game extends Component {
             <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
           </div>
         </div>
-        <button onClick={ this.handleNewGame }>New Game</button>
+        <button onClick={ this.state.newGame ? this.handleStart : this.handleCreateNewGame }>{ this.state.newGame ? "Start" : "New Game" }</button>
         <button onClick={ this.handlePause }>{ this.state.isPaused ? "Run" : "Pause" }</button>
         <button onClick={ this.handleStep }>Step</button>
         <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
         <label for="renderTrails">Render Trails</label>
-        <div>
-          <canvas
-            ref={ (c) => this._canvas = c }
-            className="game_board"
-            width={ this.state.width * this.state.pixelScale }
-            height={ this.state.height * this.state.pixelScale }>
-          </canvas>
-          { players }
-        </div>
+        { gameArea }
         { watchTile }
       </div>
     );
