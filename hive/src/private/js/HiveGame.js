@@ -3,7 +3,7 @@ import Player from "./Player.js";
 import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
 import { randomInt, playerColors, dirs } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
 import _ from "lodash";
 
 function HiveGame(props) {
@@ -99,7 +99,10 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       }
       let eggCond = true;
       if (action.layEgg) {
-        eggCond = entity.type === "queen" && entity.food >= NEW_ANT_COST;
+        eggCond = (
+          entity.type === "queen" &&
+          entity.food >= (action.layEgg === "queen" ? NEW_QUEEN_COST: NEW_ANT_COST)
+        );
       }
       return targetTile.isVacant() && trailCond && eggCond;
     case "gather":
@@ -109,7 +112,11 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
     case "drop":
       return _.isInteger(action.amount) && entity.food >= action.amount;
     case "layEgg":
-      return targetTile.isVacant() && entity.type === "queen" && entity.food >= NEW_ANT_COST;
+      return (
+        targetTile.isVacant() &&
+        entity.type === "queen" &&
+        entity.food >= (action.antType === "queen" ? NEW_QUEEN_COST: NEW_ANT_COST)
+      );
     case "attack":
       return targetTile.ant;
     default:
@@ -131,7 +138,7 @@ HiveGame.prototype.performAction = function(entity, action) {
         const previousTile = entity.tile;
         this.move(entity, targetTile, action.direction, null);
         if (action.layEgg) {
-          this.layEggOnTile(entity, previousTile);
+          this.layEggOnTile(entity, previousTile, action.layEgg);
         }
         break;
       case "gather":
@@ -158,7 +165,7 @@ HiveGame.prototype.performAction = function(entity, action) {
         this.pushCoordToRender(targetTile.coords());
         break;
       case "layEgg":
-        this.layEggOnTile(entity, targetTile);
+        this.layEggOnTile(entity, targetTile, action.antType);
         break;
       case "attack":
         targetTile.ant.health -= ANT_ATTACK_POWER;
@@ -195,17 +202,18 @@ HiveGame.prototype.layTrailOnTile = function(entity, name, qty) {
   entity.tile.trails = trails;
 }
 
-HiveGame.prototype.layEggOnTile = function(entity, tile) {
-  const worker = new Ant({
+HiveGame.prototype.layEggOnTile = function(entity, tile, type) {
+  const newAnt = new Ant({
     id: entity.owner.ants.length + 1,
-    type: 'worker',
+    type: (type === "queen" ? "queen" : "worker"),
     owner: entity.owner,
     tile: tile,
     eggTimer: EGG_TIMER,
+    food: 0,
   });
-  entity.owner.ants.push(worker);
-  entity.food -= NEW_ANT_COST;
-  tile.ant = worker;
+  entity.owner.ants.push(newAnt);
+  entity.food -= (type === "queen" ? NEW_QUEEN_COST : NEW_ANT_COST);
+  tile.ant = newAnt;
   this.pushCoordToRender(tile.coords());
 }
 

@@ -6,7 +6,7 @@ function Ant(props) {
   this.type = props.type;
   this.owner = props.owner;
   this.tile = props.tile;
-  this.food = this.type == "queen" ? 25 : 0;
+  this.food = props.food || (this.type === "queen" ? 25 : 0);
   this.eggTimer = props.eggTimer;
   this.age = 0;
   this.moves = {
