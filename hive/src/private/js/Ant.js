@@ -8,6 +8,7 @@ function Ant(props) {
   this.tile = props.tile;
   this.food = this.type == "queen" ? 25 : 0;
   this.eggTimer = props.eggTimer;
+  this.age = 0;
   this.moves = {
     left: 0,
     right: 0,
@@ -36,6 +37,7 @@ Ant.prototype.toDataHash = function() {
     adjacentTiles: tiles,
     moves: this.moves,
     health: this.health,
+    age: this.age,
   }
 }
 

@@ -34,13 +34,6 @@ HiveGame.prototype.init = function() {
       tile: this.board.getRandomVacantTile(),
       food: 35,
       eggTimer: 0,
-      health: QUEEN_HEALTH,
-      moves: {
-        left: 0,
-        right: 0,
-        up: 0,
-        down: 0,
-      },
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
@@ -74,12 +67,16 @@ HiveGame.prototype.clearUpdatedTiles = function() {
 
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
-    for (var j = 0; j < this.players[i].ants.length; j++) {
-      if (this.players[i].ants[j].eggTimer === 0) {
-        var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
-        this.performAction(this.players[i].ants[j], action);
+    const ants = this.players[i].ants;
+    const actionFunction = this.players[i].antAction;
+    for (var j = 0; j < ants.length; j++) {
+      const ant = ants[j];
+      if (ant.eggTimer === 0) {
+        const action = actionFunction(ant.toDataHash());
+        this.performAction(ant, action);
+        ant.age += 1;
       } else {
-        this.players[i].ants[j].eggTimer -= 1;
+        ant.eggTimer -= 1;
       }
     }
   }
@@ -107,11 +104,11 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
     case "gather":
       return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
     case "transfer":
-      return targetTile.hasAnt() && entity.food >= action.amount;
+      return _.isInteger(action.amount) && targetTile.hasAnt() && entity.food >= action.amount;
+    case "drop":
+      return _.isInteger(action.amount) && entity.food >= action.amount;
     case "layEgg":
       return targetTile.isVacant() && entity.type === "queen" && entity.food >= NEW_ANT_COST;
-    case "layTrail":
-      return targetTile.isVacant();
     case "attack":
       return targetTile.ant;
     default:
@@ -149,6 +146,15 @@ HiveGame.prototype.performAction = function(entity, action) {
         const quantToTransfer = targetTile.ant.type === "queen" ? action.amount : Math.min(MAX_FOOD - targetTile.ant.food, action.amount);
         entity.food -= quantToTransfer;
         targetTile.ant.food += quantToTransfer;
+        break;
+      case "drop":
+        const quantToDrop = Math.min(MAX_FOOD, action.amount);
+        entity.food -= quantToDrop;
+        targetTile.food += quantToDrop;
+        if (targetTile.food > 0) {
+          targetTile.type = "food";
+        }
+        this.pushCoordToRender(targetTile.coords());
         break;
       case "layEgg":
         this.layEggOnTile(entity, targetTile);
