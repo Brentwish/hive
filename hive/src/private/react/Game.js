@@ -22,9 +22,9 @@ class Game extends Component {
     super(props);
     this.state = {
       updatesPerStep: 1,
-      pixelScale: 5,
-      width: 200,
-      height: 100,
+      pixelScale: 4,
+      width: 400,
+      height: 200,
       shouldRenderAll: true,
       shouldRenderTrails: false,
       players: [],
@@ -139,7 +139,10 @@ class Game extends Component {
     if (this._canvas && this.state.watchTile) {
       const tileCoords = this.state.watchTile;
       const tile = this._canvas.hive.board.tiles[tileCoords[0]][tileCoords[1]]
-      watchTile = <div>{ JSON.stringify(_.omitBy(tile.toDataHash(), (v) => _.isNull(v))) }</div>;
+      watchTile = (<div>
+        <div>{ JSON.stringify(_.omitBy(_.omit(tile.toDataHash(), "ant"), (v) => _.isNull(v))) }</div>
+        <div>{ tile.ant ? JSON.stringify(_.omitBy(tile.ant.toDataHash(), (v) => _.isNull(v))) : "" }</div>
+      </div>);
     }
     let players = this.state.players.map((p) => {
       return <div style={ { color: p.color } } key={ p.id }>Player { p.id }: { p.antCount } ants</div>;

@@ -26,7 +26,9 @@ const distFromQueen = function(antData) {
 	return Math.abs(m.up - m.down) + Math.abs(m.left - m.right);
 }
 
-const getRandomDirTowardsQueen = function(adjacentTilesHash, moves, makeRandomMove=true) {
+const getRandomDirTowardsQueen = function(antData, makeRandomMove=true) {
+  const adjacentTilesHash = antData.adjacentTiles;
+  const moves = antData.moves;
   const toGo = getDirsTowardsQueen(adjacentTilesHash, moves);
   let closestEmptyTiles = toGo.filter((dir) => { return !adjacentTilesHash[dir].ant && adjacentTilesHash[dir].type !== "wall"; });
   if (closestEmptyTiles.length === 0 && makeRandomMove) {
@@ -51,28 +53,84 @@ const getForagingDir = function(antData) {
 	const openTiles = getOpenTiles(antData.adjacentTiles);
 	const tilesWithTrails = getTilesWithTrails(openTiles);
 	const dirsAwayFromQueen = getDirsAwayFromQueen(antData.adjacentTiles, antData.moves);
-	let possibleDirs = _.intersection(_.keys(tilesWithTrails), dirsAwayFromQueen);
-	if (_.isEmpty(possibleDirs)) {
-		possibleDirs = _.keys(openTiles);
-	}
-	return sample(possibleDirs);
+	let trailDirs = _.intersection(_.keys(tilesWithTrails), dirsAwayFromQueen);
+  const spiralDir = getNextSpiralDir(antData.moves.up + 5, antData.moves.left, antData.moves.down, antData.moves.right);
+  const moveCount = _.sum(_.values(antData.moves));
+	if (!_.isEmpty(trailDirs)) {
+	  return sample(trailDirs);
+	} else if (_.includes(_.keys(openTiles), spiralDir) && moveCount < 200) {
+    return spiralDir;
+	} else if (moveCount < 1000) {
+    return sample(_.keys(openTiles));
+  } else {
+    return getRandomDirTowardsQueen(antData);
+  }
+}
+
+const getNextSpiralDir = function(u, l, d, r) {
+  if (u + l <= d + r && d === r) {
+    return "up";
+  } else if (l !== u && d === r) {
+    return "left";
+  } else if (u + l > d + r && u === l) {
+    return "down";
+  } else {
+    return "right";
+  }
+}
+
+const returnToQueenDir = function(antData) {
+  const moveCount = _.sum(_.values(antData.moves));
+  if (moveCount > 500 && distFromQueen(antData) < 8) {
+    return sample(_.keys(getOpenTiles(antData.adjacentTiles)));
+  } else {
+    return getRandomDirTowardsQueen(antData)
+  }
+};
+
+const returnToQueenAction = function(antData) {
+  const queenTile = _.values(antData.adjacentTiles).find((t) => {
+    return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId;
+  });
+  if (queenTile) {
+    return {
+      type: "transfer",
+      direction: findKey(antData.adjacentTiles, queenTile),
+      amount: antData.carryingAmount,
+      resetMoves: true,
+    };
+  } else {
+    //Move towards queen
+    return {
+      type: "layTrail",
+      direction: returnToQueenDir(antData),
+      trailKey: "food" + antData.ownerId,
+      trailStrength: 100,
+    };
+  }
 }
 
 var playerGameActions = {
   antAction: function(antData) {
     const adjacentTiles = Object.values(antData.adjacentTiles);
     const emptyTiles = adjacentTiles.filter((t) => { return !t.ant; });
+    const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
 
     if (antData.type === "queen") {
-      if (antData.carryingAmount >= NEW_ANT_COST) {
+      if (adjacentEnemies.length > 0) {
+        return {
+          type: "attack",
+          direction: findKey(antData.adjacentTiles, sample(adjacentEnemies)),
+        }
+      } else if (antData.carryingAmount >= NEW_ANT_COST) {
         return {
           type: "layEgg",
-          direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
+          direction: getRandomDirTowardsQueen(antData),
         };
       } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
         return {
           type: "move",
-          direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves, false),
+          direction: getRandomDirTowardsQueen(antData, false),
         };
 			} else {
         return {
@@ -81,26 +139,9 @@ var playerGameActions = {
       }
     } else if (antData.type === "worker") {
       const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
-      const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
 
       if (antData.carryingAmount === MAX_FOOD) {
-        const queenTile = adjacentTiles.filter((t) => { return t.ant && t.ant.type === "queen" && t.ant.ownerId === antData.ownerId; })[0];
-        if (queenTile) {
-          return {
-            type: "transfer",
-            direction: findKey(antData.adjacentTiles, queenTile),
-            amount: antData.carryingAmount,
-            resetMoves: true,
-          };
-        } else {
-          //Move towards queen
-          return {
-            type: "layTrail",
-            direction: getRandomDirTowardsQueen(antData.adjacentTiles, antData.moves),
-            trailKey: "food" + antData.ownerId,
-            trailStrength: distFromQueen(antData) + 100,
-          };
-        }
+        return returnToQueenAction(antData);
       } else if (adjacentEnemies.length > 0) {
         return {
           type: "attack",
