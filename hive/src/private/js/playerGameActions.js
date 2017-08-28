@@ -1,5 +1,5 @@
 import { randomInt, distance, sample, findKey } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
 import _ from "lodash";
 
 const getDirsTowardsQueen = function(adjacentTilesHash, moves) {
@@ -24,6 +24,17 @@ const getDirsAwayFromQueen = function(adjacentTilesHash, moves) {
 const distFromQueen = function(antData) {
 	const m = antData.moves;
 	return Math.abs(m.up - m.down) + Math.abs(m.left - m.right);
+}
+
+const getRandomDirAwayFromQueen = function(antData, makeRandomMove=true) {
+  const adjacentTilesHash = antData.adjacentTiles;
+  const moves = antData.moves;
+  const toGo = getDirsAwayFromQueen(adjacentTilesHash, moves);
+  let closestEmptyTiles = toGo.filter((dir) => { return !adjacentTilesHash[dir].ant && adjacentTilesHash[dir].type !== "wall"; });
+  if (closestEmptyTiles.length === 0 && makeRandomMove) {
+		closestEmptyTiles = _.difference(dirs, toGo);
+  }
+  return sample(closestEmptyTiles);
 }
 
 const getRandomDirTowardsQueen = function(antData, makeRandomMove=true) {
@@ -124,9 +135,21 @@ var playerGameActions = {
           type: "attack",
           direction: findKey(antData.adjacentTiles, sample(adjacentEnemies)),
         }
-      } else if (antData.carryingAmount >= NEW_ANT_COST) {
+      } else if (antData.age < 50) {
+        return {
+          type: "move",
+          direction: getRandomDirAwayFromQueen(antData, false),
+        };
+      } else if (antData.age < 3000 && antData.carryingAmount >= NEW_ANT_COST) {
         return {
           type: "layEgg",
+          direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
+          resetMoves: antData.age === 50,
+        };
+      } else if (antData.carryingAmount >= NEW_QUEEN_COST) {
+        return {
+          type: "layEgg",
+          antType: "queen",
           direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
         };
       } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
