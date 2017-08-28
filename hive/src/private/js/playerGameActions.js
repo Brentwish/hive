@@ -127,7 +127,7 @@ var playerGameActions = {
       } else if (antData.carryingAmount >= NEW_ANT_COST) {
         return {
           type: "layEgg",
-          direction: getRandomDirTowardsQueen(antData),
+          direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
         };
       } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
         return {

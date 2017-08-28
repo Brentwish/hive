@@ -1,14 +1,20 @@
 import { dirs } from "./constants.js";
+import { ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
 
 function Ant(props) {
   this.id = props.id;
   this.type = props.type;
   this.owner = props.owner;
   this.tile = props.tile;
-  this.food = props.food;
+  this.food = this.type == "queen" ? 25 : 0;
   this.eggTimer = props.eggTimer;
-  this.moves = props.moves;
-  this.health = props.health;
+  this.moves = {
+    left: 0,
+    right: 0,
+    up: 0,
+    down: 0,
+  },
+  this.health = this.type == "queen" ? QUEEN_HEALTH : ANT_HEALTH;
 }
 
 Ant.prototype.toDataHash = function() {

@@ -104,7 +104,7 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
     case "transfer":
       return targetTile.hasAnt() && entity.food >= action.amount;
     case "layEgg":
-      return targetTile.isVacant() && entity.type === "queen" && entity.food > NEW_ANT_COST;
+      return targetTile.isVacant() && entity.type === "queen" && entity.food >= NEW_ANT_COST;
     case "layTrail":
       return targetTile.isVacant();
     case "attack":
@@ -150,29 +150,7 @@ HiveGame.prototype.performAction = function(entity, action) {
         }
         break;
       case "layEgg":
-        const worker = new Ant({
-          id: entity.owner.ants.length + 1,
-          type: 'worker',
-          owner: entity.owner,
-          tile: entity.tile,
-          food: 0,
-          eggTimer: EGG_TIMER,
-          health: ANT_HEALTH,
-          moves: {
-            left: 0,
-            right: 0,
-            up: 0,
-            down: 0,
-          },
-        });
-        entity.owner.ants.push(worker);
-        entity.food -= NEW_ANT_COST;
-        this.pushCoordToRender(entity.tile.coords());
-        entity.moves[action.direction] += 1;
-        entity.tile.ant = worker; //lay is either null or a new worker
-        targetTile.ant = entity;
-        entity.tile = targetTile;
-        this.pushCoordToRender(targetTile.coords());
+        this.layEggOnTile(entity, targetTile);
         break;
       case "attack":
         targetTile.ant.health -= ANT_ATTACK_POWER;
@@ -199,6 +177,20 @@ HiveGame.prototype.layTrailOnTile = function(entity, name, qty) {
   trails[trailName] += qty;
   trails[trailName] = Math.min(trails[trailName], MAX_TRAIL);
   entity.tile.trails = trails;
+}
+
+HiveGame.prototype.layEggOnTile = function(entity, tile) {
+  const worker = new Ant({
+    id: entity.owner.ants.length + 1,
+    type: 'worker',
+    owner: entity.owner,
+    tile: tile,
+    eggTimer: EGG_TIMER,
+  });
+  entity.owner.ants.push(worker);
+  entity.food -= NEW_ANT_COST;
+  tile.ant = worker;
+  this.pushCoordToRender(tile.coords());
 }
 
 HiveGame.prototype.move = function(entity, targetTile, direction, lay) {
