@@ -11,11 +11,12 @@ function HiveGame(props) {
   this.players = [];
   this.turn = 0;
   this.numPlayers = props.numPlayers;
+  this.foodProps = props.foodProps;
 }
 
 HiveGame.prototype.init = function() {
   this.board.borderedBoard();
-  this.board.addRandomFood();
+  this.board.addRandomFood(this.foodProps.sparsity, this.foodProps.density, this.foodProps.saturation);
   for (let i = 0; i < this.numPlayers; i++) {
     this.players.push(new Player({
       id: i + 1,

@@ -41,6 +41,15 @@ export const playerColors = [
   "darkgreen",
 ];
 
+export const foodGrades = {
+  "very high": 1,
+  "high": 0.8,
+  "medium": 0.6,
+  "low": 0.4,
+  "very low": 0.2,
+  "none": 0,
+}
+
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }

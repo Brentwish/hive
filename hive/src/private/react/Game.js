@@ -35,6 +35,7 @@ class Game extends Component {
       players: [],
       paused: false,
       newGame: false,
+      foodProps: {sparsity: "medium", density: "medium", saturation: "very low"},
     };
   }
 
