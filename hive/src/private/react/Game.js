@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import HiveGame from "../js/HiveGame.js";
-import { UPDATE_PERIOD } from "../js/constants.js";
+import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
   MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
@@ -163,6 +163,21 @@ class Game extends Component {
     }
     this.setState({ numPlayers });
   }
+  handleFoodSparsityChange = (e) => {
+    let foodProps = this.state.foodProps;
+    foodProps.sparsity = e.target.value;
+    this.setState({ foodProps });
+  }
+  handleFoodDensityChange = (e) => {
+    let foodProps = this.state.foodProps;
+    foodProps.density = e.target.value;
+    this.setState({ foodProps });
+  }
+  handleFoodSaturationChange = (e) => {
+    let foodProps = this.state.foodProps;
+    foodProps.saturation= e.target.value;
+    this.setState({ foodProps });
+  }
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
     delete this._gameDiv.hive;
@@ -202,6 +217,20 @@ class Game extends Component {
           <div>
             <label>Number of Players: </label>
             <input type="number" min={ MIN_NUM_PLAYERS } max={ MAX_NUM_PLAYERS } value={ this.state.numPlayers } onChange={ this.handleNumberOfPlayersChange }/>
+          </div>
+          <div>
+            <label>Sparsity: </label>
+            <select value={ this.state.foodProps.sparsity } onChange={ this.handleFoodSparsityChange }>
+              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
+            </select>
+            <label>Density: </label>
+            <select value={ this.state.foodProps.density } onChange={ this.handleFoodDensityChange }>
+              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
+            </select>
+            <label>Saturation: </label>
+            <select value={ this.state.foodProps.saturation} onChange={ this.handleFoodSaturationChange }>
+              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
+            </select>
           </div>
         </div>
       );
