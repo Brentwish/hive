@@ -33,13 +33,6 @@ HiveGame.prototype.init = function() {
       tile: this.board.getRandomVacantTile(),
       food: 35,
       eggTimer: 0,
-      health: QUEEN_HEALTH,
-      moves: {
-        left: 0,
-        right: 0,
-        up: 0,
-        down: 0,
-      },
     });
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
@@ -73,12 +66,16 @@ HiveGame.prototype.clearUpdatedTiles = function() {
 
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
-    for (var j = 0; j < this.players[i].ants.length; j++) {
-      if (this.players[i].ants[j].eggTimer === 0) {
-        var action = this.players[i].antAction(this.players[i].ants[j].toDataHash());
-        this.performAction(this.players[i].ants[j], action);
+    const ants = this.players[i].ants;
+    const actionFunction = this.players[i].antAction;
+    for (var j = 0; j < ants.length; j++) {
+      const ant = ants[j];
+      if (ant.eggTimer === 0) {
+        const action = actionFunction(ant.toDataHash());
+        this.performAction(ant, action);
+        ant.age += 1;
       } else {
-        this.players[i].ants[j].eggTimer -= 1;
+        ant.eggTimer -= 1;
       }
     }
   }
