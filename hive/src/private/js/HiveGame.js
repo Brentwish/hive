@@ -140,14 +140,6 @@ HiveGame.prototype.performAction = function(entity, action) {
         const quantToTransfer = targetTile.ant.type === "queen" ? action.amount : Math.min(MAX_FOOD - targetTile.ant.food, action.amount);
         entity.food -= quantToTransfer;
         targetTile.ant.food += quantToTransfer;
-        if (action.resetMoves) {
-          entity.moves = {
-            left: 0,
-            right: 0,
-            up: 0,
-            down: 0,
-          };
-        }
         break;
       case "layEgg":
         this.layEggOnTile(entity, targetTile);
@@ -160,6 +152,14 @@ HiveGame.prototype.performAction = function(entity, action) {
           this.pushCoordToRender(targetTile.coords());
         }
         break;
+    }
+    if (action.resetMoves) {
+      entity.moves = {
+        left: 0,
+        right: 0,
+        up: 0,
+        down: 0,
+      };
     }
   }
 }
