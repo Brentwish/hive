@@ -94,7 +94,11 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
   }
   switch (action.type) {
     case "move":
-      return targetTile.isVacant();
+      let trailCond = true;
+      if (action.trail) {
+        trailCond = action.trail.name.length > 1 && _.isInteger(action.trail.strength);
+      }
+      return targetTile.isVacant() && trailCond;
     case "gather":
       return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
     case "transfer":
@@ -118,6 +122,9 @@ HiveGame.prototype.performAction = function(entity, action) {
     }
     switch (action.type) {
       case "move":
+        if (action.trail) {
+          this.layTrailOnTile(entity, action.trail.name, action.trail.strength);
+        }
         this.move(entity, targetTile, action.direction, null);
         break;
       case "gather":
@@ -167,23 +174,6 @@ HiveGame.prototype.performAction = function(entity, action) {
         entity.tile = targetTile;
         this.pushCoordToRender(targetTile.coords());
         break;
-      case "layTrail":
-        if (!entity.tile.trails) {
-          entity.tile.trails = {};
-          this.board.pushNewTrailCoord(entity.tile);
-        }
-        if (!entity.tile.trails[action.trailKey]) {
-          entity.tile.trails[action.trailKey] = 0;
-        }
-        entity.tile.trails[action.trailKey] += action.trailStrength;
-        entity.tile.trails[action.trailKey] = Math.min(entity.tile.trails[action.trailKey], MAX_TRAIL);
-        this.pushCoordToRender(entity.tile.coords());
-        entity.moves[action.direction] += 1;
-        entity.tile.ant = null; //lay is either null or a new worker
-        targetTile.ant = entity;
-        entity.tile = targetTile;
-        this.pushCoordToRender(targetTile.coords());
-        break;
       case "attack":
         targetTile.ant.health -= ANT_ATTACK_POWER;
         if (targetTile.ant.health <= 0) {
@@ -196,7 +186,19 @@ HiveGame.prototype.performAction = function(entity, action) {
   }
 }
 
-HiveGame.prototype.killAnt = function(ant) {
+HiveGame.prototype.layTrailOnTile = function(entity, name, qty) {
+  const trails = entity.tile.trails || {};
+  const trailName = `${entity.owner.id}_${name}`;
+  if (_.isEmpty(trails)) {
+    this.board.pushNewTrailCoord(entity.tile);
+  }
+  const trail = trails[trailName];
+  if (!trail) {
+    trails[trailName] = 0;
+  }
+  trails[trailName] += qty;
+  trails[trailName] = Math.min(trails[trailName], MAX_TRAIL);
+  entity.tile.trails = trails;
 }
 
 HiveGame.prototype.move = function(entity, targetTile, direction, lay) {

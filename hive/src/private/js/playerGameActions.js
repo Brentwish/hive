@@ -102,10 +102,12 @@ const returnToQueenAction = function(antData) {
   } else {
     //Move towards queen
     return {
-      type: "layTrail",
+      type: "move",
       direction: returnToQueenDir(antData),
-      trailKey: "food" + antData.ownerId,
-      trailStrength: 100,
+      trail: {
+        name: "food",
+        strength: 100,
+      },
     };
   }
 }
