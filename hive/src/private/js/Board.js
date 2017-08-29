@@ -1,5 +1,5 @@
 import Tile from "./Tile.js";
-import { dirs } from "./constants.js";
+import { dirs, foodGrades } from "./constants.js";
 import { randomInt } from "./constants.js";
 import _ from "lodash";
 
@@ -32,19 +32,21 @@ Board.prototype.borderedBoard = function() {
   }
 }
 
-Board.prototype.addRandomFood = function() {
-  var numFood = randomInt(this.width, this.width);
-  var t;
-  var adjacentEmptyTiles;
-  for (var i = 0; i < numFood; i++) {
-    t = this.getRandomVacantTile();
-    for (var j = 0; j < this.width; j++) {
-      t.type = "food";
-      t.food = randomInt(2, 2);
-      adjacentEmptyTiles = this.adjacentTiles(t, "empty");
-      if (adjacentEmptyTiles.length > 0) {
-        t = adjacentEmptyTiles[randomInt(adjacentEmptyTiles.length)];
-      } else { continue; }
+Board.prototype.addRandomFood = function(sparsityGrade, densityGrade, saturationGrade) {
+  if (sparsityGrade === "none" || densityGrade === "none" || saturationGrade === "none") { return; };
+  const sparsity = foodGrades[sparsityGrade];
+  const density = foodGrades[densityGrade];
+  const saturation = foodGrades[saturationGrade];
+  let side = Math.sqrt(this.width * this.height);
+  let numFoodPoints = Math.floor(sparsity * randomInt(side, side));
+  let tile;
+  let adjacentEmptyTiles;
+  for (let i = 0; i < numFoodPoints; i++) {
+    tile = this.getRandomVacantTile();
+    for (let j = 0; j < Math.floor(density * side); j++) {
+      tile.type = "food";
+      tile.food += Math.floor(saturation * randomInt(5, 5));
+      tile = _.sample(_.reject(this.adjacentTiles(tile), (t) => { return t.type === "wall"; }));
     }
   }
 }
