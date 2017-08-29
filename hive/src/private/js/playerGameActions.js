@@ -54,27 +54,25 @@ const getOpenTiles = function(tiles) {
 	});
 }
 
-const getTilesWithTrails = function(tiles) {
+const getTilesWithTrails = function(tiles, name) {
 	return _.pickBy(tiles, (tile) => {
-		return !_.isEmpty(tile.trails);
+		return !_.isEmpty(tile.trails) && tile.trails[name];
 	});
 }
 
 const getForagingDir = function(antData) {
 	const openTiles = getOpenTiles(antData.adjacentTiles);
-	const tilesWithTrails = getTilesWithTrails(openTiles);
+	const tilesWithTrails = getTilesWithTrails(openTiles, `${antData.ownerId}_food`);
 	const dirsAwayFromQueen = getDirsAwayFromQueen(antData.adjacentTiles, antData.moves);
 	let trailDirs = _.intersection(_.keys(tilesWithTrails), dirsAwayFromQueen);
   const spiralDir = spiral(antData, Math.PI / 200);
   const moveCount = _.sum(_.values(antData.moves));
 	if (!_.isEmpty(trailDirs)) {
 	  return sample(trailDirs);
-	} else if (_.includes(_.keys(openTiles), spiralDir) && moveCount < 200) {
+	} else if (_.includes(_.keys(openTiles), spiralDir) && moveCount < 2000) {
     return spiralDir;
-	} else if (moveCount < 3000) {
+	} else {
     return sample(_.keys(openTiles));
-  } else {
-    return getRandomDirTowardsQueen(antData);
   }
 }
 
@@ -117,12 +115,6 @@ const spiral = function(antData, delta) {
 }
 
 const returnToQueenDir = function(antData) {
-  const moveCount = _.sum(_.values(antData.moves));
-  if (moveCount > 500 && distFromQueen(antData) < 8) {
-    return sample(_.keys(getOpenTiles(antData.adjacentTiles)));
-  } else {
-    return getRandomDirTowardsQueen(antData)
-  }
 };
 
 const returnToQueenAction = function(antData) {
@@ -138,14 +130,20 @@ const returnToQueenAction = function(antData) {
     };
   } else {
     //Move towards queen
-    return {
-      type: "move",
-      direction: returnToQueenDir(antData),
-      trail: {
-        name: "food",
-        strength: 200,
-      },
-    };
+    const action = { type: "move" };
+    const moveCount = _.sum(_.values(antData.moves));
+    if (moveCount > 500 && distFromQueen(antData) < 8) {
+      action.direction = sample(_.keys(getOpenTiles(antData.adjacentTiles)));
+    } else {
+      action.direction = getRandomDirTowardsQueen(antData);
+      if (distFromQueen(antData) > 8) {
+        action.trail = {
+          name: "food",
+          strength: 150,
+        };
+      }
+    }
+    return action;
   }
 }
 
@@ -164,6 +162,7 @@ var playerGameActions = {
       } else if (antData.age < 100) {
         return {
           type: "move",
+          resetMoves: _.some(adjacentTiles, (t) => t.type === "wall"),
           direction: getRandomDirAwayFromQueen(antData, false),
         };
       } else if (antData.age < 3000 && antData.carryingAmount >= NEW_ANT_COST) {
