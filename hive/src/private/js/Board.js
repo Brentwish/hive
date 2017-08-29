@@ -14,12 +14,12 @@ Board.prototype.getTileFromCoords = function(coords) {
   return this.tiles[coords.x][coords.y];
 }
 
-Board.prototype.borderedBoard = function() {
+Board.prototype.blankBoard = function() {
   var type;
   for (var i = 0; i < this.width; i++) {
     this.tiles[i] = [];
     for (var j = 0; j < this.height; j++) {
-      type = (i === 0 || i === this.width - 1 || j === 0 || j === this.height - 1) ? "wall" : "empty";
+      type = "empty";
       this.tiles[i][j] = new Tile({
         x: i,
         y: j,
@@ -65,7 +65,12 @@ Board.prototype.tileFromDirection = function(x, y, dir) {
   } else {
     return null;
   }
-  return this.isInBounds(u, v) ? this.tiles[u][v] : null;
+
+  if (u < 0) { u = this.width - 1; }
+  if (v < 0) { v = this.height - 1; }
+  if (u > this.width - 1) { u = 0; }
+  if (v > this.height - 1) { v = 0; }
+  return this.tiles[u][v];
 }
 
 Board.prototype.adjacentTiles = function(tile, type) {
@@ -86,10 +91,6 @@ Board.prototype.adjacentTiles = function(tile, type) {
     }
     return tilesOfType;
   }
-}
-
-Board.prototype.isInBounds = function(x, y) {
-  return (x >= 0) && (x < this.width) && (y >= 0) && (y < this.height);
 }
 
 Board.prototype.getRandomVacantTile = function() {

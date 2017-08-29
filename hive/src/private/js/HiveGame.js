@@ -15,7 +15,7 @@ function HiveGame(props) {
 }
 
 HiveGame.prototype.init = function() {
-  this.board.borderedBoard();
+  this.board.blankBoard();
   this.board.addRandomFood(this.foodProps.sparsity, this.foodProps.density, this.foodProps.saturation);
   for (let i = 0; i < this.numPlayers; i++) {
     this.players.push(new Player({
