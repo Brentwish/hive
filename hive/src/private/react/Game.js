@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import GameOptions from "./GameOptions.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
@@ -36,7 +37,9 @@ class Game extends Component {
       players: [],
       paused: false,
       newGame: false,
-      foodProps: {sparsity: "medium", density: "medium", saturation: "very low"},
+      sparsity: "medium",
+      density: "medium",
+      saturation: "very low",
     };
   }
 
@@ -140,47 +143,10 @@ class Game extends Component {
       this.stepTimeout = setTimeout(this.renderAll, 50, this.state.pixelScale);
     }
   }
-  handleWidthChange = (e) => {
-    let width = e.target.value;
-    if (width > MAX_BOARD_WIDTH) {
-      width = MAX_BOARD_WIDTH;
-    } else if (width < MIN_BOARD_WIDTH) {
-      width = MIN_BOARD_WIDTH;
-    }
-    this.setState({ width });
-  }
-  handleHeightChange = (e) => {
-    let height = e.target.value;
-    if (height > MAX_BOARD_HEIGHT) {
-      height = MAX_BOARD_HEIGHT;
-    } else if (height < MIN_BOARD_HEIGHT) {
-      height = MIN_BOARD_HEIGHT;
-    }
-    this.setState({ height });
-  }
-  handleNumberOfPlayersChange = (e) => {
-    let numPlayers = e.target.value;
-    if (numPlayers > MAX_NUM_PLAYERS) {
-      numPlayers = MAX_NUM_PLAYERS;
-    } else if (numPlayers < MIN_NUM_PLAYERS) {
-      numPlayers = MIN_NUM_PLAYERS;
-    }
-    this.setState({ numPlayers });
-  }
-  handleFoodSparsityChange = (e) => {
-    let foodProps = this.state.foodProps;
-    foodProps.sparsity = e.target.value;
-    this.setState({ foodProps });
-  }
-  handleFoodDensityChange = (e) => {
-    let foodProps = this.state.foodProps;
-    foodProps.density = e.target.value;
-    this.setState({ foodProps });
-  }
-  handleFoodSaturationChange = (e) => {
-    let foodProps = this.state.foodProps;
-    foodProps.saturation= e.target.value;
-    this.setState({ foodProps });
+  changeHandler = (value, key) => {
+    const newState = {};
+    newState[key] = value;
+    this.setState(newState);
   }
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
@@ -209,34 +175,15 @@ class Game extends Component {
     let gameArea;
     if (this.state.newGame) {
       gameArea = (
-        <div>
-          <div>
-            <label>Width: { this.state.width }</label>
-            <input type="range" min={ MIN_BOARD_WIDTH } max={ MAX_BOARD_WIDTH } step={ 10 } value={ this.state.width } onChange={ this.handleWidthChange }/>
-          </div>
-          <div>
-            <label>Height: { this.state.height }</label>
-            <input type="range" min={ MIN_BOARD_HEIGHT } max={ MAX_BOARD_HEIGHT } step={ 10 } value={ this.state.height } onChange={ this.handleHeightChange }/>
-          </div>
-          <div>
-            <label>Number of Players: { this.state.numPlayers }</label>
-            <input type="range" min={ MIN_NUM_PLAYERS } max={ MAX_NUM_PLAYERS } value={ this.state.numPlayers } onChange={ this.handleNumberOfPlayersChange }/>
-          </div>
-          <div>
-            <label>Sparsity: </label>
-            <select value={ this.state.foodProps.sparsity } onChange={ this.handleFoodSparsityChange }>
-              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
-            </select>
-            <label>Density: </label>
-            <select value={ this.state.foodProps.density } onChange={ this.handleFoodDensityChange }>
-              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
-            </select>
-            <label>Saturation: </label>
-            <select value={ this.state.foodProps.saturation} onChange={ this.handleFoodSaturationChange }>
-              { _.map(_.keys(foodGrades), (grade) => { return (<option key={ grade } value={ grade }>{ grade }</option>); }) }
-            </select>
-          </div>
-        </div>
+        <GameOptions
+          width={ this.state.width }
+          height={ this.state.height }
+          numPlayers={ this.state.numPlayers }
+          sparsity={ this.state.sparsity }
+          density={ this.state.density }
+          saturation={ this.state.saturation }
+          changeHandler={ this.changeHandler }
+        />
       );
     } else {
       gameArea = (
