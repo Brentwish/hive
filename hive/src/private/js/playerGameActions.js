@@ -76,46 +76,53 @@ const getForagingDir = function(antData) {
   }
 }
 
+const perpendicularDirections = function(dir) {
+  const rl = ["right", "left"];
+  const ud = ["up", "down"];
+  return _.includes(rl, dir) ? ud : rl;
+}
+
 const dirFromAngle = function(angle) {
   const r = Math.random();
   if (r < Math.pow(Math.sin(angle), 2)) {
     if (Math.sin(angle) > 0) {
-      return ["left", "up"];
+      return ["left", "up", "down", "right"];
     } else {
-      return ["right", "down"];
+      return ["right", "down", "up", "left"];
     }
   } else {
     if (Math.cos(angle) > 0) {
-      return ["down", "left"];
+      return ["down", "left", "right", "up"];
     } else {
-      return ["up", "right"];
+      return ["up", "right", "left", "down"];
     }
   }
 }
 
-const spiral = function(antData, delta) {
+const dirAwayFromQueen = function(antData, delta=Math.PI) {
   const moves = antData.moves;
   const x = moves.up - moves.down;
   const y = moves.right - moves.left;
   let atan = Math.atan2(y, x);
   atan = atan > 0 ? atan : ((2 * Math.PI) + atan);
 
-  const angle = atan - (Math.PI / 2) - delta;
-  const bestDirs = dirFromAngle(angle);
-  const best = bestDirs[0];
-  const secondBest = bestDirs[1];
+  const angle = atan - delta;
+  const orderedDirs = dirFromAngle(angle);
 	const openDirs = _.keys(getOpenTiles(antData.adjacentTiles));
-  if (_.includes(openDirs, best)) {
-    return best;
-  } else if (_.includes(openDirs, secondBest)) {
-    return secondBest;
+  if (!_.isEmpty(openDirs)) {
+    return _.intersection(orderedDirs, openDirs)[0];
   } else {
-    return _.sample(openDirs);
+    return "none";
   }
 }
 
-const returnToQueenDir = function(antData) {
-};
+const dirTowardsQueen = function(antData) {
+  return dirAwayFromQueen(antData, 0);
+}
+
+const spiral = function(antData, delta) {
+  return dirAwayFromQueen(antData, (Math.PI / 2) - delta);
+}
 
 const returnToQueenAction = function(antData) {
   const queenTile = _.values(antData.adjacentTiles).find((t) => {
@@ -135,8 +142,13 @@ const returnToQueenAction = function(antData) {
     if (moveCount > 500 && distFromQueen(antData) < 8) {
       action.direction = sample(_.keys(getOpenTiles(antData.adjacentTiles)));
     } else {
-      action.direction = getRandomDirTowardsQueen(antData);
-      if (distFromQueen(antData) > 8) {
+      const openTiles = getOpenTiles(antData.adjacentTiles);
+      const trailTiles = getTilesWithTrails(openTiles, `${antData.ownerId}_food`);
+      const trailDirs = _.sortBy(_.keys(trailTiles), (tDir) => -1 * trailTiles[tDir].trails[`${antData.ownerId}_food`]);
+      const toQueen = dirTowardsQueen(antData);
+      const trailsToQueen = _.intersection(trailDirs, _.concat(perpendicularDirections(toQueen), toQueen));
+      action.direction = _.isEmpty(trailsToQueen) ? toQueen : _.sample([toQueen, trailsToQueen[0]]);
+      if (distFromQueen(antData) > 4) {
         action.trail = {
           name: "food",
           strength: 150,
