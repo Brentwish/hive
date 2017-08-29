@@ -26,6 +26,7 @@ class Game extends Component {
     super(props);
     this.state = {
       updatesPerStep: 1,
+      delayPerUpdate: 10,
       pixelScale: 5,
       width: 200,
       height: 100,
@@ -81,7 +82,7 @@ class Game extends Component {
 
     // Schedule next step
     if (!this.state.isPaused) {
-      this.stepTimeout = setTimeout(this.step, 10);
+      this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
     }
   }
   renderUpdates(pixelScale) {
@@ -118,6 +119,9 @@ class Game extends Component {
   }
   handleUpdatesPerStepChange = (evt) => {
     this.setState({ updatesPerStep: parseInt(evt.target.value) });
+  }
+  handleDelayPerUpdateChange = (evt) => {
+    this.setState({ delayPerUpdate: parseInt(evt.target.value) });
   }
   handlePause = () => {
     if (!this.state.newGame && this.state.isPaused) {
@@ -258,6 +262,10 @@ class Game extends Component {
           <div>
             Updates per step: { this.state.updatesPerStep }
             <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
+          </div>
+          <div>
+            Delay per update: { this.state.delayPerUpdate }
+            <input type="range" min="10" max="1000" step="10" value={ this.state.delayPerUpdate.toString() || "1" } onChange={ this.handleDelayPerUpdateChange } />
           </div>
         </div>
         <button onClick={ this.state.newGame ? this.handleStart : this.handleCreateNewGame }>{ this.state.newGame ? "Start" : "New Game" }</button>
