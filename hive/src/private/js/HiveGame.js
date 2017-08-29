@@ -11,7 +11,7 @@ function HiveGame(props) {
   this.players = [];
   this.turn = 0;
   this.numPlayers = props.numPlayers;
-  this.foodProps = props.foodProps;
+  this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
 }
 
 HiveGame.prototype.init = function() {
