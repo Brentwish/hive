@@ -7,6 +7,8 @@ import {
   MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
 } from "../js/constants.js";
 import _ from "lodash";
+import SplitPane from "react-split-pane";
+import "./Game.css";
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -195,12 +197,11 @@ class Game extends Component {
             width={ this.state.width * this.state.pixelScale }
             height={ this.state.height * this.state.pixelScale }>
           </canvas>
-          { players }
         </div>
       );
     }
-    return (
-      <div ref={ (d) => this._gameDiv = d }>
+    const gameControls = (
+      <div>
         <div>
           <div>
             Pixel Scale: { this.state.pixelScale }
@@ -220,9 +221,19 @@ class Game extends Component {
         <button onClick={ this.handleStep }>Step</button>
         <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
         <label for="renderTrails">Render Trails</label>
-        { gameArea }
-        { watchTile }
       </div>
+    );
+    return (
+      <SplitPane split="vertical" minSize={ 100 } defaultSize={ "75vw" }>
+        <div ref={ (d) => this._gameDiv = d }>
+          { gameControls }
+          { gameArea }
+        </div>
+        <div>
+          { players }
+          { watchTile }
+        </div>
+      </SplitPane>
     );
   }
 }
