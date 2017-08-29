@@ -211,16 +211,16 @@ class Game extends Component {
       gameArea = (
         <div>
           <div>
-            <label>Width: </label>
-            <input type="number" min={ MIN_BOARD_WIDTH } max={ MAX_BOARD_WIDTH } value={ this.state.width } onChange={ this.handleWidthChange }/>
+            <label>Width: { this.state.width }</label>
+            <input type="range" min={ MIN_BOARD_WIDTH } max={ MAX_BOARD_WIDTH } step={ 10 } value={ this.state.width } onChange={ this.handleWidthChange }/>
           </div>
           <div>
-            <label>Height: </label>
-            <input type="number" min={ MIN_BOARD_HEIGHT } max={ MAX_BOARD_HEIGHT } value={ this.state.height } onChange={ this.handleHeightChange }/>
+            <label>Height: { this.state.height }</label>
+            <input type="range" min={ MIN_BOARD_HEIGHT } max={ MAX_BOARD_HEIGHT } step={ 10 } value={ this.state.height } onChange={ this.handleHeightChange }/>
           </div>
           <div>
-            <label>Number of Players: </label>
-            <input type="number" min={ MIN_NUM_PLAYERS } max={ MAX_NUM_PLAYERS } value={ this.state.numPlayers } onChange={ this.handleNumberOfPlayersChange }/>
+            <label>Number of Players: { this.state.numPlayers }</label>
+            <input type="range" min={ MIN_NUM_PLAYERS } max={ MAX_NUM_PLAYERS } value={ this.state.numPlayers } onChange={ this.handleNumberOfPlayersChange }/>
           </div>
           <div>
             <label>Sparsity: </label>
