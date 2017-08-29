@@ -1,5 +1,6 @@
 import { dirs } from "./constants.js";
 import { ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
+import _ from "lodash";
 
 function Ant(props) {
   this.id = props.id;
@@ -16,6 +17,12 @@ function Ant(props) {
     down: 0,
   },
   this.health = this.type == "queen" ? QUEEN_HEALTH : ANT_HEALTH;
+  if (this.type === "queen") {
+    this.eggsLaid = {
+      worker: 0,
+      queen: 0,
+    }
+  }
 }
 
 Ant.prototype.toDataHash = function() {
@@ -25,7 +32,7 @@ Ant.prototype.toDataHash = function() {
     const tile = this.owner.board.tileFromDirection(this.tile.x, this.tile.y, dir);
     tiles[dir] = (tile ? tile.toDataHash() : null);
   });
-  return {
+  const hash = {
     ownerId: this.owner.id,
     type: this.type,
     carrying: this.food > 0 ? "food" : null,
@@ -38,7 +45,12 @@ Ant.prototype.toDataHash = function() {
     moves: this.moves,
     health: this.health,
     age: this.age,
+
+  };
+  if (this.type === "queen") {
+    hash.eggsLaid = _.clone(this.eggsLaid);
   }
+  return hash;
 }
 
 Ant.prototype.simpleDataHash = function() {

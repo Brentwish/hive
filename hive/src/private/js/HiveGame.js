@@ -203,17 +203,19 @@ HiveGame.prototype.layTrailOnTile = function(entity, name, qty) {
 }
 
 HiveGame.prototype.layEggOnTile = function(entity, tile, type) {
+  const antType = (type === "queen" ? "queen" : "worker");
   const newAnt = new Ant({
     id: entity.owner.ants.length + 1,
-    type: (type === "queen" ? "queen" : "worker"),
+    type: antType,
     owner: entity.owner,
     tile: tile,
     eggTimer: EGG_TIMER,
     food: 0,
   });
   entity.owner.ants.push(newAnt);
-  entity.food -= (type === "queen" ? NEW_QUEEN_COST : NEW_ANT_COST);
+  entity.food -= (antType === "queen" ? NEW_QUEEN_COST : NEW_ANT_COST);
   tile.ant = newAnt;
+  entity.eggsLaid[antType] += 1;
   this.pushCoordToRender(tile.coords());
 }
 

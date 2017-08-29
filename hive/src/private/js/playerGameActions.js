@@ -165,7 +165,7 @@ var playerGameActions = {
           resetMoves: _.some(adjacentTiles, (t) => t.type === "wall"),
           direction: getRandomDirAwayFromQueen(antData, false),
         };
-      } else if (antData.age < 3000 && antData.carryingAmount >= NEW_ANT_COST) {
+      } else if (antData.eggsLaid.worker < 25 && antData.carryingAmount >= NEW_ANT_COST) {
         return {
           type: "layEgg",
           direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
