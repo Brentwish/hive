@@ -53,14 +53,14 @@ class Hive extends Component {
   onMouseDown = (e) => {
     let x = Math.floor(e.nativeEvent.offsetX / this.state.pixelScale);
     let y = Math.floor(e.nativeEvent.offsetY / this.state.pixelScale);
-    console.log(this._gameDiv.hive.board.tiles[x][y]);
+    console.log(window.hive.board.tiles[x][y]);
     this.setState({ watchTile: [x, y] });
   }
 
   componentDidMount() {
     if (!this.state.newGame) {
-      this._gameDiv.hive = new HiveGame(this.state);
-      this._gameDiv.hive.init();
+      window.hive = new HiveGame(this.state);
+      window.hive.init();
       this.stepTimeout = setTimeout(this.step, 100);
     }
   }
@@ -69,7 +69,7 @@ class Hive extends Component {
     const newState = {};
     const updateStartTime = new Date().getTime();
     for (let i = 0; i < this.state.updatesPerStep; i++) {
-      this._gameDiv.hive.update();
+      window.hive.update();
     }
     const updateTime = (new Date().getTime()) - updateStartTime;
     const renderStartTime = new Date().getTime();
@@ -81,7 +81,7 @@ class Hive extends Component {
     }
     const renderTime = (new Date().getTime()) - renderStartTime;
     //logTime(updateTime, renderTime);
-    newState.players = this._gameDiv.hive.players.map((p) => {
+    newState.players = window.hive.players.map((p) => {
       return {
         id: p.id,
         antCount: p.ants.length,
@@ -97,23 +97,23 @@ class Hive extends Component {
   }
   renderUpdates(pixelScale) {
     const ctx = this._canvas.getContext('2d');
-    const updatedTiles = this._gameDiv.hive.getUpdatedTiles();
+    const updatedTiles = window.hive.getUpdatedTiles();
     if (updatedTiles.length > 0) {
       updatedTiles.forEach((tile) => {
         ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
         ctx.fillStyle = tile.color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
       });
-      this._gameDiv.hive.clearUpdatedTiles();
+      window.hive.clearUpdatedTiles();
     }
   }
   renderAll = (pixelScale) => {
     pixelScale = this.state.pixelScale;
     const ctx = this._canvas.getContext('2d');
-    ctx.clearRect(0, 0, this._gameDiv.width, this._gameDiv.height);
-    for (var i = 0; i < this._gameDiv.hive.board.width; i++) {
-      for (var j = 0; j < this._gameDiv.hive.board.height; j++) {
-        ctx.fillStyle = this._gameDiv.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
+    ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+    for (var i = 0; i < window.hive.board.width; i++) {
+      for (var j = 0; j < window.hive.board.height; j++) {
+        ctx.fillStyle = window.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
         ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
       }
     }
@@ -157,20 +157,20 @@ class Hive extends Component {
   }
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
-    delete this._gameDiv.hive;
+    delete window.hive;
     this.setState({ newGame: true, watchTile: null });
   }
   handleStart = () => {
-    this._gameDiv.hive = new HiveGame(this.state);
-    this._gameDiv.hive.init();
+    window.hive = new HiveGame(this.state);
+    window.hive.init();
     this.setState({ newGame: false, shouldRenderAll: true });
     this.stepTimeout = setTimeout(this.step, 100);
   }
   render() {
     let watchTile;
-    if (this._gameDiv && this.state.watchTile) {
+    if (window.hive && this.state.watchTile) {
       const tileCoords = this.state.watchTile;
-      const tile = this._gameDiv.hive.board.tiles[tileCoords[0]][tileCoords[1]]
+      const tile = window.hive.board.tiles[tileCoords[0]][tileCoords[1]]
       watchTile = (<div style={ { 'text-align': "left", width: "150px", margin: "auto" } }>
         <pre>{ JSON.stringify(_.omitBy(_.omit(tile.toDataHash(), "ant"), (v) => _.isNull(v)), undefined, 2) }</pre>
         <pre>{ tile.ant ? JSON.stringify(_.omitBy(_.omit(tile.ant.toDataHash(), ['adjacentTiles', 'currentTile']), (v) => _.isNull(v)), undefined, 2) : "" }</pre>
@@ -233,7 +233,7 @@ class Hive extends Component {
       </div>
     );
     return (
-      <div ref={ (d) => this._gameDiv = d }>
+      <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "25vw" }>
           <div className="EditorPane">
             <AceEditor
