@@ -9,7 +9,11 @@ class PlayerInfo extends Component {
           className="PlayerAntCount"
           style={ { background: p.color } }
           key={ p.id }
-        > { p.antCount } </div>
+        >
+          <div style={ { textDecoration: "underline" } }>Player { p.id }</div>
+          <div>Queens: { p.antCounts.queen || 0 }</div>
+          <div>Workers: { p.antCounts.worker || 0 }</div>
+        </div>
       );
     });
     return (

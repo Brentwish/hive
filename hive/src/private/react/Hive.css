@@ -79,10 +79,11 @@
 }
 
 .PlayerAntCount {
-  width: 100px;
-  height: 40px;
+  min-width: 100px;
+  min-height: 60px;
   text-shadow: -1px 0 white, 0 1px #fff9f9, 1px 0 white, 0 -1px white;
   display: flex;
+  flex-flow: column;
   justify-content: center;
   align-items: center;
 }

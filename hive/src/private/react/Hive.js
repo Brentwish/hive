@@ -80,9 +80,9 @@ class Hive extends Component {
     newState.players = window.hive.players.map((p) => {
       return {
         id: p.id,
-        antCount: p.ants.length,
+        antCounts: _.countBy(p.ants, (ant) => { return ant.type; }) || 0,
         color: p.color,
-      };
+      }
     });
     this.setState(newState);
 
