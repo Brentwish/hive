@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
+import TileInfo from "./TileInfo.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
@@ -143,12 +144,12 @@ class Hive extends Component {
   render() {
     let watchTile;
     if (window.hive && this.state.watchTile) {
-      const tileCoords = this.state.watchTile;
-      const tile = window.hive.board.tiles[tileCoords[0]][tileCoords[1]]
-      watchTile = (<div style={ { 'text-align': "left", width: "150px", margin: "auto" } }>
-        <pre>{ JSON.stringify(_.omitBy(_.omit(tile.toDataHash(), "ant"), (v) => _.isNull(v)), undefined, 2) }</pre>
-        <pre>{ tile.ant ? JSON.stringify(_.omitBy(_.omit(tile.ant.toDataHash(), ['adjacentTiles', 'currentTile']), (v) => _.isNull(v)), undefined, 2) : "" }</pre>
-      </div>);
+      watchTile = (
+        <TileInfo
+          x={ this.state.watchTile[0] }
+          y={ this.state.watchTile[1] }
+        />
+      );
     }
     const playerAntCounts = (<div className="PlayerAntCounts"> {
       this.state.players.map((p) => {
