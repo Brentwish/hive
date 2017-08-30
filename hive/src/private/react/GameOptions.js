@@ -70,6 +70,7 @@ class GameOptions extends Component {
             { gradeOptions }
           </select>
         </div>
+        <button onClick={ this.props.startGame }>Start</button>
       </div>
     );
   }
