@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
+import GameControls from "./GameControls.js";
 import TileInfo from "./TileInfo.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
@@ -90,33 +91,43 @@ class Hive extends Component {
       this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
     }
   }
-  handlePixelScaleChange = (evt) => {
+  handleZoomIn = () => {
+    const newPixelScale = Math.min(this.state.pixelScale + 1, 10);
     this.setState({
-      pixelScale : parseInt(evt.target.value),
+      pixelScale: newPixelScale,
       shouldRenderAll: true,
     });
     if (this.state.isPaused) {
-      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(evt.target.value));
+      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(newPixelScale));
     }
   }
-  handleUpdatesPerStepChange = (evt) => {
-    this.setState({ updatesPerStep: parseInt(evt.target.value) });
+  handleZoomOut = () => {
+    const newPixelScale = Math.max(this.state.pixelScale - 1, 1);
+    this.setState({
+      pixelScale: newPixelScale,
+      shouldRenderAll: true,
+    });
+    if (this.state.isPaused) {
+      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(newPixelScale));
+    }
   }
-  handleDelayPerUpdateChange = (evt) => {
-    this.setState({ delayPerUpdate: parseInt(evt.target.value) });
-  }
-  handlePause = () => {
+  handleSpeedChange = (delay) => {
+    const newState = { delayPerUpdate: delay };
     if (!this.state.newGame && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 50);
+      newState.isPaused = false;
     }
-    this.setState({ isPaused: !this.state.isPaused });
+    this.setState(newState);
+  }
+  handlePause = () => {
+    this.setState({ isPaused: true });
   }
   handleStep = () => {
     if (!this.state.newGame && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 10);
     }
   }
-  handleRenderTrails = () => {
+  handleToggleTrails = () => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
     if (!this.state.newGame) {
       this.stepTimeout = setTimeout(this._display.renderAll, 50, this.state.pixelScale);
@@ -167,6 +178,7 @@ class Hive extends Component {
           density={ this.state.density }
           saturation={ this.state.saturation }
           changeHandler={ this.changeHandler }
+          startGame={ this.handleStart }
         />
       );
     } else {
@@ -179,31 +191,15 @@ class Hive extends Component {
         showTrails={ this.state.shouldRenderTrails }
       />
     }
-    const gameControlsButtons = (
-      <div className="GameControls">
-        <button onClick={ this.state.newGame ? this.handleStart : this.handleCreateNewGame }>{ this.state.newGame ? "Start" : "New Game" }</button>
-        <button onClick={ this.handlePause }>{ this.state.isPaused ? "Run" : "Pause" }</button>
-        <button onClick={ this.handleStep }>Step</button>
-        <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
-        <label for="renderTrails">Trails</label>
-      </div>
-    );
-    const gameControlsSliders = (
-      <div className="GameControls">
-        <div className="GameSlider">
-          <span>Pixel Scale: { this.state.pixelScale }</span>
-          <input type="range" min="1" max="10" step="1" value={ this.state.pixelScale.toString() || "1" } onChange={ this.handlePixelScaleChange } />
-        </div>
-        <div className="GameSlider">
-          <span>Updates per step: { this.state.updatesPerStep }</span>
-          <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
-        </div>
-        <div className="GameSlider">
-          <span>Delay per update: { this.state.delayPerUpdate }</span>
-          <input type="range" min="10" max="1000" step="10" value={ this.state.delayPerUpdate.toString() || "1" } onChange={ this.handleDelayPerUpdateChange } />
-        </div>
-      </div>
-    );
+    const gameControls = <GameControls
+      onPause={ this.handlePause }
+      onSpeedChange={ this.handleSpeedChange }
+      onToggleTrails={ this.handleToggleTrails }
+      handleStopGame={ this.handleCreateNewGame }
+      handleZoomOut={ this.handleZoomOut }
+      handleZoomIn={ this.handleZoomIn }
+      handleStep={ this.handleStep }
+    />;
     return (
       <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "25vw" }>
@@ -232,8 +228,7 @@ class Hive extends Component {
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "75vh" }>
               <div className="GamePane">
-                { gameControlsButtons }
-                { gameControlsSliders }
+                { gameControls }
                 { gameArea }
               </div>
               <div>
