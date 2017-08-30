@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import GameOptions from "./GameOptions.js";
+import GameDisplay from "./GameDisplay.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
@@ -50,13 +51,6 @@ class Hive extends Component {
     };
   }
 
-  onMouseDown = (e) => {
-    let x = Math.floor(e.nativeEvent.offsetX / this.state.pixelScale);
-    let y = Math.floor(e.nativeEvent.offsetY / this.state.pixelScale);
-    console.log(window.hive.board.tiles[x][y]);
-    this.setState({ watchTile: [x, y] });
-  }
-
   componentDidMount() {
     if (!this.state.newGame) {
       window.hive = new HiveGame(this.state);
@@ -74,10 +68,10 @@ class Hive extends Component {
     const updateTime = (new Date().getTime()) - updateStartTime;
     const renderStartTime = new Date().getTime();
     if (this.state.shouldRenderAll) {
-      this.renderAll(this.state.pixelScale);
+      this._display.renderAll(this.state.pixelScale);
       newState.shouldRenderAll = false;
     } else {
-      this.renderUpdates(this.state.pixelScale);
+      this._display.renderUpdates(this.state.pixelScale);
     }
     const renderTime = (new Date().getTime()) - renderStartTime;
     //logTime(updateTime, renderTime);
@@ -95,36 +89,13 @@ class Hive extends Component {
       this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
     }
   }
-  renderUpdates(pixelScale) {
-    const ctx = this._canvas.getContext('2d');
-    const updatedTiles = window.hive.getUpdatedTiles();
-    if (updatedTiles.length > 0) {
-      updatedTiles.forEach((tile) => {
-        ctx.clearRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
-        ctx.fillStyle = tile.color(this.state.shouldRenderTrails);
-        ctx.fillRect(pixelScale * tile.x, pixelScale * tile.y, pixelScale, pixelScale);
-      });
-      window.hive.clearUpdatedTiles();
-    }
-  }
-  renderAll = (pixelScale) => {
-    pixelScale = this.state.pixelScale;
-    const ctx = this._canvas.getContext('2d');
-    ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-    for (var i = 0; i < window.hive.board.width; i++) {
-      for (var j = 0; j < window.hive.board.height; j++) {
-        ctx.fillStyle = window.hive.board.tiles[i][j].color(this.state.shouldRenderTrails);
-        ctx.fillRect(pixelScale * i, pixelScale * j, pixelScale, pixelScale);
-      }
-    }
-  }
   handlePixelScaleChange = (evt) => {
     this.setState({
       pixelScale : parseInt(evt.target.value),
       shouldRenderAll: true,
     });
     if (this.state.isPaused) {
-      this.stepTimeout = setTimeout(this.renderAll, 50, parseInt(evt.target.value));
+      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(evt.target.value));
     }
   }
   handleUpdatesPerStepChange = (evt) => {
@@ -147,7 +118,7 @@ class Hive extends Component {
   handleRenderTrails = () => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
     if (!this.state.newGame) {
-      this.stepTimeout = setTimeout(this.renderAll, 50, this.state.pixelScale);
+      this.stepTimeout = setTimeout(this._display.renderAll, 50, this.state.pixelScale);
     }
   }
   changeHandler = (value, key) => {
@@ -165,6 +136,9 @@ class Hive extends Component {
     window.hive.init();
     this.setState({ newGame: false, shouldRenderAll: true });
     this.stepTimeout = setTimeout(this.step, 100);
+  }
+  handleTileSelect = (x, y) => {
+    this.setState({ watchTile: [x, y] });
   }
   render() {
     let watchTile;
@@ -195,17 +169,14 @@ class Hive extends Component {
         />
       );
     } else {
-      gameArea = (
-        <div>
-          <canvas
-            ref={ (c) => this._canvas = c }
-            className="game_board"
-            onMouseDown={ this.onMouseDown }
-            width={ this.state.width * this.state.pixelScale }
-            height={ this.state.height * this.state.pixelScale }>
-          </canvas>
-        </div>
-      );
+      gameArea = <GameDisplay
+        ref={ (d) => this._display = d }
+        gameWidth={ this.state.width }
+        gameHeight={ this.state.height }
+        pixelScale={ this.state.pixelScale }
+        onTileSelect={ this.handleTileSelect }
+        showTrails={ this.state.shouldRenderTrails }
+      />
     }
     const gameControlsButtons = (
       <div className="GameControls">
