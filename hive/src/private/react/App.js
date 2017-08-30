@@ -1,25 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import Game from './Game.js';
-
-
-//class InfoPanel extends Component {
-//
-//  componentDidMount() {
-//    this.setState({
-//      styles: {
-//        top: computeTopWith(this.refs.info),
-//        right: computeRightWith(this.refs.info)
-//      }
-//    });
-//  }
-//
-//  render() {
-//    return (
-//      <div ref="info" style={ this.state.styles }>Info Panel</div>
-//    )
-//  }
-//}
+import Hive from './Hive.js';
 
 class App extends Component {
   constructor(props) {
@@ -28,7 +9,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Game />
+        <Hive />
       </div>
     );
   }

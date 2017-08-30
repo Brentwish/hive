@@ -8,7 +8,7 @@ import {
 } from "../js/constants.js";
 import _ from "lodash";
 import SplitPane from "react-split-pane";
-import "./Game.css";
+import "./Hive.css";
 import brace from "brace";
 import AceEditor from "react-ace";
 
@@ -28,7 +28,7 @@ const logTime = function(updateTime, renderTime) {
   )
 }
 
-class Game extends Component {
+class Hive extends Component {
 
   constructor(props) {
     super(props);
@@ -276,4 +276,4 @@ class Game extends Component {
   }
 }
 
-export default Game;
+export default Hive;

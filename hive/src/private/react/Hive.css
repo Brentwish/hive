@@ -69,11 +69,13 @@
   justify-content: space-around;
   align-items: center;
   margin: 15px 20px 5px 20px;
+  min-height: 10px;
 }
 
 .GameSlider {
   display: flex;
   align-items: center;
+  margin: 0 15px;
 }
 
 .PlayerAntCount {
