@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
 import GameControls from "./GameControls.js";
-import TileInfo from "./TileInfo.js";
-import PlayerInfo from "./PlayerInfo.js";
+import InfoPane from "./InfoPane.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
@@ -154,16 +153,6 @@ class Hive extends Component {
     this.setState({ watchTile: [x, y] });
   }
   render() {
-    let watchTile;
-    if (window.hive && this.state.watchTile) {
-      watchTile = (
-        <TileInfo
-          x={ this.state.watchTile[0] }
-          y={ this.state.watchTile[1] }
-        />
-      );
-    }
-    const playerInfo = <PlayerInfo players={ this.state.players }/>;
     let gameArea;
     if (this.state.newGame) {
       gameArea = (
@@ -197,6 +186,10 @@ class Hive extends Component {
       handleZoomIn={ this.handleZoomIn }
       handleStep={ this.handleStep }
     />;
+    const infoPane = <InfoPane
+      watchTile={ this.state.watchTile }
+      players={ this.state.players }
+    />
     return (
       <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "25vw" }>
@@ -228,9 +221,8 @@ class Hive extends Component {
                 { gameControls }
                 { gameArea }
               </div>
-              <div className="InfoPane">
-                { playerInfo }
-                { watchTile }
+              <div>
+                { infoPane }
               </div>
             </SplitPane>
           </div>
