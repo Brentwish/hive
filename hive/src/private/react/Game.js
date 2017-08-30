@@ -9,6 +9,11 @@ import {
 import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Game.css";
+import brace from "brace";
+import AceEditor from "react-ace";
+
+import 'brace/mode/javascript';
+import 'brace/theme/monokai';
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -171,9 +176,11 @@ class Game extends Component {
         <pre>{ tile.ant ? JSON.stringify(_.omitBy(_.omit(tile.ant.toDataHash(), ['adjacentTiles', 'currentTile']), (v) => _.isNull(v)), undefined, 2) : "" }</pre>
       </div>);
     }
-    let players = this.state.players.map((p) => {
-      return <div style={ { color: p.color } } key={ p.id }>Player { p.id }: { p.antCount } ants</div>;
-    });
+    const playerAntCounts = (<div className="PlayerAntCounts"> {
+      this.state.players.map((p) => {
+        return <div className="PlayerAntCount" style={ { background: p.color } } key={ p.id }>{ p.antCount }</div>;
+      })
+    }</div>);
     let gameArea;
     if (this.state.newGame) {
       gameArea = (
@@ -200,40 +207,71 @@ class Game extends Component {
         </div>
       );
     }
-    const gameControls = (
-      <div>
-        <div>
-          <div>
-            Pixel Scale: { this.state.pixelScale }
-            <input type="range" min="1" max="10" step="1" value={ this.state.pixelScale.toString() || "1" } onChange={ this.handlePixelScaleChange } />
-          </div>
-          <div>
-            Updates per step: { this.state.updatesPerStep }
-            <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
-          </div>
-          <div>
-            Delay per update: { this.state.delayPerUpdate }
-            <input type="range" min="10" max="1000" step="10" value={ this.state.delayPerUpdate.toString() || "1" } onChange={ this.handleDelayPerUpdateChange } />
-          </div>
-        </div>
+    const gameControlsButtons = (
+      <div className="GameControls">
         <button onClick={ this.state.newGame ? this.handleStart : this.handleCreateNewGame }>{ this.state.newGame ? "Start" : "New Game" }</button>
         <button onClick={ this.handlePause }>{ this.state.isPaused ? "Run" : "Pause" }</button>
         <button onClick={ this.handleStep }>Step</button>
         <input type="checkbox" id="renderTrails" onChange={ this.handleRenderTrails } />
-        <label for="renderTrails">Render Trails</label>
+        <label for="renderTrails">Trails</label>
+      </div>
+    );
+    const gameControlsSliders = (
+      <div className="GameControls">
+        <div className="GameSlider">
+          <span>Pixel Scale: { this.state.pixelScale }</span>
+          <input type="range" min="1" max="10" step="1" value={ this.state.pixelScale.toString() || "1" } onChange={ this.handlePixelScaleChange } />
+        </div>
+        <div className="GameSlider">
+          <span>Updates per step: { this.state.updatesPerStep }</span>
+          <input type="range" min="1" max="100" step="1" value={ this.state.updatesPerStep.toString() || "1" } onChange={ this.handleUpdatesPerStepChange } />
+        </div>
+        <div className="GameSlider">
+          <span>Delay per update: { this.state.delayPerUpdate }</span>
+          <input type="range" min="10" max="1000" step="10" value={ this.state.delayPerUpdate.toString() || "1" } onChange={ this.handleDelayPerUpdateChange } />
+        </div>
       </div>
     );
     return (
-      <SplitPane split="vertical" minSize={ 100 } defaultSize={ "75vw" }>
-        <div ref={ (d) => this._gameDiv = d }>
-          { gameControls }
-          { gameArea }
-        </div>
-        <div>
-          { players }
-          { watchTile }
-        </div>
-      </SplitPane>
+      <div ref={ (d) => this._gameDiv = d }>
+        <SplitPane split="vertical" minSize={ 100 } defaultSize={ "25vw" }>
+          <div className="EditorPane">
+            <AceEditor
+              width={ "100%" }
+              height={ "100%" }
+              mode="javascript"
+              theme="monokai"
+              onLoad={this.onLoad}
+              onChange={this.onChange}
+              fontSize={14}
+              showPrintMargin={true}
+              showGutter={true}
+              highlightActiveLine={true}
+              value={`function onLoad(editor) {\n  console.log("i've loaded");\n}`}
+              setOptions={{
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: false,
+              enableSnippets: false,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}
+            />
+          </div>
+          <div>
+            <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "75vh" }>
+              <div className="GamePane">
+                { gameControlsButtons }
+                { gameControlsSliders }
+                { gameArea }
+              </div>
+              <div>
+                { playerAntCounts }
+                { watchTile }
+              </div>
+            </SplitPane>
+          </div>
+        </SplitPane>
+      </div>
     );
   }
 }
