@@ -3,6 +3,7 @@ import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
 import GameControls from "./GameControls.js";
 import TileInfo from "./TileInfo.js";
+import PlayerInfo from "./PlayerInfo.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import {
@@ -162,11 +163,7 @@ class Hive extends Component {
         />
       );
     }
-    const playerAntCounts = (<div className="PlayerAntCounts"> {
-      this.state.players.map((p) => {
-        return <div className="PlayerAntCount" style={ { background: p.color } } key={ p.id }>{ p.antCount }</div>;
-      })
-    }</div>);
+    const playerInfo = <PlayerInfo players={ this.state.players }/>;
     let gameArea;
     if (this.state.newGame) {
       gameArea = (
@@ -231,8 +228,8 @@ class Hive extends Component {
                 { gameControls }
                 { gameArea }
               </div>
-              <div>
-                { playerAntCounts }
+              <div className="InfoPane">
+                { playerInfo }
                 { watchTile }
               </div>
             </SplitPane>
