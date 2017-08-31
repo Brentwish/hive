@@ -66,3 +66,7 @@ export function sample(arr) {
 export function findKey(hash, value) {
   return Object.keys(hash).find((key) => { return hash[key] === value; });
 }
+
+export function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

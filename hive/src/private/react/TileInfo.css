@@ -1,0 +1,25 @@
+.TileInfoContainer {
+  display: flex;
+  flex-flow: rows;
+  justify-content: center;
+}
+
+.TileInfoContainer div {
+  width: 200px;
+  border: solid;
+  border-width: 1px;
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  padding: 5px;
+  height: 240px;
+}
+
+.TileInfoContainer div span {
+  display: flex;
+  align-content: flex-start;
+}
+
+.TileInfoContainer div h3 {
+  line-height: 1px;
+}

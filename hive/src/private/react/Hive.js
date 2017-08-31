@@ -45,6 +45,7 @@ class Hive extends Component {
       shouldRenderTrails: false,
       numPlayers: 5,
       players: [],
+      watchTile: [null, null],
       paused: false,
       newGame: false,
       sparsity: "medium",
@@ -141,7 +142,7 @@ class Hive extends Component {
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
     delete window.hive;
-    this.setState({ newGame: true, watchTile: null });
+    this.setState({ newGame: true, watchTile: [null, null] });
   }
   handleStart = () => {
     window.hive = new HiveGame(this.state);
@@ -216,7 +217,7 @@ class Hive extends Component {
             />
           </div>
           <div>
-            <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "75vh" }>
+            <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane">
                 <div className="GameControlsDiv">
                   <div className="GameControlsInner">
@@ -227,9 +228,7 @@ class Hive extends Component {
                   { gameArea }
                 </div>
               </div>
-              <div>
-                { infoPane }
-              </div>
+              { infoPane }
             </SplitPane>
           </div>
         </SplitPane>

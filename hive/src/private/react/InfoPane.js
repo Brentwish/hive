@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TileInfo from "./TileInfo.js";
 import PlayerInfo from "./PlayerInfo.js";
+import "./InfoPane.css"
 
 import { Tab, Tabs } from "react-bootstrap";
 
@@ -18,17 +19,14 @@ class InfoPane extends Component {
     const playerInfo = (
       <PlayerInfo players={ this.props.players }/>
     );
-    let tileInfo;
-    if (window.hive && this.props.watchTile) {
-      tileInfo = (
-        <TileInfo
-          x={ this.props.watchTile[0] }
-          y={ this.props.watchTile[1] }
-        />
-      );
-    }
+    const tileInfo = (
+      <TileInfo
+        x={ this.props.watchTile[0] }
+        y={ this.props.watchTile[1] }
+      />
+    );
     return (
-      <div className="InfoPanel">
+      <div className="InfoPane">
         <Tabs
           activeKey={ this.state.currentTab }
           onSelect={ this.handleSelect }
