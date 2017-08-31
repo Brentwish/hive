@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import "./GameDisplay.css";
 
 class GameDisplay extends Component {
   onMouseDown = (e) => {
@@ -46,7 +47,7 @@ class GameDisplay extends Component {
   }
   render() {
     return (
-      <div>
+      <div className="GameDisplay">
         <canvas
           ref={ (c) => this._canvas = c }
           className="game_board"

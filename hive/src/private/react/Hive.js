@@ -218,7 +218,11 @@ class Hive extends Component {
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "75vh" }>
               <div className="GamePane">
-                { gameControls }
+                <div className="GameControlsDiv">
+                  <div className="GameControlsInner">
+                    { gameControls }
+                  </div>
+                </div>
                 { gameArea }
               </div>
               <div>
