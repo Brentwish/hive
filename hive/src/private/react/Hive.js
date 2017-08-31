@@ -223,7 +223,9 @@ class Hive extends Component {
                     { gameControls }
                   </div>
                 </div>
-                { gameArea }
+                <div className="GameArea">
+                  { gameArea }
+                </div>
               </div>
               <div>
                 { infoPane }

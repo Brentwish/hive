@@ -1,0 +1,39 @@
+div.GameOptions {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 500px;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+
+div.GameOptions div {
+  margin-bottom: 10px;
+}
+
+div.GameOptions ul {
+  display: table;
+  text-align: right;
+  border-spacing: 10px;
+  padding-right: 40px;
+}
+
+div.GameOptions li {
+  display: table-row;
+  margin-bottom: 10px;
+}
+
+div.GameOptions li input{
+  display: table-row;
+  margin-left: 20px;
+}
+
+div.GameOptions label,
+div.GameOptions input {
+  display: table-cell;
+}
+
+.FoodOptions {
+  text-align: left;
+}

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import _ from "lodash";
+import "./GameOptions.css"
+import { Button } from "react-bootstrap";
 import {
   foodGrades,
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
@@ -12,7 +14,7 @@ class GameOptions extends Component {
       return (<option key={ grade } value={ grade }>{ grade }</option>);
     });
     return (
-      <div>
+      <div className="GameOptions">
         <div>
           <label>Width: { this.props.width }</label>
           <input
@@ -45,32 +47,39 @@ class GameOptions extends Component {
             onChange={ (e) => this.props.changeHandler(e.target.value, "numPlayers") }
           />
         </div>
-        <div>
-          <label>Sparsity: </label>
-          <select 
-            value={ this.props.sparsity }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "sparsity") }
-          >
-            { gradeOptions }
-          </select>
-
-          <label>Density: </label>
-          <select 
-            value={ this.props.density }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "density") }
-          >
-            { gradeOptions }
-          </select>
-
-          <label>Saturation: </label>
-          <select 
-            value={ this.props.saturation }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "saturation") }
-          >
-            { gradeOptions }
-          </select>
+        <div className="FoodOptions">
+          <label>Food options:</label>
+          <ul>
+            <li>
+              <label>Sparsity: </label>
+              <select 
+                value={ this.props.sparsity }
+                onChange={ (e) => this.props.changeHandler(e.target.value, "sparsity") }
+              >
+                { gradeOptions }
+              </select>
+            </li>
+            <li>
+              <label>Density: </label>
+              <select 
+                value={ this.props.density }
+                onChange={ (e) => this.props.changeHandler(e.target.value, "density") }
+              >
+                { gradeOptions }
+              </select>
+            </li>
+            <li>
+              <label>Saturation: </label>
+              <select 
+                value={ this.props.saturation }
+                onChange={ (e) => this.props.changeHandler(e.target.value, "saturation") }
+              >
+                { gradeOptions }
+              </select>
+            </li>
+          </ul>
         </div>
-        <button onClick={ this.props.startGame }>Start</button>
+        <Button bsStyle="success" onClick={ this.props.startGame }>Start</Button>
       </div>
     );
   }

@@ -98,3 +98,12 @@
 .GameControlsInner {
   margin-bottom: 30px;
 }
+
+.GameArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #202020;
+}
