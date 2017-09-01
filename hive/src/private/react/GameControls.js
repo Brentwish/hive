@@ -11,6 +11,7 @@ class GameControls extends Component {
     }
   }
   render() {
+    const speed = this.props.isPaused ? "pause" : this.props.gameSpeed;
     return (
       <div className="GameControls">
         <ButtonToolbar>
@@ -21,7 +22,7 @@ class GameControls extends Component {
             <Button onClick={ this.props.handleZoomOut }><span className="glyphicon glyphicon-zoom-out" /></Button>
             <Button onClick={ this.props.handleZoomIn }><span className="glyphicon glyphicon-zoom-in" /></Button>
           </ButtonGroup>
-          <ToggleButtonGroup className="ButtonPadding" type="radio" name="speed" defaultValue={ 10 } onChange={ this.handleSpeedChange }>
+          <ToggleButtonGroup className="ButtonPadding" type="radio" name="speed" value={ speed } onChange={ this.handleSpeedChange }>
             <ToggleButton value={ 10 }>
               <span className="glyphicon glyphicon-chevron-right" />
               <span className="glyphicon glyphicon-chevron-right" />

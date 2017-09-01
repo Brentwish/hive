@@ -184,6 +184,8 @@ class Hive extends Component {
         <div className="GameControlsDiv">
           <div className="GameControlsInner">
             <GameControls
+              isPaused={ this.state.isPaused }
+              gameSpeed={ this.state.delayPerUpdate }
               onPause={ this.handlePause }
               onSpeedChange={ this.handleSpeedChange }
               onToggleTrails={ this.handleToggleTrails }
