@@ -17,6 +17,7 @@ import AceEditor from "react-ace";
 
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';
+import 'brace/keybinding/vim';
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -51,6 +52,7 @@ class Hive extends Component {
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
+      playerCode: localStorage.getItem("playerCode") || "change this to a better default",
     };
   }
 
@@ -211,13 +213,17 @@ class Hive extends Component {
               height={ "100%" }
               mode="javascript"
               theme="monokai"
+              keyboardHandler="vim"
               onLoad={this.onLoad}
-              onChange={this.onChange}
+              onChange={ (newText) => {
+                localStorage.setItem("playerCode", newText);
+                this.changeHandler(newText, "playerCode");
+              } }
               fontSize={14}
               showPrintMargin={true}
               showGutter={true}
               highlightActiveLine={true}
-              value={`function onLoad(editor) {\n  console.log("i've loaded");\n}`}
+              value={ this.state.playerCode }
               setOptions={{
               enableBasicAutocompletion: false,
               enableLiveAutocompletion: false,
