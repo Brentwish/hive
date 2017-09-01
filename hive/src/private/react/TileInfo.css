@@ -1,25 +1,44 @@
-.TileInfoContainer {
+.TileInfo {
   display: flex;
   flex-flow: rows;
   justify-content: center;
 }
 
-.TileInfoContainer div {
+.Panel {
   width: 200px;
   border: solid;
   border-width: 1px;
-  display: flex;
-  flex-direction: column;
-  align-content: flex-start;
-  padding: 5px;
-  height: 240px;
+  border-color: grey;
+  border-radius: 5px;
+  padding: 15px;
+  height: 250px;
+  margin: 5px 35px;
+  box-shadow: 2px 2px 5px grey;
 }
 
-.TileInfoContainer div span {
-  display: flex;
-  align-content: flex-start;
+.Title {
+  font-weight: bold;
+  font-size: 16px;
+  padding: 3px;
+  margin: 0 10px 5px 10px;
+  border-bottom: 3px solid gray;
 }
 
-.TileInfoContainer div h3 {
-  line-height: 1px;
+.innerTable td {
+  valign: top;
+}
+
+.outerTable {
+  margin: 10px 15px;
+}
+
+.outerTable td:first-child {
+  font-weight: 600;
+  text-align: right;
+  vertical-align: top;
+}
+
+.outerTable td:nth-child(2) {
+  text-align: left;
+  padding-left: 15px;
 }
