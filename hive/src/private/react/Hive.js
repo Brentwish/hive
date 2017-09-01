@@ -178,15 +178,24 @@ class Hive extends Component {
         showTrails={ this.state.shouldRenderTrails }
       />
     }
-    const gameControls = <GameControls
-      onPause={ this.handlePause }
-      onSpeedChange={ this.handleSpeedChange }
-      onToggleTrails={ this.handleToggleTrails }
-      handleStopGame={ this.handleCreateNewGame }
-      handleZoomOut={ this.handleZoomOut }
-      handleZoomIn={ this.handleZoomIn }
-      handleStep={ this.handleStep }
-    />;
+    let gameControls;
+    if (!this.state.newGame) {
+      gameControls = (
+        <div className="GameControlsDiv">
+          <div className="GameControlsInner">
+            <GameControls
+              onPause={ this.handlePause }
+              onSpeedChange={ this.handleSpeedChange }
+              onToggleTrails={ this.handleToggleTrails }
+              handleStopGame={ this.handleCreateNewGame }
+              handleZoomOut={ this.handleZoomOut }
+              handleZoomIn={ this.handleZoomIn }
+              handleStep={ this.handleStep }
+            />
+          </div>
+        </div>
+      );
+    }
     const infoPane = <InfoPane
       watchTile={ this.state.watchTile }
       players={ this.state.players }
@@ -219,11 +228,7 @@ class Hive extends Component {
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane">
-                <div className="GameControlsDiv">
-                  <div className="GameControlsInner">
-                    { gameControls }
-                  </div>
-                </div>
+                { gameControls }
                 <div className="GameArea">
                   { gameArea }
                 </div>
