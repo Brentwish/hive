@@ -1,4 +1,4 @@
-import { randomInt, distance, sample, findKey } from "./constants.js";
+import { randomInt, distance, findKey } from "./constants.js";
 import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
 import _ from "lodash";
 
@@ -34,7 +34,7 @@ const getRandomDirAwayFromQueen = function(antData, makeRandomMove=true) {
   if (closestEmptyTiles.length === 0 && makeRandomMove) {
 		closestEmptyTiles = _.difference(dirs, toGo);
   }
-  return sample(closestEmptyTiles);
+  return _.sample(closestEmptyTiles);
 }
 
 const getRandomDirTowardsQueen = function(antData, makeRandomMove=true) {
@@ -45,7 +45,7 @@ const getRandomDirTowardsQueen = function(antData, makeRandomMove=true) {
   if (closestEmptyTiles.length === 0 && makeRandomMove) {
 		closestEmptyTiles = _.difference(dirs, toGo);
   }
-  return sample(closestEmptyTiles);
+  return _.sample(closestEmptyTiles);
 }
 
 const getOpenTiles = function(tiles) {
@@ -68,11 +68,11 @@ const getForagingDir = function(antData) {
   const spiralDir = spiral(antData, Math.PI / 200);
   const moveCount = _.sum(_.values(antData.moves));
 	if (!_.isEmpty(trailDirs)) {
-	  return sample(trailDirs);
+	  return _.sample(trailDirs);
 	} else if (_.includes(_.keys(openTiles), spiralDir) && moveCount < 2000) {
     return spiralDir;
 	} else {
-    return sample(_.keys(openTiles));
+    return _.sample(_.keys(openTiles));
   }
 }
 
@@ -140,7 +140,7 @@ const returnToQueenAction = function(antData) {
     const action = { type: "move" };
     const moveCount = _.sum(_.values(antData.moves));
     if (moveCount > 500 && distFromQueen(antData) < 8) {
-      action.direction = sample(_.keys(getOpenTiles(antData.adjacentTiles)));
+      action.direction = _.sample(_.keys(getOpenTiles(antData.adjacentTiles)));
     } else {
       const openTiles = getOpenTiles(antData.adjacentTiles);
       const trailTiles = getTilesWithTrails(openTiles, `${antData.ownerId}_food`);
@@ -169,7 +169,7 @@ var playerGameActions = {
       if (adjacentEnemies.length > 0) {
         return {
           type: "attack",
-          direction: findKey(antData.adjacentTiles, sample(adjacentEnemies)),
+          direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
         }
       } else if (antData.age < 100) {
         return {
@@ -207,12 +207,12 @@ var playerGameActions = {
       } else if (adjacentEnemies.length > 0) {
         return {
           type: "attack",
-          direction: findKey(antData.adjacentTiles, sample(adjacentEnemies)),
+          direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
         }
       } else if (adjacentFoodTiles.length > 0) {
         return {
           type: "gather",
-          direction: findKey(antData.adjacentTiles, sample(adjacentFoodTiles)),
+          direction: findKey(antData.adjacentTiles, _.sample(adjacentFoodTiles)),
         }
       } else {
         return {

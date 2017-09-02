@@ -56,7 +56,7 @@ class TileInfo extends Component {
         watchAntButtonGroup = (
           <ToggleButtonGroup className="badge" type="checkbox" defaultValue={ [] }>
             <ToggleButton className="badge" value={ 1 } checked={ this.props.isAntWatched } onChange={ this.props.onTrackAnt }>
-              <span className="glyphicon glyphicon-chevron-right" />
+              <span className="glyphicon glyphicon-pushpin" />
             </ToggleButton>
           </ToggleButtonGroup>
         );
