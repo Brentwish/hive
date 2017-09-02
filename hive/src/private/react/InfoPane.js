@@ -23,6 +23,8 @@ class InfoPane extends Component {
       <TileInfo
         x={ this.props.watchTile[0] }
         y={ this.props.watchTile[1] }
+        onTrackAnt={ this.props.onTrackAnt }
+        isAntWatched={ this.props.isAntWatched }
       />
     );
     return (

@@ -66,6 +66,12 @@ HiveGame.prototype.clearUpdatedTiles = function() {
   this.coordsToRender.clear();
 }
 
+HiveGame.prototype.findAnt = function(playerAntId) {
+  const [playerId, antId] = playerAntId.split("_");
+  const player = _.find(this.players, (p) =>  { return p.id.toString() === playerId; });
+  return _.find(player.ants, (ant) => { return ant.id.toString() === antId; });
+}
+
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
     const ants = this.players[i].ants;
