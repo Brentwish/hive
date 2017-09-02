@@ -2,11 +2,44 @@ import React, { Component } from 'react';
 import "./GameDisplay.css";
 
 class GameDisplay extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      curDown: false,
+      curXPos: 0,
+      curYPos: 0,
+    }
+  }
+  onMouseMove = (e) => {
+    if (this.state.curDown) {
+      this.props.onPan(
+        this.state.curXPos - e.nativeEvent.pageX,
+        this.state.curYPos - e.nativeEvent.pageY
+      )
+    }
+  }
+  onMouseUp = () => {
+    this.setState({ curDown: false });
+  }
   onMouseDown = (e) => {
     let x = Math.floor(e.nativeEvent.offsetX / this.props.pixelScale);
     let y = Math.floor(e.nativeEvent.offsetY / this.props.pixelScale);
-    console.log(window.hive.board.tiles[x][y]);
     this.props.onTileSelect(x, y);
+    this.setState({
+      curDown: true,
+      curXPos: e.nativeEvent.pageX,
+      curYPos: e.nativeEvent.pageY,
+    });
+  }
+  onScroll = (e) => {
+    if (e.nativeEvent.deltaY < 0) {
+      /* scrolling up */
+      this.props.onZoomIn();
+    } else {
+    /* scrolling down */
+      this.props.onZoomOut();
+    }
+    e.preventDefault();
   }
   renderUpdates() {
     const ctx = this._canvas.getContext('2d');
@@ -52,6 +85,9 @@ class GameDisplay extends Component {
           ref={ (c) => this._canvas = c }
           className="game_board"
           onMouseDown={ this.onMouseDown }
+          onMouseUp={ this.onMouseUp }
+          onMouseMove={ this.onMouseMove }
+          onWheel={ this.onScroll }
           width={ this.props.gameWidth * this.props.pixelScale }
           height={ this.props.gameHeight * this.props.pixelScale }>
         </canvas>

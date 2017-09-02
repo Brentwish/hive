@@ -155,6 +155,10 @@ class Hive extends Component {
   handleTileSelect = (x, y) => {
     this.setState({ watchTile: [x, y] });
   }
+  handleGamePan = (dX, dY) => {
+    this._gamePane.scrollLeft += Math.floor(dX/10);
+    this._gamePane.scrollTop += Math.floor(dY/10);
+  }
   render() {
     let gameArea;
     if (this.state.newGame) {
@@ -178,6 +182,9 @@ class Hive extends Component {
         pixelScale={ this.state.pixelScale }
         onTileSelect={ this.handleTileSelect }
         showTrails={ this.state.shouldRenderTrails }
+        onZoomIn={ this.handleZoomIn }
+        onZoomOut={ this.handleZoomOut }
+        onPan={ this.handleGamePan }
       />
     }
     let gameControls;
@@ -235,7 +242,7 @@ class Hive extends Component {
           </div>
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
-              <div className="GamePane">
+              <div className="GamePane" ref={ (g) => this._gamePane = g }>
                 { gameControls }
                 <div className="GameArea">
                   { gameArea }
