@@ -14,6 +14,7 @@
   height: 250px;
   margin: 5px 35px;
   box-shadow: 2px 2px 5px grey;
+  position: relative;
 }
 
 .Title {
@@ -53,7 +54,7 @@ div.Panel span.glyphicon {
 div.Panel div.badge {
   border-radius: 15px;
   padding: 2px 2px;
-  position: absolute;
-  top: 60px;
-  right: 106px;
+  position: absolute !important;
+  right: 7px;
+  top: 7px;
 }
