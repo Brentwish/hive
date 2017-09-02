@@ -42,3 +42,18 @@
   text-align: left;
   padding-left: 15px;
 }
+
+div.Panel span.glyphicon {
+  font-size: 10px;
+  width: 4px;
+  left: -3px;
+  height: 12px;
+}
+
+div.Panel div.badge {
+  border-radius: 15px;
+  padding: 2px 2px;
+  position: absolute;
+  top: 60px;
+  right: 106px;
+}
