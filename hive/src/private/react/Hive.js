@@ -5,6 +5,7 @@ import GameControls from "./GameControls.js";
 import InfoPane from "./InfoPane.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
+import { defaultPlayerFunction } from "../js/constants.js";
 import {
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
   MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
@@ -48,6 +49,8 @@ class Hive extends Component {
       numPlayers: 5,
       players: [],
       watchTile: [null, null],
+      isAntWatched: false,
+      watchAnt: "",
       paused: false,
       newGame: false,
       sparsity: "medium",
@@ -95,6 +98,15 @@ class Hive extends Component {
         color: p.color,
       }
     });
+    if (this.state.isAntWatched) {
+      const ant = window.hive.findAnt(this.state.watchAnt);
+      if (ant) {
+        newState.watchTile = [ant.tile.x, ant.tile.y];
+      } else {
+        newState.isAntWatched = false;
+        newState.watchAnt = "";
+      }
+    }
     this.setState(newState);
 
     // Schedule next step
@@ -163,9 +175,30 @@ class Hive extends Component {
   handleTileSelect = (x, y) => {
     this.setState({ watchTile: [x, y] });
   }
+  handleTrackAnt = (a) => {
+    if (this.state.watchTile[0]) {
+      const ant = window.hive.board.getTileFromCoords({ x: this.state.watchTile[0], y: this.state.watchTile[1] }).ant;
+      if (ant) {
+        debugger;
+        this.setState({
+          isAntWatched: !this.state.isAntWatched,
+          watchAnt: (!this.state.isAntWatched ? ant.owner.id + "_" + ant.id : ""),
+        });
+      }
+    }
+  }
   handleGamePan = (dX, dY) => {
     this._gamePane.scrollLeft += Math.floor(dX/10);
     this._gamePane.scrollTop += Math.floor(dY/10);
+  }
+  handleEditorSubmit = () => {
+    try {
+      eval(this.state.playerCode);
+      this.handleCreateNewGame();
+      this.handleStart();
+    } catch (error) {
+      console.log(error);
+    }
   }
   render() {
     let gameArea;
@@ -217,6 +250,8 @@ class Hive extends Component {
     }
     const infoPane = <InfoPane
       watchTile={ this.state.watchTile }
+      onTrackAnt={ this.handleTrackAnt }
+      isAntWatched={ this.state.isAntWatched }
       players={ this.state.players }
     />
     return (
@@ -225,7 +260,7 @@ class Hive extends Component {
           <div className="EditorPane">
             <AceEditor
               width={ "100%" }
-              height={ "100%" }
+              height={ "90%" }
               mode="javascript"
               theme="monokai"
               keyboardHandler="vim"
@@ -247,6 +282,11 @@ class Hive extends Component {
               tabSize: 2,
             }}
             />
+          <button
+            onClick={ this.handleEditorSubmit }
+          >
+            SHIP IT
+          </button>
           </div>
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>

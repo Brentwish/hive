@@ -4,6 +4,7 @@ import Ant from "./Ant.js";
 import playerGameActions from "./playerGameActions.js";
 import { randomInt, playerColors, dirs } from "./constants.js";
 import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
+import constants from "./constants.js";
 import _ from "lodash";
 
 function HiveGame(props) {
@@ -11,6 +12,7 @@ function HiveGame(props) {
   this.players = [];
   this.turn = 0;
   this.numPlayers = props.numPlayers;
+  this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
 }
 
@@ -66,15 +68,32 @@ HiveGame.prototype.clearUpdatedTiles = function() {
   this.coordsToRender.clear();
 }
 
+HiveGame.prototype.findAnt = function(playerAntId) {
+  const [playerId, antId] = playerAntId.split("_");
+  const player = _.find(this.players, (p) =>  { return p.id.toString() === playerId; });
+  return _.find(player.ants, (ant) => { return ant.id.toString() === antId; });
+}
+
+HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
+  return { antAction: (function(_, constants) {
+    var window = null;
+    return eval(funcText);
+  })(_, constants) };
+}
+
 HiveGame.prototype.updatePlayers = function() {
   for (var i = 0; i < this.players.length; i++) {
     const ants = this.players[i].ants;
-    const actionFunction = this.players[i].antAction;
     for (var j = 0; j < ants.length; j++) {
       const ant = ants[j];
       if (ant.eggTimer === 0) {
-        const action = actionFunction(ant.toDataHash());
-        this.performAction(ant, action);
+        try {
+          const func = this.createPlayerFuncFromText(this.actionFunction);
+          const action = func.antAction(ant.toDataHash());
+          this.performAction(ant, action);
+        } catch (error) {
+          console.log(error);
+        }
         ant.age += 1;
       } else {
         ant.eggTimer -= 1;
@@ -85,7 +104,7 @@ HiveGame.prototype.updatePlayers = function() {
 
 HiveGame.prototype.isLegalAction = function(entity, action) {
   let targetTile;
-  if (action.direction && dirs.includes(action.direction)) {
+  if (action && action.direction && dirs.includes(action.direction)) {
     targetTile = this.board.tileFromDirection(entity.tile.x, entity.tile.y, action.direction);
     if (!targetTile) return false;
   } else {
@@ -106,7 +125,7 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       }
       return targetTile.isVacant() && trailCond && eggCond;
     case "gather":
-      return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
+      return targetTile.isFood() && targetTile.food > 0 && (entity.type === "queen" || entity.food < MAX_FOOD);
     case "transfer":
       return _.isInteger(action.amount) && targetTile.hasAnt() && entity.food >= action.amount;
     case "drop":

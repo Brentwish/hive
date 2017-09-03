@@ -59,10 +59,6 @@ export function distance(p1, p2) {
   return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-export function sample(arr) {
-  return arr[randomInt(arr.length)];
-}
-
 export function findKey(hash, value) {
   return Object.keys(hash).find((key) => { return hash[key] === value; });
 }
@@ -70,3 +66,14 @@ export function findKey(hash, value) {
 export function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const defaultPlayerFunction = `(antData) => {
+  return {
+    type: "move",
+    direction: _.sample(["up", "right"]),
+  };
+}`;
+
+export default {
+  dirs,
+};
