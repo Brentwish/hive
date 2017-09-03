@@ -55,7 +55,7 @@ class Hive extends Component {
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
-      playerCode: localStorage.getItem("playerCode") || "change this to a better default",
+      playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
     };
   }
 
