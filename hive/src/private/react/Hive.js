@@ -13,6 +13,7 @@ import {
 import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Hive.css";
+import ace from "brace";
 import brace from "brace";
 import AceEditor from "react-ace";
 
@@ -65,6 +66,13 @@ class Hive extends Component {
       window.hive.init();
       this.stepTimeout = setTimeout(this.step, 100);
     }
+    ace.config.loadModule('ace/keyboard/vim', (module) => {
+      var VimApi = module.CodeMirror.Vim;
+      VimApi.defineEx('write', 'w', (cm, input) => {
+        this.handleCreateNewGame();
+        this.handleStart();
+      });
+    });
   }
 
   step = () => {
