@@ -3,6 +3,7 @@ import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
 import GameControls from "./GameControls.js";
 import InfoPane from "./InfoPane.js";
+import EditorPane from "./EditorPane.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
 import { defaultPlayerFunction } from "../js/constants.js";
@@ -13,13 +14,6 @@ import {
 import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Hive.css";
-import ace from "brace";
-import brace from "brace";
-import AceEditor from "react-ace";
-
-import 'brace/mode/javascript';
-import 'brace/theme/monokai';
-import 'brace/keybinding/vim';
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -66,13 +60,6 @@ class Hive extends Component {
       window.hive.init();
       this.stepTimeout = setTimeout(this.step, 100);
     }
-    ace.config.loadModule('ace/keyboard/vim', (module) => {
-      var VimApi = module.CodeMirror.Vim;
-      VimApi.defineEx('write', 'w', (cm, input) => {
-        this.handleCreateNewGame();
-        this.handleStart();
-      });
-    });
   }
 
   step = () => {
@@ -256,38 +243,12 @@ class Hive extends Component {
     />
     return (
       <div>
-        <SplitPane split="vertical" minSize={ 100 } defaultSize={ "25vw" }>
-          <div className="EditorPane">
-            <AceEditor
-              width={ "100%" }
-              height={ "90%" }
-              mode="javascript"
-              theme="monokai"
-              keyboardHandler="vim"
-              onLoad={this.onLoad}
-              onChange={ (newText) => {
-                localStorage.setItem("playerCode", newText);
-                this.changeHandler(newText, "playerCode");
-              } }
-              fontSize={14}
-              showPrintMargin={true}
-              showGutter={true}
-              highlightActiveLine={true}
-              value={ this.state.playerCode }
-              setOptions={{
-              enableBasicAutocompletion: false,
-              enableLiveAutocompletion: false,
-              enableSnippets: false,
-              showLineNumbers: true,
-              tabSize: 2,
-            }}
-            />
-          <button
-            onClick={ this.handleEditorSubmit }
-          >
-            SHIP IT
-          </button>
-          </div>
+        <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" }>
+          <EditorPane
+            playerCode={ this.state.playerCode }
+            changeHandler={ this.changeHandler }
+            onRun={ this.handleEditorSubmit }
+          />
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane" ref={ (g) => this._gamePane = g }>
