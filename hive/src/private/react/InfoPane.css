@@ -2,3 +2,11 @@
   height: 100%;
   margin: 2px;
 }
+
+.InfoPane div:first-child {
+  height: 100%;
+}
+
+.tab-content {
+  height: 100%;
+}

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TileInfo from "./TileInfo.js";
 import PlayerInfo from "./PlayerInfo.js";
+import HiveConsole from "./HiveConsole.js";
 import "./InfoPane.css"
 
 import { Tab, Tabs } from "react-bootstrap";
@@ -27,16 +28,23 @@ class InfoPane extends Component {
         isAntWatched={ this.props.isAntWatched }
       />
     );
+    const hiveConsole = (
+      <HiveConsole
+      />
+    );
     return (
       <div className="InfoPane">
         <Tabs
           activeKey={ this.state.currentTab }
           onSelect={ this.handleSelect }
         >
-          <Tab eventKey={ 1 } title="Player Info">
+          <Tab eventKey={ 1 } title="Hive Console">
+            { hiveConsole }
+          </Tab>
+          <Tab eventKey={ 2 } title="Player Info">
             { playerInfo }
           </Tab>
-          <Tab eventKey={ 2 } title="Tile Info">
+          <Tab eventKey={ 3 } title="Tile Info">
             { tileInfo }
           </Tab>
         </Tabs>

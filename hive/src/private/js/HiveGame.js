@@ -125,7 +125,7 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
       }
       return targetTile.isVacant() && trailCond && eggCond;
     case "gather":
-      return targetTile.isFood() && targetTile.food > 0 && entity.food < MAX_FOOD;
+      return targetTile.isFood() && targetTile.food > 0 && (entity.type === "queen" || entity.food < MAX_FOOD);
     case "transfer":
       return _.isInteger(action.amount) && targetTile.hasAnt() && entity.food >= action.amount;
     case "drop":
