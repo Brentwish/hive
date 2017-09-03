@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from "lodash";
 import "./GameDisplay.css";
 
 class GameDisplay extends Component {
@@ -9,6 +10,17 @@ class GameDisplay extends Component {
       curXPos: 0,
       curYPos: 0,
     }
+  }
+  componentWillMount = () => {
+    this.delayedCallback = _.debounce((deltaY) => {
+      if (deltaY < 0) {
+        /* scrolling up */
+        this.props.onZoomIn();
+      } else {
+      /* scrolling down */
+        this.props.onZoomOut();
+      }
+    }, 25);
   }
   onMouseMove = (e) => {
     if (this.state.curDown) {
@@ -32,12 +44,8 @@ class GameDisplay extends Component {
     });
   }
   onScroll = (e) => {
-    if (e.nativeEvent.deltaY < 0) {
-      /* scrolling up */
-      this.props.onZoomIn();
-    } else {
-    /* scrolling down */
-      this.props.onZoomOut();
+    if (Math.abs(e.nativeEvent.deltaY) > 10) {
+      this.delayedCallback(e.nativeEvent.deltaY);
     }
     e.preventDefault();
   }
