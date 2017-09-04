@@ -190,7 +190,7 @@ class Hive extends Component {
   }
   handleDownload = () => {
     var blob = new Blob([this.state.playerCode], {type: "text/plain;charset=utf-8"});
-    FileSaver.saveAs(blob, "HiveAI.txt");
+    FileSaver.saveAs(blob, "HiveAI.js");
   }
   render() {
     let gameArea;
