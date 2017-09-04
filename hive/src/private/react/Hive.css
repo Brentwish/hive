@@ -47,7 +47,9 @@
 .Resizer.disabled:hover {
   border-color: transparent;
 }
-
+.Pane.horizontal.Pane2 {
+  overflow: hidden;
+}
 .GamePane {
   width: 100%;
   height: 100%;

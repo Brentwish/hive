@@ -33,22 +33,17 @@ class InfoPane extends Component {
       />
     );
     return (
-      <div className="InfoPane">
-        <Tabs
-          activeKey={ this.state.currentTab }
-          onSelect={ this.handleSelect }
-        >
-          <Tab eventKey={ 1 } title="Hive Console">
-            { hiveConsole }
-          </Tab>
-          <Tab eventKey={ 2 } title="Player Info">
-            { playerInfo }
-          </Tab>
-          <Tab eventKey={ 3 } title="Tile Info">
-            { tileInfo }
-          </Tab>
-        </Tabs>
-      </div>
+      <Tabs className="InfoPane" activeKey={ this.state.currentTab } onSelect={ this.handleSelect } >
+        <Tab eventKey={ 1 } title="Hive Console">
+          { hiveConsole }
+        </Tab>
+        <Tab eventKey={ 2 } title="Player Info">
+          { playerInfo }
+        </Tab>
+        <Tab eventKey={ 3 } title="Tile Info">
+          { tileInfo }
+        </Tab>
+      </Tabs>
     );
   }
 }
