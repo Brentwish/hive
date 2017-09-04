@@ -123,6 +123,7 @@ class EditorPane extends Component {
         </div>
         <div className="EditorContorls">
           <button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></button>
+          <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
           { watchLabel }
           <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
         </div>

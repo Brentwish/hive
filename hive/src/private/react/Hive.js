@@ -3,6 +3,7 @@ import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
 import GameControls from "./GameControls.js";
 import InfoPane from "./InfoPane.js";
+import FileSaver from "file-saver";
 import EditorPane from "./EditorPane.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
@@ -187,6 +188,10 @@ class Hive extends Component {
       console.log(error);
     }
   }
+  handleDownload = () => {
+    var blob = new Blob([this.state.playerCode], {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(blob, "HiveAI.txt");
+  }
   render() {
     let gameArea;
     if (this.state.newGame) {
@@ -241,16 +246,20 @@ class Hive extends Component {
       isAntWatched={ this.state.isAntWatched }
       players={ this.state.players }
     />
+    const editorPane = (
+      <EditorPane
+        playerCode={ this.state.playerCode }
+        changeHandler={ this.changeHandler }
+        onRun={ this.handleEditorSubmit }
+        onFileWatch={ this.handleFileWatch }
+        changeHandler={ this.changeHandler }
+        onDownload={ this.handleDownload }
+      />
+    );
     return (
       <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" }>
-          <EditorPane
-            playerCode={ this.state.playerCode }
-            changeHandler={ this.changeHandler }
-            onRun={ this.handleEditorSubmit }
-            onFileWatch={ this.handleFileWatch }
-            changeHandler={ this.changeHandler }
-          />
+          { editorPane }
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane" ref={ (g) => this._gamePane = g }>
