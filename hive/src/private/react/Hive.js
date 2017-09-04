@@ -248,6 +248,8 @@ class Hive extends Component {
             playerCode={ this.state.playerCode }
             changeHandler={ this.changeHandler }
             onRun={ this.handleEditorSubmit }
+            onFileWatch={ this.handleFileWatch }
+            changeHandler={ this.changeHandler }
           />
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
