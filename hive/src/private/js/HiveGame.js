@@ -220,6 +220,10 @@ HiveGame.prototype.performAction = function(entity, action) {
         targetTile.ant.health -= ANT_ATTACK_POWER;
         if (targetTile.ant.health <= 0) {
           targetTile.ant.owner.ants.splice(_.indexOf(targetTile.ant.owner.ants, targetTile.ant), 1);
+          targetTile.food += (targetTile.ant.food + 5);
+          if (targetTile.food > 0) {
+            targetTile.type = "food";
+          }
           delete targetTile.ant;
           this.pushCoordToRender(targetTile.coords());
         }
