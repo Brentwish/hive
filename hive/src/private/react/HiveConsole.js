@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import "./HiveConsole.css";
 import Console from "react-console-component";
+import _ from "lodash";
 
 class HiveConsole extends Component {
   constructor(props) {
@@ -11,6 +12,9 @@ class HiveConsole extends Component {
   }
   componentDidUpdate = () => {
     this.refs.console.scrollToBottom();
+  }
+  componentDidMount = () => {
+    setInterval(this.echoLogQueue, 100);
   }
   echo = (text) => {
     try {
@@ -24,6 +28,25 @@ class HiveConsole extends Component {
   }
   isEndOfInput = (line) => {
     return line.length > 0 && line[line.length - 1] !== ";";
+  }
+  echoLogQueue = () => {
+    if (!window.hive) {
+      return;
+    }
+    const logQueue = window.hive.consoleLogs || [];
+    const console = this.refs.console;
+    let log = console.state.log;
+    _.forEach(logQueue, (msg) => {
+			log.push({
+				label: msg.message,
+				command: "",
+				message: [msg.type],
+			});
+    });
+    console.setState({ log });
+    this.refs.console.return();
+    this.refs.console.scrollToBottom();
+    window.hive.consoleLogs = [];
   }
   render() {
     return (

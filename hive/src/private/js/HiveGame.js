@@ -14,6 +14,7 @@ function HiveGame(props) {
   this.numPlayers = props.numPlayers;
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
+  this.consoleLogs = [];
 }
 
 HiveGame.prototype.init = function() {
@@ -75,10 +76,22 @@ HiveGame.prototype.findAnt = function(playerAntId) {
 }
 
 HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
-  return { antAction: (function(_, constants) {
+  const console = {
+    log: (expr) => {
+      this.consoleLogs.push({ type: "log", message: expr });
+    },
+    error: (expr) => {
+      this.consoleLogs.push({ type: "error", message: expr });
+    },
+    warn: (expr) => {
+      this.consoleLogs.push({ type: "warn", message: expr });
+    },
+  };
+  return { antAction: (function(_, constants, _console) {
+    var console = _console;
     var window = null;
     return eval(funcText);
-  })(_, constants) };
+  })(_, constants, console) };
 }
 
 HiveGame.prototype.updatePlayers = function() {
