@@ -157,7 +157,7 @@ const returnToQueenAction = function(antData) {
   }
 }
 
-(antData) => {
+return (antData) => {
   const adjacentTiles = Object.values(antData.adjacentTiles);
   const emptyTiles = adjacentTiles.filter((t) => { return !t.ant; });
   const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
