@@ -28,23 +28,24 @@ class HiveConsole extends Component {
     return line.length > 0 && line[line.length - 1] !== ";";
   }
   echoLogQueue = () => {
-    if (!window.hive) {
-      return;
+
+    if (window.hive && !_.isEmpty(window.hive.consoleLogs)) {
+      const logQueue = window.hive.consoleLogs || [];
+      const console = this.refs.console;
+      let log = console.state.log;
+      _.forEach(logQueue, (msg) => {
+        const message = _.isString(msg.message) ? msg.message : JSON.stringify(msg.message, null, 2);
+        log.push({
+          label: message,
+          command: "",
+          message: [msg.type],
+        });
+      });
+      console.setState({ log });
+      this.refs.console.return();
+      this.refs.console.scrollToBottom();
+      window.hive.consoleLogs = [];
     }
-    const logQueue = window.hive.consoleLogs || [];
-    const console = this.refs.console;
-    let log = console.state.log;
-    _.forEach(logQueue, (msg) => {
-			log.push({
-				label: msg.message,
-				command: "",
-				message: [msg.type],
-			});
-    });
-    console.setState({ log });
-    this.refs.console.return();
-    this.refs.console.scrollToBottom();
-    window.hive.consoleLogs = [];
   }
   render() {
     return (
