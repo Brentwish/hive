@@ -10,6 +10,9 @@ class HiveConsole extends Component {
       fakeEnv: [],
     }
   }
+  componentDidMount = () => {
+    setInterval(this.echoLogQueue, 100);
+  }
   echo = (text) => {
     try {
       const newEnv = this.state.fakeEnv.concat([text])
@@ -23,6 +26,25 @@ class HiveConsole extends Component {
   }
   isEndOfInput = (line) => {
     return line.length > 0 && line[line.length - 1] !== ";";
+  }
+  echoLogQueue = () => {
+    if (!window.hive) {
+      return;
+    }
+    const logQueue = window.hive.consoleLogs || [];
+    const console = this.refs.console;
+    let log = console.state.log;
+    _.forEach(logQueue, (msg) => {
+			log.push({
+				label: msg.message,
+				command: "",
+				message: [msg.type],
+			});
+    });
+    console.setState({ log });
+    this.refs.console.return();
+    this.refs.console.scrollToBottom();
+    window.hive.consoleLogs = [];
   }
   render() {
     return (
