@@ -256,6 +256,10 @@ class Hive extends Component {
         onDownload={ this.handleDownload }
       />
     );
+    let gameEndMessage;
+    if (window.hive && window.hive.isGameOver) {
+      gameEndMessage = <div>Player { window.hive.winningPlayer } wins!</div>;
+    }
     return (
       <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" }>
@@ -264,6 +268,7 @@ class Hive extends Component {
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane" ref={ (g) => this._gamePane = g }>
                 { gameControls }
+                { gameEndMessage }
                 <div className="GameArea">
                   { gameArea }
                 </div>

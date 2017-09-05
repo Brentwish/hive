@@ -15,6 +15,8 @@ function HiveGame(props) {
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
   this.consoleLogs = [];
+  this.isGameOver = false;
+  this.winningPlayer = "";
 }
 
 HiveGame.prototype.init = function() {
@@ -48,10 +50,25 @@ HiveGame.prototype.init = function() {
 HiveGame.prototype.update = function() {
   this.turn += 1;
   this.updatePlayers();
+  this.checkWinConditions();
   const trailsToRender = this.board.updateTrails();
   trailsToRender.forEach((tile) => {
     this.pushCoordToRender(tile.coords());
   });
+}
+
+HiveGame.prototype.checkWinConditions = function() {
+  const playersWithAnts = _.filter(this.players, (p) => {
+    return p.ants.length > 0;
+  });
+  if (playersWithAnts.length < 2) {
+    this.isGameOver= true;
+    if (playersWithAnts.length === 0) {
+      this.winningPlayer = "no one";
+    } else {
+      this.winningPlayer = playersWithAnts[0].id;
+    }
+  }
 }
 
 HiveGame.prototype.pushCoordToRender = function(coord) {
