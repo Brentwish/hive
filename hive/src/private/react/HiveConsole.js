@@ -19,7 +19,7 @@ class HiveConsole extends Component {
       this.refs.console.log(eval(newEnv.join(";")));
       this.setState({ fakeEnv: newEnv });
     } catch(error) {
-      this.refs.console.logX("err", error.message);
+      this.refs.console.logX("error", error.message);
     }
     this.refs.console.return();
     _.delay(this.refs.console.scrollToBottom);
@@ -28,7 +28,6 @@ class HiveConsole extends Component {
     return line.length > 0 && line[line.length - 1] !== ";";
   }
   echoLogQueue = () => {
-
     if (window.hive && !_.isEmpty(window.hive.consoleLogs)) {
       const logQueue = window.hive.consoleLogs || [];
       const console = this.refs.console;
@@ -36,9 +35,9 @@ class HiveConsole extends Component {
       _.forEach(logQueue, (msg) => {
         const message = _.isString(msg.message) ? msg.message : JSON.stringify(msg.message, null, 2);
         log.push({
-          label: message,
+          label: "",
           command: "",
-          message: [msg.type],
+          message: [{ type: msg.type, value: [message] }],
         });
       });
       console.setState({ log });

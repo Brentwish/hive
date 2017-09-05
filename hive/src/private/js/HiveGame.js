@@ -105,7 +105,7 @@ HiveGame.prototype.updatePlayers = function() {
           const action = func.antAction(ant.toDataHash());
           this.performAction(ant, action);
         } catch (error) {
-          console.log(error);
+          this.consoleLogs.push({ type: "error", message: error.message });
         }
         ant.age += 1;
       } else {

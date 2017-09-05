@@ -185,7 +185,7 @@ class Hive extends Component {
       this.handleCreateNewGame();
       this.handleStart();
     } catch (error) {
-      console.log(error);
+      window.hive.consoleLogs.push({ type: "error", message: error.message });
     }
   }
   handleDownload = () => {

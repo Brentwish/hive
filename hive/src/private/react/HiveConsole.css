@@ -12,7 +12,7 @@
   padding-left: 15px;
 }
 
-div.react-console-message.react-console-message-err {
+div.react-console-message.react-console-message-error {
   color: red;
 }
 
