@@ -1,6 +1,4 @@
-import { randomInt, distance, findKey } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, STARTING_TRAIL_TIMER, dirs } from "./constants.js";
-import _ from "lodash";
+const { findKey, MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, STARTING_TRAIL_TIMER, dirs }  = constants;
 
 const getDirsTowardsQueen = function(adjacentTilesHash, moves) {
   let toGo = [];
@@ -159,69 +157,65 @@ const returnToQueenAction = function(antData) {
   }
 }
 
-var playerGameActions = {
-  antAction: function(antData) {
-    const adjacentTiles = Object.values(antData.adjacentTiles);
-    const emptyTiles = adjacentTiles.filter((t) => { return !t.ant; });
-    const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
+(antData) => {
+  const adjacentTiles = Object.values(antData.adjacentTiles);
+  const emptyTiles = adjacentTiles.filter((t) => { return !t.ant; });
+  const adjacentEnemies = adjacentTiles.filter((t) => { return t.ant && t.ant.ownerId !== antData.ownerId; });
 
-    if (antData.type === "queen") {
-      if (adjacentEnemies.length > 0) {
-        return {
-          type: "attack",
-          direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
-        }
-      } else if (antData.age < 100) {
-        return {
-          type: "move",
-          resetMoves: _.some(adjacentTiles, (t) => t.type === "wall"),
-          direction: getRandomDirAwayFromQueen(antData, false),
-        };
-      } else if (antData.eggsLaid.worker < 25 && antData.carryingAmount >= NEW_ANT_COST) {
-        return {
-          type: "layEgg",
-          direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
-          resetMoves: antData.age === 100,
-        };
-      } else if (antData.carryingAmount >= NEW_QUEEN_COST) {
-        return {
-          type: "layEgg",
-          antType: "queen",
-          direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
-        };
-      } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
-        return {
-          type: "move",
-          direction: getRandomDirTowardsQueen(antData, false),
-        };
-			} else {
-        return {
-          type: "none",
-        };
+  if (antData.type === "queen") {
+    if (adjacentEnemies.length > 0) {
+      return {
+        type: "attack",
+        direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
       }
-    } else if (antData.type === "worker") {
-      const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
+    } else if (antData.age < 100) {
+      return {
+        type: "move",
+        resetMoves: _.some(adjacentTiles, (t) => t.type === "wall"),
+        direction: getRandomDirAwayFromQueen(antData, false),
+      };
+    } else if (antData.eggsLaid.worker < 25 && antData.carryingAmount >= NEW_ANT_COST) {
+      return {
+        type: "layEgg",
+        direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
+        resetMoves: antData.age === 100,
+      };
+    } else if (antData.carryingAmount >= NEW_QUEEN_COST) {
+      return {
+        type: "layEgg",
+        antType: "queen",
+        direction: _.sample(_.keys(getOpenTiles(antData.adjacentTiles))),
+      };
+    } else if (antData.moves.left !== antData.moves.right || antData.moves.up !== antData.moves.down) {
+      return {
+        type: "move",
+        direction: getRandomDirTowardsQueen(antData, false),
+      };
+    } else {
+      return {
+        type: "none",
+      };
+    }
+  } else if (antData.type === "worker") {
+    const adjacentFoodTiles = adjacentTiles.filter((t) => { return t.type === "food"; });
 
-      if (antData.carryingAmount === MAX_FOOD) {
-        return returnToQueenAction(antData);
-      } else if (adjacentEnemies.length > 0) {
-        return {
-          type: "attack",
-          direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
-        }
-      } else if (adjacentFoodTiles.length > 0) {
-        return {
-          type: "gather",
-          direction: findKey(antData.adjacentTiles, _.sample(adjacentFoodTiles)),
-        }
-      } else {
-        return {
-          type: "move",
-          direction: getForagingDir(antData),
-        };
+    if (antData.carryingAmount === MAX_FOOD) {
+      return returnToQueenAction(antData);
+    } else if (adjacentEnemies.length > 0) {
+      return {
+        type: "attack",
+        direction: findKey(antData.adjacentTiles, _.sample(adjacentEnemies)),
       }
+    } else if (adjacentFoodTiles.length > 0) {
+      return {
+        type: "gather",
+        direction: findKey(antData.adjacentTiles, _.sample(adjacentFoodTiles)),
+      }
+    } else {
+      return {
+        type: "move",
+        direction: getForagingDir(antData),
+      };
     }
   }
 }
-
-export default playerGameActions;

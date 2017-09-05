@@ -1,7 +1,6 @@
 import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
-import playerGameActions from "./playerGameActions.js";
 import { randomInt, playerColors, dirs } from "./constants.js";
 import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
 import constants from "./constants.js";
@@ -28,7 +27,6 @@ HiveGame.prototype.init = function() {
       color: playerColors[i],
       ants: [],
       board: this.board,
-      playerGameActions: playerGameActions,
     }));
   }
 
