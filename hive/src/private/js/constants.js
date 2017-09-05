@@ -67,7 +67,7 @@ export function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export const defaultPlayerFunction = `(antData) => {
+export const defaultPlayerFunction = `return (antData) => {
   return {
     type: "move",
     direction: _.sample(["up", "right"]),
@@ -75,5 +75,23 @@ export const defaultPlayerFunction = `(antData) => {
 }`;
 
 export default {
+  randomInt,
+  distance,
+  findKey,
   dirs,
+  UPDATE_PERIOD,
+  MAX_FOOD,
+  MAX_TRAIL,
+  NEW_ANT_COST,
+  NEW_QUEEN_COST,
+  EGG_TIMER,
+  ANT_ATTACK_POWER,
+  ANT_HEALTH,
+  QUEEN_HEALTH,
+  MIN_BOARD_WIDTH,
+  MAX_BOARD_WIDTH,
+  MIN_BOARD_HEIGHT,
+  MAX_BOARD_HEIGHT,
+  MIN_NUM_PLAYERS,
+  MAX_NUM_PLAYERS,
 };

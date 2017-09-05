@@ -107,7 +107,8 @@ HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
   return { antAction: (function(_, constants, _console) {
     var console = _console;
     var window = null;
-    return eval(funcText);
+    var f = eval(`(() => { ${funcText} })`)();
+    return f;
   })(_, constants, console) };
 }
 
