@@ -181,7 +181,7 @@ class Hive extends Component {
   }
   handleEditorSubmit = () => {
     try {
-      eval(this.state.playerCode);
+      eval(`(() => { ${this.state.playerCode} })`);
       this.handleCreateNewGame();
       this.handleStart();
     } catch (error) {
