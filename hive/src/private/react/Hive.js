@@ -80,10 +80,26 @@ class Hive extends Component {
     const renderTime = (new Date().getTime()) - renderStartTime;
     //logTime(updateTime, renderTime);
     newState.players = window.hive.players.map((p) => {
+      const numQueens = _.countBy(p.ants, (ant) => { return ant.type; }).queen || 0;
+      const numWorkers = p.ants.length - numQueens;
       return {
-        id: p.id,
-        antCounts: _.countBy(p.ants, (ant) => { return ant.type; }) || 0,
-        color: p.color,
+        playerIdentifiers: {
+          id: p.id,
+          name: p.name,
+          color: p.color,
+        },
+        antCounts: {
+          numQueens,
+          numWorkers,
+        },
+        combatCounts: {
+          numDeadAnts: p.numDeadAnts,
+          numAntsKilled: p.numAntsKilled,
+        },
+        foodCounts: {
+          totalFood: p.totalFood,
+          currentFood: p.currentFood,
+        },
       }
     });
     if (this.state.isAntWatched) {

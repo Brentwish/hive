@@ -14,6 +14,7 @@ export const MIN_BOARD_HEIGHT = 20;
 export const MAX_BOARD_HEIGHT = 600;
 export const MIN_NUM_PLAYERS = 1;
 export const MAX_NUM_PLAYERS = 10;
+export const STARTING_FOOD = 35;
 export const tileColors = {
   "empty": "#E4AF77",
   "wall": "#424949",
@@ -51,6 +52,24 @@ export const foodGrades = {
   "none": 0,
 }
 
+export const keysToTitles = {
+  antCounts: "Ants",
+  numQueens: "Queens",
+  numWorkers: "Workers",
+  combatCounts: "Combat",
+  numDeadAnts: "Dead Ants",
+  numAntsKilled: "Ants Killed",
+  foodCounts: "Food",
+  totalFood: "Total",
+  currentFood: "Current",
+};
+export const listOfNames = [
+  "Bob Jenkins", "LeeRoy Jenkins",
+  "Cassy Jenkins", "Alexander Jenkins",
+  "Flarfalarf Jenkins", "And sometimes 'Y' Jenkins",
+  "BoJack Jenkins", "Tubby Jenkins",
+  "PhoLin Jenkins", "Tarloc Jenkins"
+];
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }
