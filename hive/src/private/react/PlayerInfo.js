@@ -29,7 +29,7 @@ class PlayerInfo extends Component {
   }
   generateTable = (player) => {
     return (
-      <table key="PlayerTable">
+      <table className="PlayerTable" key="PlayerTable">
         <tbody>
           { _.map(player, (counts, type) => {
               return (
@@ -48,7 +48,7 @@ class PlayerInfo extends Component {
   }
   generateInnerTable = (type, counts) => {
     return (
-      <table key={ type }>
+      <table className="InnerTables" key={ type }>
         <tbody>
           { _.map(counts, (v, k) => {
               return (
@@ -69,13 +69,13 @@ class PlayerInfo extends Component {
   render() {
     let currentPlayerColor;
     if (this.props.players[this.state.currentTab]) {
-      currentPlayerColor = this.props.players[this.state.currentTab].color;
+      currentPlayerColor = this.props.players[this.state.currentTab].playerIdentifiers.color;
     }
     return (
       <div className="PlayerInfo">
         <Tabs
           className={ "PlayerTabs" }
-          style={ { borderLeft: "solid " + currentPlayerColor } }
+          style={ { border: "solid " + currentPlayerColor } }
           stacked={ true }
           activeKey={ this.state.currentTab }
           onSelect={ this.handleSelect }
