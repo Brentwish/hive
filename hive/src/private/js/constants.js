@@ -70,6 +70,7 @@ export const listOfNames = [
   "BoJack Jenkins", "Tubby Jenkins",
   "PhoLin Jenkins", "Tarloc Jenkins"
 ];
+export const graphTypes = ["TotalAnts", "DeadAnts", "AntsKilled", "TotalFood"];
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }

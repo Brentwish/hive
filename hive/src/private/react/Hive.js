@@ -6,7 +6,7 @@ import InfoPane from "./InfoPane.js";
 import FileSaver from "file-saver";
 import EditorPane from "./EditorPane.js";
 import HiveGame from "../js/HiveGame.js";
-import { UPDATE_PERIOD, foodGrades } from "../js/constants.js";
+import { UPDATE_PERIOD, foodGrades, graphTypes } from "../js/constants.js";
 import { defaultPlayerFunction } from "../js/constants.js";
 import {
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
@@ -43,6 +43,7 @@ class Hive extends Component {
       shouldRenderTrails: false,
       numPlayers: 5,
       players: [],
+      currentGraph: "TotalAnts",
       watchTile: [null, null],
       isAntWatched: false,
       watchAnt: "",
@@ -59,6 +60,7 @@ class Hive extends Component {
     if (!this.state.newGame) {
       window.hive = new HiveGame(this.state);
       window.hive.init();
+      this.setState({ graphs: this.initGraphs() });
       this.stepTimeout = setTimeout(this.step, 100);
     }
   }
@@ -111,12 +113,62 @@ class Hive extends Component {
         newState.watchAnt = "";
       }
     }
+    if (window.hive.turn % 10 === 0) newState.graphs = this.updateGraphs(newState.players);
     this.setState(newState);
 
     // Schedule next step
     if (!this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
     }
+  }
+  initGraphs = () => {
+    const graphs = {};
+    const colors = graphs["playerColors"] = [];
+    _.forEach(graphTypes, (type) => {
+      const graph = graphs[type] = []; //Array of players' data
+      _.forEach(window.hive.players, (player, i) => {
+        graph.push([]); //Array of player's data
+        colors.push(player.color);
+      });
+    });
+    return graphs;
+  }
+  updateGraphs = (players) => {
+    const graphs = this.state.graphs;
+    _.forEach(graphTypes, (type) => {
+      const graph = graphs[type];
+      _.forEach(players, (player, i) => {
+        const data = graph[i];
+        if (data.length > 100) data.shift();
+        switch (type) {
+          case "TotalAnts":
+            data.push({
+              x: window.hive.turn,
+              y: player.antCounts.numQueens + player.antCounts.numWorkers,
+            });
+            break;
+          case "DeadAnts":
+            data.push({
+              x: window.hive.turn,
+              y: player.combatCounts.numDeadAnts,
+            });
+            break;
+          case "AntsKilled":
+            data.push({
+              x: window.hive.turn,
+              y: player.combatCounts.numAntsKilled,
+            });
+            break;
+          case "TotalFood":
+            data.push({
+              x: window.hive.turn,
+              y: player.foodCounts.totalFood,
+            });
+            break;
+        }
+      });
+    });
+    return graphs;
   }
   handleZoomIn = () => {
     const newPixelScale = Math.min(this.state.pixelScale + 1, 10);
@@ -173,7 +225,11 @@ class Hive extends Component {
   handleStart = () => {
     window.hive = new HiveGame(this.state);
     window.hive.init();
-    this.setState({ newGame: false, shouldRenderAll: true });
+    this.setState({
+      newGame: false,
+      shouldRenderAll: true,
+      graphs: this.initGraphs(),
+    });
     this.stepTimeout = setTimeout(this.step, 100);
   }
   handleTileSelect = (x, y) => {
@@ -261,6 +317,8 @@ class Hive extends Component {
       onTrackAnt={ this.handleTrackAnt }
       isAntWatched={ this.state.isAntWatched }
       players={ this.state.players }
+      graphs={ this.state.graphs }
+      currentGraph={ this.state.currentGraph }
     />
     const editorPane = (
       <EditorPane

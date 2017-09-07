@@ -18,7 +18,11 @@ class InfoPane extends Component {
   }
   render() {
     const playerInfo = (
-      <PlayerInfo players={ this.props.players }/>
+      <PlayerInfo
+        players={ this.props.players }
+        graphs={ this.props.graphs }
+        currentGraph={ this.props.currentGraph }
+      />
     );
     const tileInfo = (
       <TileInfo

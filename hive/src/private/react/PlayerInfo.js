@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import "./PlayerInfo.css"
 import { keysToTitles } from "../js/constants.js"
-import { Tab, Tabs } from "react-bootstrap";
+
 import _ from "lodash";
+import { Tab, Tabs } from "react-bootstrap";
+import { LineChart } from "react-easy-chart";
 
 class PlayerInfo extends Component {
   constructor(props) {
@@ -13,16 +15,17 @@ class PlayerInfo extends Component {
   }
   generatePlayerTabs = () => {
     return _.map(this.props.players, (player) => {
+      const playerWithoutIdentifiers = _.omitBy(player, (v, k) => {
+        return k === "playerIdentifiers";
+      })
       return (
         <Tab
           key={ player.playerIdentifiers.id }
           eventKey={ player.playerIdentifiers.id }
           title={ player.playerIdentifiers.name }
         >
-          { this.generateTable(_.omitBy(player, (v, k) => {
-              return k === "playerIdentifiers"
-            }))
-          }
+          { this.generateTable(playerWithoutIdentifiers) }
+          { this.generateLineGraph() }
         </Tab>
       );
     });
@@ -62,6 +65,29 @@ class PlayerInfo extends Component {
         </tbody>
       </table>
     );
+  }
+  generateLineGraph = () => {
+    if (this.props.graphs && this.props.currentGraph) {
+      const currentGraph = this.props.currentGraph;
+      const graph = this.props.graphs[currentGraph];
+      const yVals = _.map(_.flatten(graph), (pair) => { return pair.y; });
+      return (
+        <LineChart
+          data={ graph }
+          axisLabels={ { x: 'Ticks', y: currentGraph } }
+          lineColors={ this.props.graphs.playerColors }
+          style={ { width: "100%", height: "100%" } }
+          width={ 500}
+          height={ 250 }
+          xTicks={ 10 }
+          yDomainRange={ [
+            0,
+            Math.max(Math.max(...yVals), 25)
+          ] }
+          axes={ true }
+        />
+      );
+    }
   }
   handleSelect = (tab) => {
     this.setState({ currentTab: tab });
