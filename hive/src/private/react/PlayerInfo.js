@@ -11,13 +11,21 @@ class PlayerInfo extends Component {
     super();
     this.state = {
       currentTab: props.activeTab || 0,
+      graphDimensions: { width: 0, height: 0 },
     };
+  }
+  componentDidUpdate = (prevProps) => {
+    this.props.setGraphDimensions();
   }
   generatePlayerTabs = () => {
     return _.map(this.props.players, (player) => {
       const playerWithoutIdentifiers = _.omitBy(player, (v, k) => {
         return k === "playerIdentifiers";
       })
+      let lineGraph;
+      if (this.state.currentTab === player.playerIdentifiers.id) {
+        lineGraph = this.generateLineGraph();
+      }
       return (
         <Tab
           key={ player.playerIdentifiers.id }
@@ -25,7 +33,7 @@ class PlayerInfo extends Component {
           title={ player.playerIdentifiers.name }
         >
           { this.generateTable(playerWithoutIdentifiers) }
-          { this.generateLineGraph() }
+          { lineGraph }
         </Tab>
       );
     });
@@ -72,24 +80,26 @@ class PlayerInfo extends Component {
       const graph = this.props.graphs[currentGraph];
       const yVals = _.map(_.flatten(graph), (pair) => { return pair.y; });
       return (
-        <LineChart
-          data={ graph }
-          axisLabels={ { x: 'Ticks', y: currentGraph } }
-          lineColors={ this.props.graphs.playerColors }
-          style={ { width: "100%", height: "100%" } }
-          width={ 500}
-          height={ 250 }
-          xTicks={ 10 }
-          yDomainRange={ [
-            0,
-            Math.max(Math.max(...yVals), 25)
-          ] }
-          axes={ true }
-        />
+        <div ref={ (d) => this._graphContainer = d } className="LineGraph">
+          <LineChart
+            data={ graph }
+            axes={ true }
+            axisLabels={ { x: 'Ticks', y: currentGraph } }
+            xTicks={ 10 }
+            yDomainRange={ [
+              0,
+              Math.max(Math.max(...yVals), 25)
+            ] }
+            lineColors={ this.props.graphs.playerColors }
+            width={ this.props.graphDimensions.width }
+            height={ this.props.graphDimensions.height }
+          />
+        </div>
       );
     }
   }
   handleSelect = (tab) => {
+    this.props.setGraphDimensions();
     this.setState({ currentTab: tab });
   }
   render() {

@@ -44,6 +44,7 @@ class Hive extends Component {
       numPlayers: 5,
       players: [],
       currentGraph: "TotalAnts",
+      graphDimensions: { width: 0, height: 0 },
       watchTile: [null, null],
       isAntWatched: false,
       watchAnt: "",
@@ -260,6 +261,14 @@ class Hive extends Component {
       window.hive.consoleLogs.push({ type: "error", message: error.message });
     }
   }
+  setGraphDimensions = () => {
+    if (this._infoPane && this._infoPane._playerInfo && this._infoPane._playerInfo._graphContainer) {
+      const div = this._infoPane._playerInfo._graphContainer
+      this.setState({
+        graphDimensions: { width: div.offsetWidth, height: div.offsetHeight }
+      });
+    }
+  }
   handleDownload = () => {
     var blob = new Blob([this.state.playerCode], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "HiveAI.js");
@@ -313,12 +322,15 @@ class Hive extends Component {
       );
     }
     const infoPane = <InfoPane
+      ref={ (i) => this._infoPane = i }
       watchTile={ this.state.watchTile }
       onTrackAnt={ this.handleTrackAnt }
       isAntWatched={ this.state.isAntWatched }
       players={ this.state.players }
       graphs={ this.state.graphs }
       currentGraph={ this.state.currentGraph }
+      graphDimensions={ this.state.graphDimensions }
+      setGraphDimensions={ this.setGraphDimensions }
     />
     const editorPane = (
       <EditorPane
@@ -336,10 +348,10 @@ class Hive extends Component {
     }
     return (
       <div>
-        <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" }>
+        <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" } onChange={ this.setGraphDimensions}>
           { editorPane }
           <div>
-            <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
+            <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" } onChange={ this.setGraphDimensions }>
               <div className="GamePane" ref={ (g) => this._gamePane = g }>
                 { gameControls }
                 { gameEndMessage }
