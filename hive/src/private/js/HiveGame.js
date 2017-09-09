@@ -8,9 +8,15 @@ import _ from "lodash";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
-  this.players = [];
+  this.players = _.map(props.players, (player, i) => {
+    return new Player(_.merge(player, {
+      id: i,
+      color: playerColors[i],
+      board: this.board,
+      code: player.AICode,
+    }));
+  });
   this.turn = 0;
-  this.numPlayers = props.numPlayers;
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
   this.consoleLogs = [];
@@ -21,15 +27,6 @@ function HiveGame(props) {
 HiveGame.prototype.init = function() {
   this.board.blankBoard();
   this.board.addRandomFood(this.foodProps.sparsity, this.foodProps.density, this.foodProps.saturation);
-  for (let i = 0; i < this.numPlayers; i++) {
-    this.players.push(new Player({
-      id: i,
-      name: listOfNames[i],
-      color: playerColors[i],
-      ants: [],
-      board: this.board,
-    }));
-  }
 
   for (var i = 0; i < this.players.length; i++) {
     var queen = new Ant({
@@ -114,13 +111,11 @@ HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
 }
 
 HiveGame.prototype.updatePlayers = function() {
-  for (var i = 0; i < this.players.length; i++) {
-    const ants = this.players[i].ants;
-    for (var j = 0; j < ants.length; j++) {
-      const ant = ants[j];
+  this.players.forEach((player) => {
+    player.ants.forEach((ant) => {
       if (ant.eggTimer === 0) {
         try {
-          const func = this.createPlayerFuncFromText(this.actionFunction);
+          const func = this.createPlayerFuncFromText(player.code);
           const action = func.antAction(ant.toDataHash());
           this.performAction(ant, action);
         } catch (error) {
@@ -130,8 +125,8 @@ HiveGame.prototype.updatePlayers = function() {
       } else {
         ant.eggTimer -= 1;
       }
-    }
-  }
+    });
+  });
 }
 
 HiveGame.prototype.isLegalAction = function(entity, action) {
