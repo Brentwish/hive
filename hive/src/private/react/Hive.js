@@ -48,7 +48,7 @@ class Hive extends Component {
       isAntWatched: false,
       watchAnt: "",
       paused: false,
-      newGame: true,
+      newGame: false,
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
