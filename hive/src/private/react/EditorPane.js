@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import "./EditorPane.css"
+import AIManagerModal from "./AIManagerModal.js";
 
 import ace from "brace";
 import brace from "brace";
@@ -16,6 +17,7 @@ class EditorPane extends Component {
     super(props);
     this.state = {
       watchingFile: false,
+      showModal: true,
     };
   }
   componentDidMount() {
@@ -25,6 +27,12 @@ class EditorPane extends Component {
         this.props.onRun();
       });
     });
+  }
+  closeModal = () => {
+    this.setState({ showModal: false });
+  }
+  openModal = () => {
+    this.setState({ showModal: true });
   }
   updatePlayerCodeFromFile = () => {
     console.log("wat");
@@ -52,7 +60,7 @@ class EditorPane extends Component {
         // Closure to capture the file information.
         reader.onload = ((theFile) => {
           return (e) => {
-            this.props.changeHandler(e.target.result, "playerCode");
+            this.props.updatePlayerCode(e.target.result);
             this.setState({ fileLastModified: theFile.lastModified });
             this.props.onRun();
           };
@@ -102,10 +110,7 @@ class EditorPane extends Component {
             theme="monokai"
             keyboardHandler="vim"
             onLoad={this.onLoad}
-            onChange={ (newText) => {
-              localStorage.setItem("playerCode", newText);
-              this.props.changeHandler(newText, "playerCode");
-            } }
+            onChange={ this.props.updatePlayerCode }
             fontSize={14}
             showPrintMargin={true}
             showGutter={true}
@@ -123,10 +128,20 @@ class EditorPane extends Component {
         </div>
         <div className="EditorContorls">
           <button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></button>
+          <button onClick={ this.openModal } ><span className="glyphicon glyphicon-folder-close"/></button>
           <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
           { watchLabel }
           <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
         </div>
+        <AIManagerModal
+          showModal={ this.state.showModal }
+          close={ this.closeModal }
+          addAI={ this.props.addAI }
+          updateAI={ this.props.updateAI }
+          selectAI={ this.props.selectAI }
+          deleteAI={ this.props.deleteAI }
+          AIs={ this.props.AIs }
+        />
       </div>
     );
   }
