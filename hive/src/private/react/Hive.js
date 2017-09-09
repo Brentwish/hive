@@ -41,14 +41,13 @@ class Hive extends Component {
       height: 100,
       shouldRenderAll: true,
       shouldRenderTrails: false,
-      numPlayers: 5,
       players: [],
       graphDimensions: { width: 0, height: 0 },
       watchTile: [null, null],
       isAntWatched: false,
       watchAnt: "",
       paused: false,
-      newGame: false,
+      newGame: true,
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
@@ -59,17 +58,24 @@ class Hive extends Component {
           AICode: localStorage.getItem("playerCode") || defaultPlayerFunction
         }
       },
+      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ "new_1" ],
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
     };
   }
 
   componentDidMount() {
     if (!this.state.newGame) {
-      window.hive = new HiveGame(_.merge(this.state, { playerCode: this.currentAIcode() }));
+      window.hive = new HiveGame(this.hiveGameOptions());
       window.hive.init();
       this.setState({ graphs: this.initGraphs() });
       this.stepTimeout = setTimeout(this.step, 100);
     }
+  }
+
+  hiveGameOptions() {
+    return _.merge(_.omit(this.state, "players"), {
+      players: _.map(this.state.playerAIs, (ai) => this.state.AIs[ai]),
+    });
   }
 
   step = () => {
@@ -230,7 +236,7 @@ class Hive extends Component {
     this.setState({ newGame: true, watchTile: [null, null] });
   }
   handleStart = () => {
-    window.hive = new HiveGame(_.merge(this.state, { playerCode: this.currentAIcode() }));
+    window.hive = new HiveGame(this.hiveGameOptions());
     window.hive.init();
     this.setState({
       newGame: false,
@@ -246,7 +252,6 @@ class Hive extends Component {
     if (this.state.watchTile[0]) {
       const ant = window.hive.board.getTileFromCoords({ x: this.state.watchTile[0], y: this.state.watchTile[1] }).ant;
       if (ant) {
-        debugger;
         this.setState({
           isAntWatched: !this.state.isAntWatched,
           watchAnt: (!this.state.isAntWatched ? ant.owner.id + "_" + ant.id : ""),
@@ -337,6 +342,23 @@ class Hive extends Component {
       console.log("Couldn't find AI with id", id);
     }
   }
+  addPlayer = () => {
+    const newPlayers = _.concat(this.state.playerAIs, this.state.editingAIid);
+    this.setState({ playerAIs: newPlayers });
+    localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
+  }
+  removePlayer = (index) => {
+    const newPlayers = _.clone(this.state.playerAIs);
+    newPlayers.splice(index, 1);
+    this.setState({ playerAIs: newPlayers });
+    localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
+  }
+  updatePlayer = (index, key, value) => {
+    const newPlayers = _.clone(this.state.playerAIs);
+    newPlayers[index] = value;
+    this.setState({ playerAIs: newPlayers });
+    localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
+  }
   render() {
     let gameArea;
     if (this.state.newGame) {
@@ -344,12 +366,17 @@ class Hive extends Component {
         <GameOptions
           width={ this.state.width }
           height={ this.state.height }
-          numPlayers={ this.state.numPlayers }
           sparsity={ this.state.sparsity }
           density={ this.state.density }
           saturation={ this.state.saturation }
           changeHandler={ this.changeHandler }
           startGame={ this.handleStart }
+
+          players={ this.state.playerAIs }
+          AIs={ this.state.AIs }
+          onAddPlayer={ this.addPlayer }
+          removePlayer={ this.removePlayer }
+          updatePlayer={ this.updatePlayer }
         />
       );
     } else {
