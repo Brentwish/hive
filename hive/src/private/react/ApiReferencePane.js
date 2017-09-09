@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Markdown from "react-markdown";
 import "./ApiReferencePane.css"
 
+import codeRenderer from './CodeRenderer.js';
+
+
 class ApiReferencePane extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +31,10 @@ class ApiReferencePane extends Component {
         <Markdown
           className="Markdown"
           source={ this.state.source }
+          renderers={ {
+            CodeBlock: codeRenderer,
+            Code: codeRenderer,
+          } }
         />
       </div>
     );
