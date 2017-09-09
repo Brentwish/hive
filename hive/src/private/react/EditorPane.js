@@ -35,7 +35,6 @@ class EditorPane extends Component {
     this.setState({ showModal: true });
   }
   updatePlayerCodeFromFile = () => {
-    console.log("wat");
     let file;
 
     if (typeof window.FileReader !== 'function') {
@@ -132,6 +131,7 @@ class EditorPane extends Component {
           <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
           { watchLabel }
           <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
+          <button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></button>
         </div>
         <AIManagerModal
           showModal={ this.state.showModal }
