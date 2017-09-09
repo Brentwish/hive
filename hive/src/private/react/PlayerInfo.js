@@ -88,7 +88,7 @@ class PlayerInfo extends Component {
               <DropdownButton
                 title={ currentGraph }
                 id="dropdown-size-medium"
-                onSelect={ (graphType) => { return this.changeGraph(graphType) } }
+                onSelect={ this.changeGraph }
               >
               {
                 _.map(graphTypes, (type) => {
