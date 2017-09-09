@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import "./PlayerInfo.css"
-import { keysToTitles } from "../js/constants.js"
+import { keysToTitles, graphTypes } from "../js/constants.js"
 
 import _ from "lodash";
 import { Tab, Tabs } from "react-bootstrap";
+import { ButtonToolbar, DropdownButton, MenuItem } from "react-bootstrap";
 import { LineChart } from "react-easy-chart";
 
 class PlayerInfo extends Component {
@@ -11,6 +12,7 @@ class PlayerInfo extends Component {
     super();
     this.state = {
       currentTab: props.activeTab || 0,
+      currentGraph: "TotalFood",
       graphDimensions: { width: 0, height: 0 },
     };
   }
@@ -75,28 +77,50 @@ class PlayerInfo extends Component {
     );
   }
   generateLineGraph = () => {
-    if (this.props.graphs && this.props.currentGraph) {
-      const currentGraph = this.props.currentGraph;
+    if (this.props.graphs) {
+      const currentGraph = this.state.currentGraph;
       const graph = this.props.graphs[currentGraph];
       const yVals = _.map(_.flatten(graph), (pair) => { return pair.y; });
       return (
-        <div ref={ (d) => this._graphContainer = d } className="LineGraph">
-          <LineChart
-            data={ graph }
-            axes={ true }
-            axisLabels={ { x: 'Ticks', y: currentGraph } }
-            xTicks={ 10 }
-            yDomainRange={ [
-              0,
-              Math.max(Math.max(...yVals), 25)
-            ] }
-            lineColors={ this.props.graphs.playerColors }
-            width={ this.props.graphDimensions.width }
-            height={ this.props.graphDimensions.height }
-          />
+        <div className="Graph">
+          <div className="GraphButtons">
+            <ButtonToolbar>
+              <DropdownButton
+                title={ currentGraph }
+                id="dropdown-size-medium"
+                onSelect={ (graphType) => { return this.changeGraph(graphType) } }
+              >
+              {
+                _.map(graphTypes, (type) => {
+                  return (
+                    <MenuItem key={ type } eventKey={ type }>{ type }</MenuItem>
+                  );
+                })
+              }
+              </DropdownButton>
+            </ButtonToolbar>
+          </div>
+          <div ref={ (d) => this._graphContainer = d } className="GraphContainer">
+            <LineChart
+              data={ graph }
+              axes={ true }
+              axisLabels={ { x: 'Ticks', y: currentGraph } }
+              xTicks={ 10 }
+              yDomainRange={ [
+                0,
+                Math.max(Math.max(...yVals), 25)
+              ] }
+              lineColors={ this.props.graphs.playerColors }
+              width={ 0.9 * this.props.graphDimensions.width }
+              height={ 0.9 * this.props.graphDimensions.height }
+            />
+          </div>
         </div>
       );
     }
+  }
+  changeGraph = (newGraph) => {
+    this.setState({ currentGraph: newGraph });
   }
   handleSelect = (tab) => {
     this.props.setGraphDimensions();

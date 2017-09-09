@@ -43,7 +43,6 @@ class Hive extends Component {
       shouldRenderTrails: false,
       numPlayers: 5,
       players: [],
-      currentGraph: "TotalAnts",
       graphDimensions: { width: 0, height: 0 },
       watchTile: [null, null],
       isAntWatched: false,
@@ -328,7 +327,6 @@ class Hive extends Component {
       isAntWatched={ this.state.isAntWatched }
       players={ this.state.players }
       graphs={ this.state.graphs }
-      currentGraph={ this.state.currentGraph }
       graphDimensions={ this.state.graphDimensions }
       setGraphDimensions={ this.setGraphDimensions }
     />

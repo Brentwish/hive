@@ -22,7 +22,6 @@ class InfoPane extends Component {
         ref={ (p) => this._playerInfo = p }
         players={ this.props.players }
         graphs={ this.props.graphs }
-        currentGraph={ this.props.currentGraph }
         graphDimensions={ this.props.graphDimensions }
         setGraphDimensions={ this.props.setGraphDimensions }
       />
