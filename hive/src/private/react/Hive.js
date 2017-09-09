@@ -85,7 +85,7 @@ class Hive extends Component {
       const numQueens = _.countBy(p.ants, (ant) => { return ant.type; }).queen || 0;
       const numWorkers = p.ants.length - numQueens;
       return {
-        playerIdentifiers: {
+        identifiers: {
           id: p.id,
           name: p.name,
           color: p.color,

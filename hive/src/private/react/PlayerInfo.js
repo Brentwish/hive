@@ -22,17 +22,17 @@ class PlayerInfo extends Component {
   generatePlayerTabs = () => {
     return _.map(this.props.players, (player) => {
       const playerWithoutIdentifiers = _.omitBy(player, (v, k) => {
-        return k === "playerIdentifiers";
+        return k === "identifiers";
       })
       let lineGraph;
-      if (this.state.currentTab === player.playerIdentifiers.id) {
+      if (this.state.currentTab === player.identifiers.id) {
         lineGraph = this.generateLineGraph();
       }
       return (
         <Tab
-          key={ player.playerIdentifiers.id }
-          eventKey={ player.playerIdentifiers.id }
-          title={ player.playerIdentifiers.name }
+          key={ player.identifiers.id }
+          eventKey={ player.identifiers.id }
+          title={ player.identifiers.name }
         >
           { this.generateTable(playerWithoutIdentifiers) }
           { lineGraph }
@@ -129,7 +129,7 @@ class PlayerInfo extends Component {
   render() {
     let currentPlayerColor;
     if (this.props.players[this.state.currentTab]) {
-      currentPlayerColor = this.props.players[this.state.currentTab].playerIdentifiers.color;
+      currentPlayerColor = this.props.players[this.state.currentTab].identifiers.color;
     }
     return (
       <div className="PlayerInfo">
