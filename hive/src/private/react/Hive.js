@@ -52,13 +52,20 @@ class Hive extends Component {
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
-      playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
+      AIs: JSON.parse(localStorage.getItem("AIs") || '""') || {
+        new_1: {
+          id: "new_1",
+          name: "My Hive AI",
+          AICode: localStorage.getItem("playerCode") || defaultPlayerFunction
+        }
+      },
+      editingAIid: localStorage.getItem("editingAIid") || "new_1",
     };
   }
 
   componentDidMount() {
     if (!this.state.newGame) {
-      window.hive = new HiveGame(this.state);
+      window.hive = new HiveGame(_.merge(this.state, { playerCode: this.currentAIcode() }));
       window.hive.init();
       this.setState({ graphs: this.initGraphs() });
       this.stepTimeout = setTimeout(this.step, 100);
@@ -212,7 +219,7 @@ class Hive extends Component {
       this.stepTimeout = setTimeout(this._display.renderAll, 50, this.state.pixelScale);
     }
   }
-  changeHandler = (value, key) => {
+  changeHandler = (key, value) => {
     const newState = {};
     newState[key] = value;
     this.setState(newState);
@@ -223,7 +230,7 @@ class Hive extends Component {
     this.setState({ newGame: true, watchTile: [null, null] });
   }
   handleStart = () => {
-    window.hive = new HiveGame(this.state);
+    window.hive = new HiveGame(_.merge(this.state, { playerCode: this.currentAIcode() }));
     window.hive.init();
     this.setState({
       newGame: false,
@@ -251,9 +258,13 @@ class Hive extends Component {
     this._gamePane.scrollLeft += Math.floor(dX/10);
     this._gamePane.scrollTop += Math.floor(dY/10);
   }
+  currentAIcode = () => {
+    const ai = this.state.AIs[this.state.editingAIid];
+    return ai ? ai.AICode : "";
+  }
   handleEditorSubmit = () => {
     try {
-      eval(`(() => { ${this.state.playerCode} })`);
+      eval(`(() => { ${this.currentAIcode()} })`);
       this.handleCreateNewGame();
       this.handleStart();
     } catch (error) {
@@ -269,8 +280,62 @@ class Hive extends Component {
     }
   }
   handleDownload = () => {
-    var blob = new Blob([this.state.playerCode], {type: "text/plain;charset=utf-8"});
+    var blob = new Blob([this.currentAIcode()], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "HiveAI.js");
+  }
+  updatePlayerCode = (newCode) => {
+    this.updateAI(this.state.editingAIid, "AICode", newCode);
+  }
+  addAI = () => {
+    const ids = _.keys(this.state.AIs);
+    let nextId;
+    let count = 1;
+    while (_.indexOf(ids, `new_${count}`) !== -1) {
+      count++;
+    }
+    const newId = `new_${count}`;
+    const newAIs = this.state.AIs;
+    newAIs[newId] = {
+      id: newId,
+      name: "My Hive AI",
+      AICode: defaultPlayerFunction,
+    };
+    this.setState({ AIs: newAIs });
+    localStorage.setItem("AIs", JSON.stringify(newAIs));
+  }
+  updateAI = (id, key, value) => {
+    const newAIs = this.state.AIs;
+    const oldAI = newAIs[id];
+    if (oldAI) {
+      oldAI[key] = value;
+      newAIs[id] = oldAI;
+      this.setState({ AIs: newAIs });
+      localStorage.setItem("AIs", JSON.stringify(newAIs));
+    } else {
+      console.log("Couldn't find AI with id", id);
+    }
+  }
+  deleteAI = (id) => {
+    if (this.state.AIs[id]) {
+      const newAIs =_.omit(this.state.AIs, id);
+      const keys = _.keys(newAIs);
+      if (keys.length > 0) {
+        const selectedAI = keys[0];
+        this.setState({ AIs: _.omit(this.state.AIs, id), editingAIid: selectedAI });
+        localStorage.setItem("AIs", JSON.stringify(_.omit(this.state.AIs, id)));
+        localStorage.setItem("editingAIid", selectedAI);
+      }
+    } else {
+      console.log("Couldn't find AI with id", id);
+    }
+  }
+  selectAI = (id) => {
+    if (this.state.AIs[id]) {
+      this.setState({ editingAIid: id });
+      localStorage.setItem("editingAIid", id);
+    } else {
+      console.log("Couldn't find AI with id", id);
+    }
   }
   render() {
     let gameArea;
@@ -332,12 +397,17 @@ class Hive extends Component {
     />
     const editorPane = (
       <EditorPane
-        playerCode={ this.state.playerCode }
-        changeHandler={ this.changeHandler }
+        playerCode={ this.currentAIcode() }
+        updatePlayerCode={ this.updatePlayerCode }
         onRun={ this.handleEditorSubmit }
         onFileWatch={ this.handleFileWatch }
-        changeHandler={ this.changeHandler }
         onDownload={ this.handleDownload }
+
+        AIs={ _.values(this.state.AIs) }
+        selectAI={ this.selectAI }
+        addAI={ this.addAI }
+        updateAI={ this.updateAI }
+        deleteAI={ this.deleteAI }
       />
     );
     let gameEndMessage;

@@ -23,7 +23,7 @@ class GameOptions extends Component {
             max={ MAX_BOARD_WIDTH }
             step={ 10 }
             value={ this.props.width }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "width") }
+            onChange={ (e) => this.props.changeHandler("width", e.target.value) }
           />
         </div>
         <div>
@@ -34,7 +34,7 @@ class GameOptions extends Component {
             max={ MAX_BOARD_HEIGHT }
             step={ 10 }
             value={ this.props.height }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "height") }
+            onChange={ (e) => this.props.changeHandler("height", e.target.value) }
           />
         </div>
         <div>
@@ -44,7 +44,7 @@ class GameOptions extends Component {
             min={ MIN_NUM_PLAYERS }
             max={ MAX_NUM_PLAYERS }
             value={ this.props.numPlayers }
-            onChange={ (e) => this.props.changeHandler(e.target.value, "numPlayers") }
+            onChange={ (e) => this.props.changeHandler("numPlayers", e.target.value) }
           />
         </div>
         <div className="FoodOptions">
@@ -54,7 +54,7 @@ class GameOptions extends Component {
               <label>Sparsity: </label>
               <select 
                 value={ this.props.sparsity }
-                onChange={ (e) => this.props.changeHandler(e.target.value, "sparsity") }
+                onChange={ (e) => this.props.changeHandler("sparsity", e.target.value) }
               >
                 { gradeOptions }
               </select>
@@ -63,7 +63,7 @@ class GameOptions extends Component {
               <label>Density: </label>
               <select 
                 value={ this.props.density }
-                onChange={ (e) => this.props.changeHandler(e.target.value, "density") }
+                onChange={ (e) => this.props.changeHandler("density", e.target.value) }
               >
                 { gradeOptions }
               </select>
@@ -72,7 +72,7 @@ class GameOptions extends Component {
               <label>Saturation: </label>
               <select 
                 value={ this.props.saturation }
-                onChange={ (e) => this.props.changeHandler(e.target.value, "saturation") }
+                onChange={ (e) => this.props.changeHandler("saturation", e.target.value) }
               >
                 { gradeOptions }
               </select>
