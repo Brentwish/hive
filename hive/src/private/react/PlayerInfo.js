@@ -103,7 +103,7 @@ class PlayerInfo extends Component {
           <div ref={ (d) => this._graphContainer = d } className="GraphContainer">
             <LineChart
               data={ graph }
-              axes={ true }
+              axes
               axisLabels={ { x: 'Ticks', y: currentGraph } }
               xTicks={ 10 }
               yDomainRange={ [
@@ -136,7 +136,7 @@ class PlayerInfo extends Component {
         <Tabs
           className={ "PlayerTabs" }
           style={ { border: "solid " + currentPlayerColor } }
-          stacked={ true }
+          stacked
           activeKey={ this.state.currentTab }
           onSelect={ this.handleSelect }
         >
