@@ -17,7 +17,7 @@ class EditorPane extends Component {
     super(props);
     this.state = {
       watchingFile: false,
-      showModal: true,
+      showModal: false,
     };
   }
   componentDidMount() {
