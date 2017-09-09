@@ -82,20 +82,6 @@
   justify-content: center;
 }
 
-.GameControlsDiv {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  pointer-events: none;
-}
-
-.GameControlsInner {
-  margin-bottom: 30px;
-}
-
 .GameArea {
   display: flex;
   align-items: center;
@@ -103,4 +89,17 @@
   width: 100%;
   height: 100%;
   background: #202020;
+}
+
+.Controls {
+  height: 50px;
+  background: gray;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.Logo {
+  color: gold;
+  font-size: 26px;
 }

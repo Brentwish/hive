@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import GameOptions from "./GameOptions.js";
 import GameDisplay from "./GameDisplay.js";
 import GameControls from "./GameControls.js";
+import EditorControls from "./EditorControls.js";
 import InfoPane from "./InfoPane.js";
 import FileSaver from "file-saver";
 import EditorPane from "./EditorPane.js";
@@ -256,18 +257,25 @@ class Hive extends Component {
         onDownload={ this.handleDownload }
       />
     );
+    const editorControls = (
+      <EditorControls />
+    );
     let gameEndMessage;
     if (window.hive && window.hive.isGameOver) {
       gameEndMessage = <div>Player { window.hive.winningPlayer } wins!</div>;
     }
     return (
       <div>
+        <div className="Controls">
+          <div className="Logo">Hive</div>
+          { editorControls }
+          { gameControls }
+        </div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" }>
           { editorPane }
           <div>
             <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" }>
               <div className="GamePane" ref={ (g) => this._gamePane = g }>
-                { gameControls }
                 { gameEndMessage }
                 <div className="GameArea">
                   { gameArea }
