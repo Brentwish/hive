@@ -2,7 +2,12 @@
 
 function Player(props) {
   this.id = props.id;
+  this.name = props.name;
   this.ants = props.ants;
+  this.numDeadAnts = 0;
+  this.numAntsKilled = 0;
+  this.totalFood = 0;
+  this.currentFood = 0;
   this.board = props.board;
   this.color = props.color;
 }
