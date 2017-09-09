@@ -77,7 +77,7 @@ class Hive extends Component {
 
   hiveGameOptions() {
     return _.merge(_.omit(this.state, "players"), {
-      players: _.map(this.state.playerAIs, (ai) => this.state.AIs[ai]),
+      players: _.compact(_.map(this.state.playerAIs, (ai) => this.state.AIs[ai])),
     });
   }
 
