@@ -36,7 +36,7 @@ class Hive extends Component {
     super(props);
     this.state = {
       updatesPerStep: 1,
-      delayPerUpdate: 10,
+      delayPerUpdate: 1,
       pixelScale: 5,
       width: 200,
       height: 100,

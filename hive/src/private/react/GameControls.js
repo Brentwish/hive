@@ -23,7 +23,7 @@ class GameControls extends Component {
             <Button onClick={ this.props.handleZoomIn }><span className="glyphicon glyphicon-zoom-in" /></Button>
           </ButtonGroup>
           <ToggleButtonGroup className="ButtonPadding SpeedControls" type="radio" name="speed" value={ speed } onChange={ this.handleSpeedChange }>
-            <ToggleButton value={ 10 }>
+            <ToggleButton value={ 1 }>
               <span className="glyphicon glyphicon-chevron-right" />
               <span className="glyphicon glyphicon-chevron-right" />
               <span className="glyphicon glyphicon-chevron-right" />
