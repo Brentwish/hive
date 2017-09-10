@@ -329,11 +329,20 @@ class Hive extends Component {
     if (this.state.AIs[id]) {
       const newAIs =_.omit(this.state.AIs, id);
       const keys = _.keys(newAIs);
+      let updatedPlayerAIs = _.without(this.state.playerAIs, id);
       if (keys.length > 0) {
         const selectedAI = keys[0];
-        this.setState({ AIs: _.omit(this.state.AIs, id), editingAIid: selectedAI });
+        if (_.isEmpty(updatedPlayerAIs)) {
+          updatedPlayerAIs = [selectedAI];
+        }
+        this.setState({
+          AIs: _.omit(this.state.AIs, id),
+          editingAIid: selectedAI,
+          playerAIs: updatedPlayerAIs,
+        });
         localStorage.setItem("AIs", JSON.stringify(_.omit(this.state.AIs, id)));
         localStorage.setItem("editingAIid", selectedAI);
+        localStorage.setItem("editingAIid", JSON.stringify(updatedPlayerAIs));
       }
     } else {
       console.log("Couldn't find AI with id", id);
