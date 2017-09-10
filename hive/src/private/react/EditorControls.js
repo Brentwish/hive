@@ -71,9 +71,11 @@ class EditorControls extends Component {
     return (
       <div className="EditorContorls">
         <button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></button>
+        <button onClick={ this.props.onManageAIs } ><span className="glyphicon glyphicon-folder-close"/></button>
         <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
         { watchLabel }
         <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
+        <button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></button>
       </div>
     );
   }

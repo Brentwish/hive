@@ -1,0 +1,25 @@
+.AIManagerModal th.name {
+  text-align: left; 
+  padding-left: 8px;
+}
+
+.AIManagerModal td.name {
+  vertical-align: middle;
+}
+
+.AIManagerModal td.name input {
+  padding: 4px;
+  width: 100%;
+}
+
+.AIManagerModal th.centered {
+  text-align: center; 
+}
+
+.AIManagerModal td.centered {
+  width: 50px;
+}
+
+.AIManagerModal tr:last-child td {
+  border-top: none;
+}

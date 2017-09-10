@@ -1,16 +1,22 @@
 import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
-import { randomInt, playerColors, dirs } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH } from "./constants.js";
+import { listOfNames, randomInt, playerColors, dirs } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH, STARTING_FOOD } from "./constants.js";
 import constants from "./constants.js";
 import _ from "lodash";
 
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
-  this.players = [];
+  this.players = _.map(props.players, (player, i) => {
+    return new Player(_.merge(player, {
+      id: i,
+      color: playerColors[i],
+      board: this.board,
+      code: player.AICode,
+    }));
+  });
   this.turn = 0;
-  this.numPlayers = props.numPlayers;
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
   this.consoleLogs = [];
@@ -21,14 +27,6 @@ function HiveGame(props) {
 HiveGame.prototype.init = function() {
   this.board.blankBoard();
   this.board.addRandomFood(this.foodProps.sparsity, this.foodProps.density, this.foodProps.saturation);
-  for (let i = 0; i < this.numPlayers; i++) {
-    this.players.push(new Player({
-      id: i + 1,
-      color: playerColors[i],
-      ants: [],
-      board: this.board,
-    }));
-  }
 
   for (var i = 0; i < this.players.length; i++) {
     var queen = new Ant({
@@ -36,9 +34,11 @@ HiveGame.prototype.init = function() {
       type: 'queen',
       owner: this.players[i],
       tile: this.board.getRandomVacantTile(),
-      food: 35,
+      food: STARTING_FOOD,
       eggTimer: 0,
     });
+    this.players[i].currentFood += STARTING_FOOD;
+    this.players[i].totalFood += STARTING_FOOD;
     this.players[i].ants.push(queen);
     queen.tile.ant = queen;
   }
@@ -111,13 +111,11 @@ HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
 }
 
 HiveGame.prototype.updatePlayers = function() {
-  for (var i = 0; i < this.players.length; i++) {
-    const ants = this.players[i].ants;
-    for (var j = 0; j < ants.length; j++) {
-      const ant = ants[j];
+  this.players.forEach((player) => {
+    player.ants.forEach((ant) => {
       if (ant.eggTimer === 0) {
         try {
-          const func = this.createPlayerFuncFromText(this.actionFunction);
+          const func = this.createPlayerFuncFromText(player.code);
           const action = func.antAction(ant.toDataHash());
           this.performAction(ant, action);
         } catch (error) {
@@ -127,8 +125,8 @@ HiveGame.prototype.updatePlayers = function() {
       } else {
         ant.eggTimer -= 1;
       }
-    }
-  }
+    });
+  });
 }
 
 HiveGame.prototype.isLegalAction = function(entity, action) {
@@ -192,6 +190,8 @@ HiveGame.prototype.performAction = function(entity, action) {
       case "gather":
         targetTile.food -= 1;
         entity.food += 1;
+        entity.owner.currentFood += 1;
+        entity.owner.totalFood += 1;
         if (targetTile.food === 0) {
           targetTile.type = "empty";
           targetTile.food = null;
@@ -207,6 +207,8 @@ HiveGame.prototype.performAction = function(entity, action) {
         const quantToDrop = Math.min(MAX_FOOD, action.amount);
         entity.food -= quantToDrop;
         targetTile.food += quantToDrop;
+        entity.owner.currentFood -= 1;
+        entity.owner.totalFood -= 1;
         if (targetTile.food > 0) {
           targetTile.type = "food";
         }
@@ -220,9 +222,13 @@ HiveGame.prototype.performAction = function(entity, action) {
         if (targetTile.ant.health <= 0) {
           targetTile.ant.owner.ants.splice(_.indexOf(targetTile.ant.owner.ants, targetTile.ant), 1);
           targetTile.food += (targetTile.ant.food + 5);
+          targetTile.ant.owner.currentFood -= (targetTile.ant.food + 5);
+          targetTile.ant.owner.totalFood -= (targetTile.ant.food + 5);
           if (targetTile.food > 0) {
             targetTile.type = "food";
           }
+          entity.owner.numAntsKilled += 1;
+          targetTile.ant.owner.numDeadAnts += 1;
           delete targetTile.ant;
           this.pushCoordToRender(targetTile.coords());
         }
@@ -266,6 +272,7 @@ HiveGame.prototype.layEggOnTile = function(entity, tile, type) {
   });
   entity.owner.ants.push(newAnt);
   entity.food -= (antType === "queen" ? NEW_QUEEN_COST : NEW_ANT_COST);
+  entity.owner.currentFood -= (antType === "queen" ? NEW_QUEEN_COST : NEW_ANT_COST);
   tile.ant = newAnt;
   entity.eggsLaid[antType] += 1;
   this.pushCoordToRender(tile.coords());

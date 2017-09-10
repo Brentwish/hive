@@ -1,11 +1,19 @@
-div.GameOptions {
+div.GameOptionsTabs {
   background: white;
   padding: 40px;
   border-radius: 20px;
   width: 500px;
+  min-height: 450px;
   display: flex;
   flex-flow: column;
-  justify-content: center;
+  justify-content: space-between;
+}
+div.GameOptions {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  padding: 25px 10px 10px 10px;
 }
 
 div.GameOptions div {
@@ -36,4 +44,35 @@ div.GameOptions input {
 
 .FoodOptions {
   text-align: left;
+}
+
+div.AISelector {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+div.AISelector span.glyphicon {
+  font-size: 9px;
+}
+
+div.AISelector thead th:first-child {
+  text-align: center;
+}
+
+div.AISelector thead th:nth-child(2) {
+  padding-left: 9px;
+}
+
+div.AISelector select {
+  width: 100%;
+  border-radius: 10px;
+}
+
+div.AISelector select:focus {
+  outline: none !important;
+}
+
+button.AddPlayerButton {
+  margin: 10px 0;
 }
