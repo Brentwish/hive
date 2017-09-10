@@ -17,15 +17,18 @@ class InfoPane extends Component {
     this.setState({ currentTab: tab });
   }
   render() {
-    const playerInfo = (
-      <PlayerInfo
-        ref={ (p) => this._playerInfo = p }
-        players={ this.props.players }
-        graphs={ this.props.graphs }
-        graphDimensions={ this.props.graphDimensions }
-        setGraphDimensions={ this.props.setGraphDimensions }
-      />
-    );
+    let playerInfo;
+    if (this.state.currentTab === 2) {
+      playerInfo = (
+        <PlayerInfo
+          ref={ (p) => this._playerInfo = p }
+          players={ this.props.players }
+          graphs={ this.props.graphs }
+          graphDimensions={ this.props.graphDimensions }
+          setGraphDimensions={ this.props.setGraphDimensions }
+        />
+      );
+    }
     const tileInfo = (
       <TileInfo
         x={ this.props.watchTile[0] }
