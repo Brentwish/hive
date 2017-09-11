@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import "./EditorPane.css"
 import AIManagerModal from "./AIManagerModal.js";
+import EditorControls from "./EditorControls.js";
+import { Pane, PaneContent } from "./Pane.js";
 
 import ace from "brace";
 import brace from "brace";
@@ -74,34 +76,16 @@ class EditorPane extends Component {
     editor.gotoLine(1, 0, true);
     editor.focus();
   }
-  onStopFileWatch = (e) => {
-    clearInterval(this.watchInterval);
-    this._file.value = null;
-    this.setState({ watchingFile: false });
-    e.preventDefault();
-  }
-  onStartFileWatch = (file) => {
-    this.setState({ watchingFile: true });
-    this.watchInterval = setInterval(this.updatePlayerCodeFromFile, 100);
-  }
   render() {
-    let watchLabel;
-    if (!this.state.watchingFile) {
-      watchLabel = (
-        <label htmlFor="filename" className="custom-file-upload">
-          <span className="glyphicon glyphicon-eye-open"/>
-        </label>
-      );
-    } else {
-      watchLabel = (
-        <label className="custom-file-upload" onClick={ this.onStopFileWatch }>
-          <span className="glyphicon glyphicon-eye-close"/>
-        </label>
-      );
-    }
     return (
-      <div className="EditorPane">
-        <div className="EditorDiv">
+      <Pane>
+        <EditorControls
+          onRun={ this.props.onRun }
+          onManageAIs={ this.openModal }
+          onDownload={ this.props.onDownload }
+          onShowApi={ this.props.onShowApi }
+        />
+        <PaneContent>
           <AceEditor
             width={ "100%" }
             height={ "100%" }
@@ -117,22 +101,14 @@ class EditorPane extends Component {
             value={ this.props.playerCode }
             cursorStart={3}
             setOptions={{
-            enableBasicAutocompletion: false,
-            enableLiveAutocompletion: false,
-            enableSnippets: false,
-            showLineNumbers: true,
-            tabSize: 2,
-          }}
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: false,
+              enableSnippets: false,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}
           />
-        </div>
-        <div className="EditorContorls">
-          <button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></button>
-          <button onClick={ this.openModal } ><span className="glyphicon glyphicon-folder-close"/></button>
-          <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
-          { watchLabel }
-          <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
-          <button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></button>
-        </div>
+        </PaneContent>
         <AIManagerModal
           showModal={ this.state.showModal }
           close={ this.closeModal }
@@ -142,7 +118,7 @@ class EditorPane extends Component {
           deleteAI={ this.props.deleteAI }
           AIs={ this.props.AIs }
         />
-      </div>
+      </Pane>
     );
   }
 }

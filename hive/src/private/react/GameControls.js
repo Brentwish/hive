@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ButtonToolbar, ToggleButtonGroup, ToggleButton, ButtonGroup, Button } from 'react-bootstrap';
+import { PaneControls } from "./Pane.js";
 import "./GameControls.css";
 
 class GameControls extends Component {
@@ -13,14 +14,14 @@ class GameControls extends Component {
   render() {
     const speed = this.props.isPaused ? "pause" : this.props.gameSpeed;
     return (
-      <div className="GameControls">
+      <PaneControls>
         <ButtonToolbar>
           <ButtonGroup className="ButtonPadding">
             <Button onClick={ this.props.handleStopGame }><span className="glyphicon glyphicon-stop" /></Button>
           </ButtonGroup>
           <ButtonGroup className="ButtonPadding">
-            <Button onClick={ this.props.handleZoomOut }><span className="glyphicon glyphicon-zoom-out" /></Button>
-            <Button onClick={ this.props.handleZoomIn }><span className="glyphicon glyphicon-zoom-in" /></Button>
+            <Button onClick={ this.props.onZoomOut }><span className="glyphicon glyphicon-zoom-out" /></Button>
+            <Button onClick={ this.props.onZoomIn }><span className="glyphicon glyphicon-zoom-in" /></Button>
           </ButtonGroup>
           <ToggleButtonGroup className="ButtonPadding SpeedControls" type="radio" name="speed" value={ speed } onChange={ this.handleSpeedChange }>
             <ToggleButton value={ 1 }>
@@ -46,7 +47,7 @@ class GameControls extends Component {
             </ToggleButton>
           </ToggleButtonGroup>
         </ButtonToolbar>
-      </div>
+      </PaneControls>
     );
   }
 }
