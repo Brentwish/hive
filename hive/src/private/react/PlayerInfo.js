@@ -9,29 +9,25 @@ import { LineChart } from "react-easy-chart";
 
 class StatsTable extends Component {
   render() {
-    const players = _.map(this.props.players, (player) => {
-      return _.omitBy(player, (v, k) => {
-        return k === "identifiers";
-      });
-    });
+    const players = this.props.players;
     return (
-      <div>
+      <div className="PlayerTable">
         <table>
           <thead>
-            <tr>
+            <tr className="PlayerTable Header">
               { 
                 _.map(players[0], (counts, type) => { 
                   return (
-                    <th colspan={ _.size(counts) }>{ type }</th>
+                    <th key={ type } colSpan={ _.size(counts) }>{ keysToTitles[type] }</th>
                   );
                 })
               }
             </tr>
-            <tr>
+            <tr className="PlayerTable Subheader">
               {
                 _.map(_.flatten(_.map(players[0], _.keys)), (type) => {
                   return (
-                    <th scope="col">{ type }</th>
+                    <th key={ type } scope="col">{ keysToTitles[type] }</th>
                   );
                 })
               }
@@ -41,11 +37,11 @@ class StatsTable extends Component {
             {
               _.map(players, (player) => {
                 return (
-                  <tr>
+                  <tr key={ player.identifiers.id }>
                     {
-                      _.map(_.flatten(_.map(player, _.values)), (count) => {
+                      _.map(_.flatten(_.map(player, _.values)), (count, key) => {
                         return (
-                          <td>{ count }</td>
+                          <td key={ key }>{ count }</td>
                         );
                       })
                     }
@@ -112,48 +108,8 @@ class PlayerInfo extends Component {
   componentDidUpdate = (prevProps) => {
     this.props.setGraphDimensions();
   }
-  generateTable = (player) => {
-    return (
-      <table className="PlayerTable" key="PlayerTable">
-        <tbody>
-          { _.map(player, (counts, type) => {
-              return (
-                <tr key={ type }>
-                  <td key={ type + "_title" }>{ keysToTitles[type] }</td>
-                  <td key={ type + "_table" }>
-                    { this.generateInnerTable(type, counts) }
-                  </td>
-                </tr>
-              );
-            })
-          }
-        </tbody>
-      </table>
-    );
-  }
-  generateInnerTable = (type, counts) => {
-    return (
-      <table className="InnerTables" key={ type }>
-        <tbody>
-          { _.map(counts, (v, k) => {
-              return (
-                <tr key={ k }>
-                  <td key={ k + "_title" }>{ keysToTitles[k] }</td>
-                  <td key={ k + "_value" }>{ v }</td>
-                </tr>
-              );
-            })
-          }
-        </tbody>
-      </table>
-    );
-  }
-  changeGraph = (newGraph) => {
+  changeGraphType = (newGraph) => {
     this.setState({ currentGraph: newGraph });
-  }
-  handleSelect = (tab) => {
-    this.props.setGraphDimensions();
-    this.setState({ currentTab: tab });
   }
   render() {
     const graph = this.props.graphs[this.state.currentGraph];
@@ -167,7 +123,7 @@ class PlayerInfo extends Component {
           graphType={ this.state.currentGraph }
           graph={ graph }
           yVals={ _.map(_.flatten(graph), (pair) => { return pair.y; }) }
-          changeGraph={ this.changeGraph }
+          changeGraphType={ this.changeGraphType }
           playerColors={ this.props.graphs.playerColors }
           graphDimensions={ this.props.graphDimensions }
         />

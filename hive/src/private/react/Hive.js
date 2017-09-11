@@ -287,8 +287,9 @@ class Hive extends Component {
   setGraphDimensions = () => {
     if (this._game && this._game._infoPane &&
         this._game._infoPane._playerInfo &&
-        this._game._infoPane._playerInfo._graphContainer) {
-      const div = this._game._infoPane._playerInfo._graphContainer;
+        this._game._infoPane._playerInfo._graph &&
+        this._game._infoPane._playerInfo._graph._graphContainer) {
+      const div = this._game._infoPane._playerInfo._graph._graphContainer;
       this.setState({
         graphDimensions: { width: div.offsetWidth, height: div.offsetHeight }
       });
