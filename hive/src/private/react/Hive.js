@@ -6,6 +6,7 @@ import EditorControls from "./EditorControls.js";
 import InfoPane from "./InfoPane.js";
 import FileSaver from "file-saver";
 import EditorPane from "./EditorPane.js";
+import GamePane from "./GamePane.js";
 import ApiReferencePane from "./ApiReferencePane.js";
 import HiveGame from "../js/HiveGame.js";
 import { UPDATE_PERIOD, foodGrades, graphTypes } from "../js/constants.js";
@@ -90,12 +91,12 @@ class Hive extends Component {
     }
     const updateTime = (new Date().getTime()) - updateStartTime;
     const renderStartTime = new Date().getTime();
-    if (this._display) {
+    if (this._game && this._game._display) {
       if (this.state.shouldRenderAll) {
-        this._display.renderAll(this.state.pixelScale);
+        this._game._display.renderAll(this.state.pixelScale);
         newState.shouldRenderAll = false;
       } else {
-        this._display.renderUpdates(this.state.pixelScale);
+        this._game._display.renderUpdates(this.state.pixelScale);
       }
     }
     const renderTime = (new Date().getTime()) - renderStartTime;
@@ -196,7 +197,7 @@ class Hive extends Component {
       shouldRenderAll: true,
     });
     if (this.state.isPaused) {
-      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(newPixelScale));
+      this.stepTimeout = setTimeout(this._game._display.renderAll, 50, parseInt(newPixelScale));
     }
   }
   handleZoomOut = () => {
@@ -206,7 +207,7 @@ class Hive extends Component {
       shouldRenderAll: true,
     });
     if (this.state.isPaused) {
-      this.stepTimeout = setTimeout(this._display.renderAll, 50, parseInt(newPixelScale));
+      this.stepTimeout = setTimeout(this._game._display.renderAll, 50, parseInt(newPixelScale));
     }
   }
   handleSpeedChange = (delay) => {
@@ -228,7 +229,7 @@ class Hive extends Component {
   handleToggleTrails = () => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
     if (!this.state.newGame) {
-      this.stepTimeout = setTimeout(this._display.renderAll, 50, this.state.pixelScale);
+      this.stepTimeout = setTimeout(this._game._display.renderAll, 50, this.state.pixelScale);
     }
   }
   changeHandler = (key, value) => {
@@ -266,8 +267,8 @@ class Hive extends Component {
     }
   }
   handleGamePan = (dX, dY) => {
-    this._gamePane.scrollLeft += Math.floor(dX/10);
-    this._gamePane.scrollTop += Math.floor(dY/10);
+    this._game._display._div.scrollLeft += Math.floor(dX/10);
+    this._game._display._div.scrollTop += Math.floor(dY/10);
   }
   currentAIcode = () => {
     const ai = this.state.AIs[this.state.editingAIid];
@@ -283,8 +284,10 @@ class Hive extends Component {
     }
   }
   setGraphDimensions = () => {
-    if (this._infoPane && this._infoPane._playerInfo && this._infoPane._playerInfo._graphContainer) {
-      const div = this._infoPane._playerInfo._graphContainer
+    if (this._game && this._game._infoPane &&
+        this._game._infoPane._playerInfo &&
+        this._game._infoPane._playerInfo._graphContainer) {
+      const div = this._game._infoPane._playerInfo._graphContainer;
       this.setState({
         graphDimensions: { width: div.offsetWidth, height: div.offsetHeight }
       });
@@ -377,6 +380,38 @@ class Hive extends Component {
     this.setState({ playerAIs: newPlayers });
     localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
   }
+  renderGamePane() {
+    return (
+      <GamePane
+        ref={ (g) => this._game = g }
+
+        gameWidth={ this.state.width }
+        gameHeight={ this.state.height }
+        pixelScale={ this.state.pixelScale }
+        onTileSelect={ this.handleTileSelect }
+        showTrails={ this.state.shouldRenderTrails }
+        onZoomIn={ this.handleZoomIn }
+        onZoomOut={ this.handleZoomOut }
+        onPan={ this.handleGamePan }
+
+        isPaused={ this.state.isPaused }
+        gameSpeed={ this.state.delayPerUpdate }
+        onPause={ this.handlePause }
+        onSpeedChange={ this.handleSpeedChange }
+        onToggleTrails={ this.handleToggleTrails }
+        handleStopGame={ this.handleCreateNewGame }
+        handleStep={ this.handleStep }
+
+        watchTile={ this.state.watchTile }
+        onTrackAnt={ this.handleTrackAnt }
+        isAntWatched={ this.state.isAntWatched }
+        players={ this.state.players }
+        graphs={ this.state.graphs }
+        graphDimensions={ this.state.graphDimensions }
+        setGraphDimensions={ this.setGraphDimensions }
+      />
+    );
+  }
   render() {
     let rightPane;
     if (this.state.showApi) {
@@ -384,84 +419,25 @@ class Hive extends Component {
         <ApiReferencePane
         />
       );
-    } else {
-      let gameArea;
-      if (this.state.newGame) {
-        gameArea = (
-          <GameOptions
-            width={ this.state.width }
-            height={ this.state.height }
-            sparsity={ this.state.sparsity }
-            density={ this.state.density }
-            saturation={ this.state.saturation }
-            changeHandler={ this.changeHandler }
-            startGame={ this.handleStart }
-            players={ this.state.playerAIs }
-            AIs={ this.state.AIs }
-            onAddPlayer={ this.addPlayer }
-            removePlayer={ this.removePlayer }
-            updatePlayer={ this.updatePlayer }
-          />
-        );
-      } else {
-        gameArea = <GameDisplay
-          ref={ (d) => this._display = d }
-          gameWidth={ this.state.width }
-          gameHeight={ this.state.height }
-          pixelScale={ this.state.pixelScale }
-          onTileSelect={ this.handleTileSelect }
-          showTrails={ this.state.shouldRenderTrails }
-          onZoomIn={ this.handleZoomIn }
-          onZoomOut={ this.handleZoomOut }
-          onPan={ this.handleGamePan }
-        />
-      }
-      let gameControls;
-      if (!this.state.newGame) {
-        gameControls = (
-          <div className="GameControlsDiv">
-            <div className="GameControlsInner">
-              <GameControls
-                isPaused={ this.state.isPaused }
-                gameSpeed={ this.state.delayPerUpdate }
-                onPause={ this.handlePause }
-                onSpeedChange={ this.handleSpeedChange }
-                onToggleTrails={ this.handleToggleTrails }
-                handleStopGame={ this.handleCreateNewGame }
-                handleZoomOut={ this.handleZoomOut }
-                handleZoomIn={ this.handleZoomIn }
-                handleStep={ this.handleStep }
-              />
-            </div>
-          </div>
-        );
-      }
-      const infoPane = (
-        <InfoPane
-          ref={ (i) => this._infoPane = i }
-          watchTile={ this.state.watchTile }
-          onTrackAnt={ this.handleTrackAnt }
-          isAntWatched={ this.state.isAntWatched }
-          players={ this.state.players }
-          graphs={ this.state.graphs }
-          graphDimensions={ this.state.graphDimensions }
-          setGraphDimensions={ this.setGraphDimensions }
-        />
-      );
+    } else if (this.state.newGame) {
       rightPane = (
-        <div>
-          <SplitPane split="horizontal" minSize={ 100 } defaultSize={ "69vh" } onChange={ this.setGraphDimensions }>
-            <div className="GamePane" ref={ (g) => this._gamePane = g }>
-              { gameControls }
-              { gameEndMessage }
-              <div className="GameArea">
-                { gameArea }
-              </div>
-            </div>
-            { infoPane }
-          </SplitPane>
-        </div>
+        <GameOptions
+          width={ this.state.width }
+          height={ this.state.height }
+          sparsity={ this.state.sparsity }
+          density={ this.state.density }
+          saturation={ this.state.saturation }
+          changeHandler={ this.changeHandler }
+          startGame={ this.handleStart }
+          players={ this.state.playerAIs }
+          AIs={ this.state.AIs }
+          onAddPlayer={ this.addPlayer }
+          removePlayer={ this.removePlayer }
+          updatePlayer={ this.updatePlayer }
+        />
       );
+    } else {
+      rightPane = this.renderGamePane();
     }
     const editorPane = (
       <EditorPane
@@ -478,10 +454,6 @@ class Hive extends Component {
         onShowApi={ this.handleShowApi }
       />
     );
-    let gameEndMessage;
-    if (window.hive && window.hive.isGameOver) {
-      gameEndMessage = <div>Player { window.hive.winningPlayer } wins!</div>;
-    }
     return (
       <div>
         <SplitPane split="vertical" minSize={ 100 } defaultSize={ "670px" } onChange={ this.setGraphDimensions}>

@@ -88,7 +88,7 @@ class GameDisplay extends Component {
   }
   render() {
     return (
-      <div className="GameDisplay">
+      <div className="GameDisplay" ref={ (d) => this._div = d }>
         <canvas
           ref={ (c) => this._canvas = c }
           className="game_board"

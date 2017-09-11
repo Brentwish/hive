@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { PaneControls } from "./Pane.js";
+import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import "./EditorControls.css";
 
 class EditorControls extends Component {
   constructor(props) {
@@ -57,26 +60,30 @@ class EditorControls extends Component {
     let watchLabel;
     if (!this.state.watchingFile) {
       watchLabel = (
-        <label htmlFor="filename" className="custom-file-upload">
+        <label htmlFor="filename" className="custom-file-upload btn btn-default">
           <span className="glyphicon glyphicon-eye-open"/>
         </label>
       );
     } else {
       watchLabel = (
-        <label className="custom-file-upload" onClick={ this.onStopFileWatch }>
+        <label className="custom-file-upload btn btn-default" onClick={ this.onStopFileWatch }>
           <span className="glyphicon glyphicon-eye-close"/>
         </label>
       );
     }
     return (
-      <div className="EditorContorls">
-        <button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></button>
-        <button onClick={ this.props.onManageAIs } ><span className="glyphicon glyphicon-folder-close"/></button>
-        <button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></button>
-        { watchLabel }
-        <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
-        <button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></button>
-      </div>
+      <PaneControls>
+        <ButtonToolbar>
+          <ButtonGroup>
+            <Button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></Button>
+            <Button onClick={ this.props.onManageAIs } ><span className="glyphicon glyphicon-folder-close"/></Button>
+            <Button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></Button>
+            { watchLabel }
+            <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
+            <Button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></Button>
+          </ButtonGroup>
+        </ButtonToolbar>
+      </PaneControls>
     );
   }
 }

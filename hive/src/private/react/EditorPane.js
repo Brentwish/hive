@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import "./EditorPane.css"
 import AIManagerModal from "./AIManagerModal.js";
 import EditorControls from "./EditorControls.js";
+import { Pane, PaneContent } from "./Pane.js";
 
 import ace from "brace";
 import brace from "brace";
@@ -77,14 +78,14 @@ class EditorPane extends Component {
   }
   render() {
     return (
-      <div className="EditorPane">
+      <Pane>
         <EditorControls
           onRun={ this.props.onRun }
           onManageAIs={ this.openModal }
           onDownload={ this.props.onDownload }
           onShowApi={ this.props.onShowApi }
         />
-        <div className="EditorDiv">
+        <PaneContent>
           <AceEditor
             width={ "100%" }
             height={ "100%" }
@@ -100,14 +101,14 @@ class EditorPane extends Component {
             value={ this.props.playerCode }
             cursorStart={3}
             setOptions={{
-            enableBasicAutocompletion: false,
-            enableLiveAutocompletion: false,
-            enableSnippets: false,
-            showLineNumbers: true,
-            tabSize: 2,
-          }}
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: false,
+              enableSnippets: false,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}
           />
-        </div>
+        </PaneContent>
         <AIManagerModal
           showModal={ this.state.showModal }
           close={ this.closeModal }
@@ -117,7 +118,7 @@ class EditorPane extends Component {
           deleteAI={ this.props.deleteAI }
           AIs={ this.props.AIs }
         />
-      </div>
+      </Pane>
     );
   }
 }
