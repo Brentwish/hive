@@ -84,6 +84,7 @@ class EditorPane extends Component {
           onManageAIs={ this.openModal }
           onDownload={ this.props.onDownload }
           onShowApi={ this.props.onShowApi }
+          changeHandler={ this.props.changeHandler }
         />
         <PaneContent>
           <AceEditor

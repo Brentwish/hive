@@ -7,38 +7,110 @@ import { Tab, Tabs } from "react-bootstrap";
 import { ButtonToolbar, DropdownButton, MenuItem } from "react-bootstrap";
 import { LineChart } from "react-easy-chart";
 
+class StatsTable extends Component {
+  render() {
+    const players = _.map(this.props.players, (player) => {
+      return _.omitBy(player, (v, k) => {
+        return k === "identifiers";
+      });
+    });
+    return (
+      <div>
+        <table>
+          <thead>
+            <tr>
+              { 
+                _.map(players[0], (counts, type) => { 
+                  return (
+                    <th colspan={ _.size(counts) }>{ type }</th>
+                  );
+                })
+              }
+            </tr>
+            <tr>
+              {
+                _.map(_.flatten(_.map(players[0], _.keys)), (type) => {
+                  return (
+                    <th scope="col">{ type }</th>
+                  );
+                })
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              _.map(players, (player) => {
+                return (
+                  <tr>
+                    {
+                      _.map(_.flatten(_.map(player, _.values)), (count) => {
+                        return (
+                          <td>{ count }</td>
+                        );
+                      })
+                    }
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+}
+
+class Graph extends Component {
+  render() {
+    return (
+      <div className="Graph">
+        <div className="GraphButtons">
+          <ButtonToolbar>
+            <DropdownButton
+              title={ this.props.graphType }
+              id="dropdown-size-medium"
+              onSelect={ this.props.changeGraphType }
+            >
+            {
+              _.map(graphTypes, (type) => {
+                return (
+                  <MenuItem key={ type } eventKey={ type }>{ type }</MenuItem>
+                );
+              })
+            }
+            </DropdownButton>
+          </ButtonToolbar>
+        </div>
+        <div ref={ (d) => this._graphContainer = d } className="GraphContainer">
+          <LineChart
+            data={ this.props.graph }
+            axes
+            axisLabels={ { x: 'Ticks', y: this.props.graphType } }
+            xTicks={ 10 }
+            yDomainRange={ [
+              0,
+              Math.max(Math.max(...this.props.yVals), 25)
+            ] }
+            lineColors={ this.props.playerColors }
+            width={ 0.9 * this.props.graphDimensions.width }
+            height={ 0.9 * this.props.graphDimensions.height }
+          />
+        </div>
+      </div>
+    );
+  }
+}
+
 class PlayerInfo extends Component {
   constructor(props) {
     super();
     this.state = {
       currentTab: props.activeTab || 0,
       currentGraph: "TotalFood",
-      graphDimensions: { width: 0, height: 0 },
     };
   }
   componentDidUpdate = (prevProps) => {
     this.props.setGraphDimensions();
-  }
-  generatePlayerTabs = () => {
-    return _.map(this.props.players, (player) => {
-      const playerWithoutIdentifiers = _.omitBy(player, (v, k) => {
-        return k === "identifiers";
-      })
-      let lineGraph;
-      if (this.state.currentTab === player.identifiers.id) {
-        lineGraph = this.generateLineGraph();
-      }
-      return (
-        <Tab
-          key={ player.identifiers.id }
-          eventKey={ player.identifiers.id }
-          title={ player.identifiers.name }
-        >
-          { this.generateTable(playerWithoutIdentifiers) }
-          { lineGraph }
-        </Tab>
-      );
-    });
   }
   generateTable = (player) => {
     return (
@@ -76,49 +148,6 @@ class PlayerInfo extends Component {
       </table>
     );
   }
-  generateLineGraph = () => {
-    if (this.props.graphs) {
-      const currentGraph = this.state.currentGraph;
-      const graph = this.props.graphs[currentGraph];
-      const yVals = _.map(_.flatten(graph), (pair) => { return pair.y; });
-      return (
-        <div className="Graph">
-          <div className="GraphButtons">
-            <ButtonToolbar>
-              <DropdownButton
-                title={ currentGraph }
-                id="dropdown-size-medium"
-                onSelect={ this.changeGraph }
-              >
-              {
-                _.map(graphTypes, (type) => {
-                  return (
-                    <MenuItem key={ type } eventKey={ type }>{ type }</MenuItem>
-                  );
-                })
-              }
-              </DropdownButton>
-            </ButtonToolbar>
-          </div>
-          <div ref={ (d) => this._graphContainer = d } className="GraphContainer">
-            <LineChart
-              data={ graph }
-              axes
-              axisLabels={ { x: 'Ticks', y: currentGraph } }
-              xTicks={ 10 }
-              yDomainRange={ [
-                0,
-                Math.max(Math.max(...yVals), 25)
-              ] }
-              lineColors={ this.props.graphs.playerColors }
-              width={ 0.9 * this.props.graphDimensions.width }
-              height={ 0.9 * this.props.graphDimensions.height }
-            />
-          </div>
-        </div>
-      );
-    }
-  }
   changeGraph = (newGraph) => {
     this.setState({ currentGraph: newGraph });
   }
@@ -127,21 +156,21 @@ class PlayerInfo extends Component {
     this.setState({ currentTab: tab });
   }
   render() {
-    let currentPlayerColor;
-    if (this.props.players[this.state.currentTab]) {
-      currentPlayerColor = this.props.players[this.state.currentTab].identifiers.color;
-    }
+    const graph = this.props.graphs[this.state.currentGraph];
     return (
       <div className="PlayerInfo">
-        <Tabs
-          className={ "PlayerTabs" }
-          style={ { border: "solid " + currentPlayerColor } }
-          stacked
-          activeKey={ this.state.currentTab }
-          onSelect={ this.handleSelect }
-        >
-          { this.generatePlayerTabs() }
-        </Tabs>
+        <StatsTable
+          players={ this.props.players }
+        />
+        <Graph
+          ref={ (g) => this._graph = g }
+          graphType={ this.state.currentGraph }
+          graph={ graph }
+          yVals={ _.map(_.flatten(graph), (pair) => { return pair.y; }) }
+          changeGraph={ this.changeGraph }
+          playerColors={ this.props.graphs.playerColors }
+          graphDimensions={ this.props.graphDimensions }
+        />
       </div>
     );
   }
