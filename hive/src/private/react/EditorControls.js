@@ -4,13 +4,6 @@ import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
 import "./EditorControls.css";
 
 class EditorControls extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      watchingFile: false,
-      watchFileName: "",
-    };
-  }
   updatePlayerCodeFromFile = () => {
     console.log("wat");
     let file;
@@ -37,7 +30,7 @@ class EditorControls extends Component {
         // Closure to capture the file information.
         reader.onload = ((theFile) => {
           return (e) => {
-            this.props.changeHandler(e.target.result, "playerCode");
+            this.props.updatePlayerCode(e.target.result);
             this.setState({ fileLastModified: theFile.lastModified });
             this.props.onRun();
           };
@@ -50,25 +43,26 @@ class EditorControls extends Component {
   onStopFileWatch = (e) => {
     clearInterval(this.watchInterval);
     this._file.value = null;
-    this.setState({ watchingFile: false, watchFileName: "" });
+    this.props.onStopFileWatch();
     e.preventDefault();
   }
   onStartFileWatch = (file) => {
     this.setState({ watchingFile: true, watchFileName: file.target.files[0].name });
+    this.props.onStartFileWatch(file.target.files[0].name);
     this.watchInterval = setInterval(this.updatePlayerCodeFromFile, 100);
   }
   render() {
     let watchLabel;
-    if (!this.state.watchingFile) {
+    if (!this.props.watchingFile) {
       watchLabel = (
-        <label onMouseOver={ this.state.watchFileName } htmlFor="filename" className="custom-file-upload btn btn-default">
+        <label onMouseOver={ this.props.watchFileName } htmlFor="filename" className="custom-file-upload btn btn-default">
           <span className="glyphicon glyphicon-eye-open"/>
         </label>
       );
     } else {
       watchLabel = (
-        <label className="custom-file-upload btn btn-default" onClick={ this.onStopFileWatch }>
-          <div className="WatchFileName">{ this.state.watchFileName }</div>
+        <label className="custom-file-upload btn btn-default btn-warning" onClick={ this.onStopFileWatch }>
+          <div className="WatchFileName">{ this.props.watchFileName }</div>
           <span className="glyphicon glyphicon-eye-close"/>
         </label>
       );

@@ -20,6 +20,7 @@ class EditorPane extends Component {
     super(props);
     this.state = {
       watchingFile: false,
+      watchFileName: "",
       showModal: false,
       showGameOptionsModal: false,
     };
@@ -44,47 +45,34 @@ class EditorPane extends Component {
   openModal = () => {
     this.setState({ showModal: true });
   }
-  updatePlayerCodeFromFile = () => {
-    let file;
-
-    if (typeof window.FileReader !== 'function') {
-      console.log("The file API isn't supported on this browser yet.");
-      return;
-    }
-
-    const input = this._file;
-    if (!input) {
-      console.log("Um, couldn't find the filename element.");
-    }
-    else if (!input.files) {
-      console.log("This browser doesn't seem to support the `files` property of file inputs.");
-    }
-    else if (!input.files[0]) {
-      console.log("Please select a file before clicking 'Show Size'");
-    } else {
-      file = input.files[0];
-      if (!this.state.fileLastModified || this.state.fileLastModified < file.lastModified) {
-        const reader = new FileReader();
-
-        // Closure to capture the file information.
-        reader.onload = ((theFile) => {
-          return (e) => {
-            this.props.updatePlayerCode(e.target.result);
-            this.setState({ fileLastModified: theFile.lastModified });
-            this.props.onRun();
-          };
-        })(file);
-
-        reader.readAsText(file);
-      }
-    }
+  onStopFileWatch = () => {
+    this.setState({ watchingFile: false, watchFileName: "" });
+  }
+  onStartFileWatch = (filename) => {
+    this.setState({ watchingFile: true, watchFileName: filename });
   }
   onLoad = (editor) => {
     editor.scrollToLine(1, true, true, () => {});
     editor.gotoLine(1, 0, true);
     editor.focus();
   }
+  renderOverlay() {
+    return (
+      <div className="WatchFileOverlayContainer">
+        <div className="WatchFileOverlay"/>
+        <div className="WatchFileOverlayMessage">
+          <div>Currently watching:</div>
+          <div>{ this.state.watchFileName }</div>
+          <div>Any changes made to the file will be imported, and a new game will be started. Press the eye button again to stop.</div>
+        </div>
+      </div>
+    );
+  }
   render() {
+    let watchFileOverlay;
+    if (this.state.watchingFile) {
+      watchFileOverlay = this.renderOverlay();
+    }
     return (
       <Pane>
         <EditorControls
@@ -92,9 +80,15 @@ class EditorPane extends Component {
           onManageAIs={ this.openModal }
           onOpenGameOptions={ this.openGameOptionsModal }
           onDownload={ this.props.onDownload }
-          changeHandler={ this.props.changeHandler }
+          updatePlayerCode={ this.props.updatePlayerCode }
+          watchingFile={ this.state.watchingFile }
+          watchFileName={ this.state.watchFileName }
+
+          onStopFileWatch={ this.onStopFileWatch }
+          onStartFileWatch={ this.onStartFileWatch }
         />
         <PaneContent>
+          { watchFileOverlay }
           <AceEditor
             width={ "100%" }
             height={ "100%" }
