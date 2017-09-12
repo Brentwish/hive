@@ -62,7 +62,6 @@ class EditorControls extends Component {
     } else {
       watchLabel = (
         <label className="custom-file-upload btn btn-default btn-warning" onClick={ this.onStopFileWatch }>
-          <div className="WatchFileName">{ this.props.watchFileName }</div>
           <span className="glyphicon glyphicon-eye-close"/>
         </label>
       );
