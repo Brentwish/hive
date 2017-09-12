@@ -92,6 +92,7 @@ class EditorPane extends Component {
           onManageAIs={ this.openModal }
           onOpenGameOptions={ this.openGameOptionsModal }
           onDownload={ this.props.onDownload }
+          changeHandler={ this.props.changeHandler }
         />
         <PaneContent>
           <AceEditor

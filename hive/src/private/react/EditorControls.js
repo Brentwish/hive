@@ -8,6 +8,7 @@ class EditorControls extends Component {
     super(props);
     this.state = {
       watchingFile: false,
+      watchFileName: "",
     };
   }
   updatePlayerCodeFromFile = () => {
@@ -49,24 +50,26 @@ class EditorControls extends Component {
   onStopFileWatch = (e) => {
     clearInterval(this.watchInterval);
     this._file.value = null;
-    this.setState({ watchingFile: false });
+    this.setState({ watchingFile: false, watchFileName: "" });
     e.preventDefault();
   }
   onStartFileWatch = (file) => {
-    this.setState({ watchingFile: true });
+    debugger;
+    this.setState({ watchingFile: true, watchFileName: file.target.files[0].name });
     this.watchInterval = setInterval(this.updatePlayerCodeFromFile, 100);
   }
   render() {
     let watchLabel;
     if (!this.state.watchingFile) {
       watchLabel = (
-        <label htmlFor="filename" className="custom-file-upload btn btn-default">
+        <label onMouseOver={ this.state.watchFileName } htmlFor="filename" className="custom-file-upload btn btn-default">
           <span className="glyphicon glyphicon-eye-open"/>
         </label>
       );
     } else {
       watchLabel = (
         <label className="custom-file-upload btn btn-default" onClick={ this.onStopFileWatch }>
+          <div className="WatchFileName">{ this.state.watchFileName }</div>
           <span className="glyphicon glyphicon-eye-close"/>
         </label>
       );

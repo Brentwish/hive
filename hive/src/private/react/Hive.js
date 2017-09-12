@@ -75,73 +75,10 @@ class Hive extends Component {
       this.stepTimeout = setTimeout(this.step, 100);
     }
   }
-
   hiveGameOptions() {
     return _.merge(_.omit(this.state, "players"), {
       players: _.compact(_.map(this.state.playerAIs, (ai) => this.state.AIs[ai])),
     });
-  }
-
-  step = () => {
-    if (!window.hive) {
-      return;
-    }
-    const newState = {};
-    const updateStartTime = new Date().getTime();
-    for (let i = 0; i < this.state.updatesPerStep; i++) {
-      window.hive.update();
-    }
-    const updateTime = (new Date().getTime()) - updateStartTime;
-    const renderStartTime = new Date().getTime();
-    if (this._game && this._game._display) {
-      if (this.state.shouldRenderAll) {
-        this._game._display.renderAll(this.state.pixelScale);
-        newState.shouldRenderAll = false;
-      } else {
-        this._game._display.renderUpdates(this.state.pixelScale);
-      }
-    }
-    const renderTime = (new Date().getTime()) - renderStartTime;
-    //logTime(updateTime, renderTime);
-    newState.players = window.hive.players.map((p) => {
-      const numQueens = _.countBy(p.ants, (ant) => { return ant.type; }).queen || 0;
-      const numWorkers = p.ants.length - numQueens;
-      return {
-        identifiers: {
-          id: p.id,
-          name: p.name,
-          color: p.color,
-        },
-        antCounts: {
-          numQueens,
-          numWorkers,
-        },
-        combatCounts: {
-          numDeadAnts: p.numDeadAnts,
-          numAntsKilled: p.numAntsKilled,
-        },
-        foodCounts: {
-          totalFood: p.totalFood,
-          currentFood: p.currentFood,
-        },
-      }
-    });
-    if (this.state.isAntWatched) {
-      const ant = window.hive.findAnt(this.state.watchAnt);
-      if (ant) {
-        newState.watchTile = [ant.tile.x, ant.tile.y];
-      } else {
-        newState.isAntWatched = false;
-        newState.watchAnt = "";
-      }
-    }
-    if (window.hive.turn % 10 === 0) newState.graphs = this.updateGraphs(newState.players);
-    this.setState(newState);
-
-    // Schedule next step
-    if (!this.state.isPaused) {
-      this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
-    }
   }
   initGraphs = () => {
     const graphs = {};
@@ -191,6 +128,70 @@ class Hive extends Component {
       });
     });
     return graphs;
+  }
+  getPlayersFromGame = () => {
+    return window.hive.players.map((p) => {
+      const numQueens = _.countBy(p.ants, (ant) => { return ant.type; }).queen || 0;
+      const numWorkers = p.ants.length - numQueens;
+      return {
+        identifiers: {
+          id: p.id,
+          name: p.name,
+          color: p.color,
+        },
+        antCounts: {
+          numQueens,
+          numWorkers,
+        },
+        combatCounts: {
+          numDeadAnts: p.numDeadAnts,
+          numAntsKilled: p.numAntsKilled,
+        },
+        foodCounts: {
+          totalFood: p.totalFood,
+          currentFood: p.currentFood,
+        },
+      }
+    });
+  }
+  step = () => {
+    if (!window.hive) {
+      return;
+    }
+    const newState = {};
+    const updateStartTime = new Date().getTime();
+    for (let i = 0; i < this.state.updatesPerStep; i++) {
+      window.hive.update();
+    }
+    const updateTime = (new Date().getTime()) - updateStartTime;
+    const renderStartTime = new Date().getTime();
+    if (this._game && this._game._display) {
+      if (this.state.shouldRenderAll) {
+        this._game._display.renderAll(this.state.pixelScale);
+        newState.shouldRenderAll = false;
+      } else {
+        this._game._display.renderUpdates(this.state.pixelScale);
+      }
+    }
+    const renderTime = (new Date().getTime()) - renderStartTime;
+    //logTime(updateTime, renderTime);
+    newState.players = this.getPlayersFromGame();
+    if (this.state.isAntWatched) {
+      const ant = window.hive.findAnt(this.state.watchAnt);
+      if (ant) {
+        newState.watchTile = [ant.tile.x, ant.tile.y];
+      } else {
+        newState.isAntWatched = false;
+        newState.watchAnt = "";
+      }
+    }
+    if (window.hive.turn % 10 === 0) newState.graphs = this.updateGraphs(newState.players);
+    this.setState(newState);
+
+    // Schedule next step
+    if (!this.state.isPaused) {
+      this.stepTimeout = setTimeout(this.step, this.state.delayPerUpdate);
+    }
   }
   handleZoomIn = () => {
     const newPixelScale = Math.min(this.state.pixelScale + 1, 10);
@@ -288,8 +289,9 @@ class Hive extends Component {
   setGraphDimensions = () => {
     if (this._game && this._game._infoPane &&
         this._game._infoPane._playerInfo &&
-        this._game._infoPane._playerInfo._graphContainer) {
-      const div = this._game._infoPane._playerInfo._graphContainer;
+        this._game._infoPane._playerInfo._graph &&
+        this._game._infoPane._playerInfo._graph._graphContainer) {
+      const div = this._game._infoPane._playerInfo._graph._graphContainer;
       this.setState({
         graphDimensions: { width: div.offsetWidth, height: div.offsetHeight }
       });
@@ -450,6 +452,7 @@ class Hive extends Component {
         onAddPlayer={ this.addPlayer }
         removePlayer={ this.removePlayer }
         updatePlayer={ this.updatePlayer }
+        changeHandler={ this.changeHandler }
       />
     );
     return (

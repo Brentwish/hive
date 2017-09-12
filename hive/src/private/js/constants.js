@@ -62,6 +62,10 @@ export const keysToTitles = {
   foodCounts: "Food",
   totalFood: "Total",
   currentFood: "Current",
+  identifiers: "Player",
+  name: "Name",
+  id: "ID",
+  color: "Color",
 };
 export const listOfNames = [
   "Bob Jenkins", "LeeRoy Jenkins",
