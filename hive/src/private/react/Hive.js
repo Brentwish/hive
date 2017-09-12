@@ -432,7 +432,6 @@ class Hive extends Component {
         playerCode={ this.currentAIcode() }
         updatePlayerCode={ this.updatePlayerCode }
         onRun={ this.handleEditorSubmit }
-        onFileWatch={ this.handleFileWatch }
         onDownload={ this.handleDownload }
         AIs={ _.values(this.state.AIs) }
         selectAI={ this.selectAI }

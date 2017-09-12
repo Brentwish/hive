@@ -37,7 +37,7 @@ class EditorControls extends Component {
         // Closure to capture the file information.
         reader.onload = ((theFile) => {
           return (e) => {
-            this.props.changeHandler(e.target.result, "playerCode");
+            this.props.updatePlayerCode(e.target.result);
             this.setState({ fileLastModified: theFile.lastModified });
             this.props.onRun();
           };
@@ -54,7 +54,6 @@ class EditorControls extends Component {
     e.preventDefault();
   }
   onStartFileWatch = (file) => {
-    debugger;
     this.setState({ watchingFile: true, watchFileName: file.target.files[0].name });
     this.watchInterval = setInterval(this.updatePlayerCodeFromFile, 100);
   }

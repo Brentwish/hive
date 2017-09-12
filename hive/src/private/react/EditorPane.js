@@ -44,41 +44,6 @@ class EditorPane extends Component {
   openModal = () => {
     this.setState({ showModal: true });
   }
-  updatePlayerCodeFromFile = () => {
-    let file;
-
-    if (typeof window.FileReader !== 'function') {
-      console.log("The file API isn't supported on this browser yet.");
-      return;
-    }
-
-    const input = this._file;
-    if (!input) {
-      console.log("Um, couldn't find the filename element.");
-    }
-    else if (!input.files) {
-      console.log("This browser doesn't seem to support the `files` property of file inputs.");
-    }
-    else if (!input.files[0]) {
-      console.log("Please select a file before clicking 'Show Size'");
-    } else {
-      file = input.files[0];
-      if (!this.state.fileLastModified || this.state.fileLastModified < file.lastModified) {
-        const reader = new FileReader();
-
-        // Closure to capture the file information.
-        reader.onload = ((theFile) => {
-          return (e) => {
-            this.props.updatePlayerCode(e.target.result);
-            this.setState({ fileLastModified: theFile.lastModified });
-            this.props.onRun();
-          };
-        })(file);
-
-        reader.readAsText(file);
-      }
-    }
-  }
   onLoad = (editor) => {
     editor.scrollToLine(1, true, true, () => {});
     editor.gotoLine(1, 0, true);
@@ -92,7 +57,7 @@ class EditorPane extends Component {
           onManageAIs={ this.openModal }
           onOpenGameOptions={ this.openGameOptionsModal }
           onDownload={ this.props.onDownload }
-          changeHandler={ this.props.changeHandler }
+          updatePlayerCode={ this.props.updatePlayerCode }
         />
         <PaneContent>
           <AceEditor
