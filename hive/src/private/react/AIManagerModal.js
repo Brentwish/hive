@@ -4,15 +4,6 @@ import { Modal, Button, Table } from 'react-bootstrap';
 import _ from "lodash";
 
 class AIManagerModal extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      AIs: [
-        { name: "Bob", id: 5 },
-        { name: "A really cool AI", id: 4 },
-      ],
-    };
-  }
   generateAITableRow = (ai) => {
     return (
       <tr>

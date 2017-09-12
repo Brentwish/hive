@@ -17,7 +17,7 @@ class GameControls extends Component {
       <PaneControls>
         <ButtonToolbar>
           <ButtonGroup className="ButtonPadding">
-            <Button onClick={ this.props.handleStopGame }><span className="glyphicon glyphicon-stop" /></Button>
+            <Button bsStyle="danger" onClick={ this.props.handleStopGame }><span className="glyphicon glyphicon-stop" /></Button>
           </ButtonGroup>
           <ButtonGroup className="ButtonPadding">
             <Button onClick={ this.props.onZoomOut }><span className="glyphicon glyphicon-zoom-out" /></Button>

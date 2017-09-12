@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import "./EditorPane.css"
 import AIManagerModal from "./AIManagerModal.js";
+import GameOptionsModal from "./GameOptionsModal.js";
 import EditorControls from "./EditorControls.js";
 import { Pane, PaneContent } from "./Pane.js";
 
@@ -20,6 +21,7 @@ class EditorPane extends Component {
     this.state = {
       watchingFile: false,
       showModal: false,
+      showGameOptionsModal: false,
     };
   }
   componentDidMount() {
@@ -29,6 +31,12 @@ class EditorPane extends Component {
         this.props.onRun();
       });
     });
+  }
+  closeGameOptionsModal = () => {
+    this.setState({ showGameOptionsModal: false });
+  }
+  openGameOptionsModal = () => {
+    this.setState({ showGameOptionsModal: true });
   }
   closeModal = () => {
     this.setState({ showModal: false });
@@ -82,8 +90,8 @@ class EditorPane extends Component {
         <EditorControls
           onRun={ this.props.onRun }
           onManageAIs={ this.openModal }
+          onOpenGameOptions={ this.openGameOptionsModal }
           onDownload={ this.props.onDownload }
-          onShowApi={ this.props.onShowApi }
         />
         <PaneContent>
           <AceEditor
@@ -117,6 +125,22 @@ class EditorPane extends Component {
           selectAI={ this.props.selectAI }
           deleteAI={ this.props.deleteAI }
           AIs={ this.props.AIs }
+        />
+        <GameOptionsModal
+          showModal={ this.state.showGameOptionsModal }
+          close={ this.closeGameOptionsModal }
+          width={ this.props.width }
+          height={ this.props.height }
+          sparsity={ this.props.sparsity }
+          density={ this.props.density }
+          saturation={ this.props.saturation }
+          changeHandler={ this.props.changeHandler }
+          startGame={ this.props.startGame }
+          players={ this.props.players }
+          AIs={ this.props.AIs }
+          onAddPlayer={ this.props.onAddPlayer }
+          removePlayer={ this.props.removePlayer }
+          updatePlayer={ this.props.updatePlayer }
         />
       </Pane>
     );

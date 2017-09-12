@@ -1,9 +1,6 @@
 div.GameOptionsTabs {
   background: white;
-  padding: 40px;
-  border-radius: 20px;
-  width: 500px;
-  min-height: 450px;
+  min-height: 350px;
   display: flex;
   flex-flow: column;
   justify-content: space-between;
@@ -50,6 +47,8 @@ div.AISelector {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  text-align: center;
+  margin: 1px 0;
 }
 
 div.AISelector span.glyphicon {
@@ -71,8 +70,4 @@ div.AISelector select {
 
 div.AISelector select:focus {
   outline: none !important;
-}
-
-button.AddPlayerButton {
-  margin: 10px 0;
 }

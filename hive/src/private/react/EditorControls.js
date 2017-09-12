@@ -75,12 +75,11 @@ class EditorControls extends Component {
       <PaneControls>
         <ButtonToolbar>
           <ButtonGroup>
-            <Button onClick={ this.props.onRun } ><span className="glyphicon glyphicon-play"/></Button>
             <Button onClick={ this.props.onManageAIs } ><span className="glyphicon glyphicon-folder-close"/></Button>
             <Button onClick={ this.props.onDownload } ><span className="glyphicon glyphicon-download"/></Button>
             { watchLabel }
             <input type='file' id='filename' ref={ (f) => { this._file = f; } } onChange={ this.onStartFileWatch }/>
-            <Button onClick={ this.props.onShowApi } ><span className="glyphicon glyphicon-book"/></Button>
+            <Button onClick={ this.props.onOpenGameOptions } ><span className="glyphicon glyphicon-cog"/></Button>
           </ButtonGroup>
         </ButtonToolbar>
       </PaneControls>

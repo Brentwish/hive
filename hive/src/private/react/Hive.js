@@ -50,7 +50,6 @@ class Hive extends Component {
       isAntWatched: false,
       watchAnt: "",
       paused: false,
-      newGame: false,
       sparsity: "medium",
       density: "medium",
       saturation: "very low",
@@ -69,7 +68,7 @@ class Hive extends Component {
   }
 
   componentDidMount() {
-    if (!this.state.newGame) {
+    if (!this.state.showApi) {
       window.hive = new HiveGame(this.hiveGameOptions());
       window.hive.init();
       this.setState({ graphs: this.initGraphs() });
@@ -84,6 +83,9 @@ class Hive extends Component {
   }
 
   step = () => {
+    if (!window.hive) {
+      return;
+    }
     const newState = {};
     const updateStartTime = new Date().getTime();
     for (let i = 0; i < this.state.updatesPerStep; i++) {
@@ -212,7 +214,7 @@ class Hive extends Component {
   }
   handleSpeedChange = (delay) => {
     const newState = { delayPerUpdate: delay };
-    if (!this.state.newGame && this.state.isPaused) {
+    if (!this.state.showApi && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 50);
       newState.isPaused = false;
     }
@@ -222,13 +224,13 @@ class Hive extends Component {
     this.setState({ isPaused: true });
   }
   handleStep = () => {
-    if (!this.state.newGame && this.state.isPaused) {
+    if (!this.state.showApi && this.state.isPaused) {
       this.stepTimeout = setTimeout(this.step, 10);
     }
   }
   handleToggleTrails = () => {
     this.setState({ shouldRenderTrails: !this.state.shouldRenderTrails });
-    if (!this.state.newGame) {
+    if (!this.state.showApi) {
       this.stepTimeout = setTimeout(this._game._display.renderAll, 50, this.state.pixelScale);
     }
   }
@@ -240,13 +242,13 @@ class Hive extends Component {
   handleCreateNewGame = () => {
     clearTimeout(this.stepTimeout);
     delete window.hive;
-    this.setState({ newGame: true, watchTile: [null, null] });
+    this.setState({ showApi: true, watchTile: [null, null] });
   }
   handleStart = () => {
     window.hive = new HiveGame(this.hiveGameOptions());
     window.hive.init();
     this.setState({
-      newGame: false,
+      showApi: false,
       shouldRenderAll: true,
       graphs: this.initGraphs(),
     });
@@ -417,23 +419,7 @@ class Hive extends Component {
     if (this.state.showApi) {
       rightPane = (
         <ApiReferencePane
-        />
-      );
-    } else if (this.state.newGame) {
-      rightPane = (
-        <GameOptions
-          width={ this.state.width }
-          height={ this.state.height }
-          sparsity={ this.state.sparsity }
-          density={ this.state.density }
-          saturation={ this.state.saturation }
-          changeHandler={ this.changeHandler }
-          startGame={ this.handleStart }
-          players={ this.state.playerAIs }
-          AIs={ this.state.AIs }
-          onAddPlayer={ this.addPlayer }
-          removePlayer={ this.removePlayer }
-          updatePlayer={ this.updatePlayer }
+          onRun={ this.handleEditorSubmit }
         />
       );
     } else {
@@ -451,7 +437,19 @@ class Hive extends Component {
         addAI={ this.addAI }
         updateAI={ this.updateAI }
         deleteAI={ this.deleteAI }
-        onShowApi={ this.handleShowApi }
+
+        width={ this.state.width }
+        height={ this.state.height }
+        sparsity={ this.state.sparsity }
+        density={ this.state.density }
+        saturation={ this.state.saturation }
+        changeHandler={ this.changeHandler }
+        startGame={ this.handleStart }
+        players={ this.state.playerAIs }
+        AIs={ this.state.AIs }
+        onAddPlayer={ this.addPlayer }
+        removePlayer={ this.removePlayer }
+        updatePlayer={ this.updatePlayer }
       />
     );
     return (

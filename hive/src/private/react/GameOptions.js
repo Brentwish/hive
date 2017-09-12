@@ -127,10 +127,8 @@ class GameOptions extends Component {
   renderAISelector = () => {
     return (
       <div className="AISelector">
-        <Button className="AddPlayerButton" bsStyle="primary" onClick={ this.handleAddPlayer }>Add Player</Button>
-        <div style={ { height: "200px", "overflow-y": "scroll" } }>
-          { this.renderPlayersTable() }
-        </div>
+        { this.renderPlayersTable() }
+        <Button className="AddPlayerButton" bsStyle="primary" onClick={ this.handleAddPlayer }>Add AI</Button>
       </div>
     );
   }
@@ -145,7 +143,6 @@ class GameOptions extends Component {
             { this.renderBoardOptions() }
           </Tab>
         </Tabs>
-        <Button bsStyle="success" onClick={ this.props.startGame }>Start</Button>
       </div>
     );
   }
