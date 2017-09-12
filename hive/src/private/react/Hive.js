@@ -155,7 +155,7 @@ class Hive extends Component {
     });
   }
   step = () => {
-    if (!window.hive) {
+    if (!window.hive || window.hive.isGameOver) {
       return;
     }
     const newState = {};

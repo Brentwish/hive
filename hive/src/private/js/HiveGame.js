@@ -59,7 +59,7 @@ HiveGame.prototype.checkWinConditions = function() {
   const playersWithAnts = _.filter(this.players, (p) => {
     return p.ants.length > 0;
   });
-  if (playersWithAnts.length < 2) {
+  if (playersWithAnts.length < 2 && this.players.length > 1) {
     this.isGameOver= true;
     if (playersWithAnts.length === 0) {
       this.winningPlayer = "no one";
@@ -120,6 +120,7 @@ HiveGame.prototype.updatePlayers = function() {
           this.performAction(ant, action);
         } catch (error) {
           this.consoleLogs.push({ type: "error", message: error.message });
+          this.isGameOver = true;
         }
         ant.age += 1;
       } else {
