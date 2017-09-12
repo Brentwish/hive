@@ -20,6 +20,7 @@ class EditorPane extends Component {
     super(props);
     this.state = {
       watchingFile: false,
+      watchFileName: "",
       showModal: false,
       showGameOptionsModal: false,
     };
@@ -44,12 +45,34 @@ class EditorPane extends Component {
   openModal = () => {
     this.setState({ showModal: true });
   }
+  onStopFileWatch = () => {
+    this.setState({ watchingFile: false, watchFileName: "" });
+  }
+  onStartFileWatch = (filename) => {
+    this.setState({ watchingFile: true, watchFileName: filename });
+  }
   onLoad = (editor) => {
     editor.scrollToLine(1, true, true, () => {});
     editor.gotoLine(1, 0, true);
     editor.focus();
   }
+  renderOverlay() {
+    return (
+      <div className="WatchFileOverlayContainer">
+        <div className="WatchFileOverlay"/>
+        <div className="WatchFileOverlayMessage">
+          <div>Currently watching:</div>
+          <div>{ this.state.watchFileName }</div>
+          <div>Any changes made to the file will be imported, and a new game will be started. Press the eye button again to stop.</div>
+        </div>
+      </div>
+    );
+  }
   render() {
+    let watchFileOverlay;
+    if (this.state.watchingFile) {
+      watchFileOverlay = this.renderOverlay();
+    }
     return (
       <Pane>
         <EditorControls
@@ -58,8 +81,14 @@ class EditorPane extends Component {
           onOpenGameOptions={ this.openGameOptionsModal }
           onDownload={ this.props.onDownload }
           updatePlayerCode={ this.props.updatePlayerCode }
+          watchingFile={ this.state.watchingFile }
+          watchFileName={ this.state.watchFileName }
+
+          onStopFileWatch={ this.onStopFileWatch }
+          onStartFileWatch={ this.onStartFileWatch }
         />
         <PaneContent>
+          { watchFileOverlay }
           <AceEditor
             width={ "100%" }
             height={ "100%" }
