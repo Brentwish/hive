@@ -4,6 +4,16 @@ import { Modal, Button, Table } from 'react-bootstrap';
 import _ from "lodash";
 
 class AIManagerModal extends Component {
+  validateName = (ai) => {
+    const otherAINames = _.map(_.values(_.omit(this.props.AIs, ai.id)), "name");
+    if (_.includes(otherAINames, ai.name)) {
+      let i = 1;
+      while (_.includes(otherAINames, `${ai.name} (${i})`)) {
+        i++;
+      }
+      this.props.updateAI(ai.id, 'name', `${ai.name} (${i})`);
+    }
+  }
   generateAITableRow = (ai) => {
     return (
       <tr>
@@ -12,7 +22,13 @@ class AIManagerModal extends Component {
             <span className="glyphicon glyphicon-folder-open"/>
           </Button>
         </td>
-        <td className="name"><input value={ ai.name } onChange={ (e) => this.props.updateAI(ai.id, 'name', e.target.value) }/></td>
+        <td className="name">
+          <input
+            value={ ai.name }
+            onChange={ (e) => this.props.updateAI(ai.id, 'name', e.target.value) }
+            onBlur={ (e) => this.validateName(ai) }
+          />
+        </td>
         <td className="centered">
           <Button bsStyle="danger" onClick={ () => this.props.deleteAI(ai.id) }>
             <span className="glyphicon glyphicon-trash"/>

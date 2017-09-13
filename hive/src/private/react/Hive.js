@@ -312,10 +312,19 @@ class Hive extends Component {
       count++;
     }
     const newId = `new_${count}`;
+    const otherAINames = _.map(_.values(this.state.AIs), "name");
+    let newName = "New Hive AI"
+    if (_.includes(otherAINames, newName)) {
+      let i = 1;
+      while (_.includes(otherAINames, `${newName} (${i})`)) {
+        i++;
+      }
+      newName = `${newName} (${i})`;
+    }
     const newAIs = this.state.AIs;
     newAIs[newId] = {
       id: newId,
-      name: "My Hive AI",
+      name: newName,
       AICode: defaultPlayerFunction,
     };
     this.setState({ AIs: newAIs });
