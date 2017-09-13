@@ -4,6 +4,10 @@ import { Modal, Button, Table } from 'react-bootstrap';
 import _ from "lodash";
 
 class AIManagerModal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { addedAI: false };
+  }
   validateName = (ai) => {
     const otherAINames = _.map(_.values(_.omit(this.props.AIs, ai.id)), "name");
     if (_.includes(otherAINames, ai.name)) {
@@ -13,6 +17,14 @@ class AIManagerModal extends Component {
       }
       this.props.updateAI(ai.id, 'name', `${ai.name} (${i})`);
     }
+  }
+  onAddAI = () => {
+    this.setState({ addedAI: true });
+    this.props.addAI();
+  }
+  onLeave = () => {
+    this.setState({ addedAI: false });
+    this.props.close();
   }
   generateAITableRow = (ai) => {
     return (
@@ -27,6 +39,8 @@ class AIManagerModal extends Component {
             value={ ai.name }
             onChange={ (e) => this.props.updateAI(ai.id, 'name', e.target.value) }
             onBlur={ (e) => this.validateName(ai) }
+            onFocus={ (e) => e.target.select() }
+            autoFocus={ this.state.addedAI }
           />
         </td>
         <td className="centered">
@@ -48,7 +62,7 @@ class AIManagerModal extends Component {
         <tbody>
           { _.map(this.props.AIs, this.generateAITableRow) }
           <tr><td>
-            <Button bsStyle="success" onClick={ this.props.addAI }>
+            <Button bsStyle="success" onClick={ this.onAddAI }>
               <span className="glyphicon glyphicon-plus"/>
             </Button>
           </td></tr>
@@ -58,7 +72,7 @@ class AIManagerModal extends Component {
   }
   render() {
     return (
-      <Modal className="AIManagerModal" show={ this.props.showModal } onHide={ this.props.close }>
+      <Modal className="AIManagerModal" show={ this.props.showModal } onHide={ this.onLeave }>
         <Modal.Header closeButton>
           <Modal.Title>AI Manager</Modal.Title>
         </Modal.Header>
@@ -66,7 +80,7 @@ class AIManagerModal extends Component {
           { this.generateAITable() }
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={ this.props.close }>Close</Button>
+          <Button onClick={ this.onLeave }>Close</Button>
         </Modal.Footer>
       </Modal>
     );
