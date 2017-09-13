@@ -7,57 +7,63 @@ import { Table, ButtonToolbar, DropdownButton, MenuItem } from "react-bootstrap"
 import { LineChart } from "react-easy-chart";
 
 class StatsTable extends Component {
+  renderGroupHeader() {
+    return (
+      <tr>
+        <th colSpan={ 3 }>Player</th>
+        <th colSpan={ 2 }>Ants</th>
+        <th colSpan={ 2 }>Combat</th>
+        <th colSpan={ 2 }>Food</th>
+      </tr>
+    );
+  }
+  renderRowHeaders() {
+    return (
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Color</th>
+        <th>Queens</th>
+        <th>Workers</th>
+        <th>Dead</th>
+        <th>Killed</th>
+        <th>Total</th>
+        <th>Current</th>
+      </tr>
+    );
+  }
+  renderPlayerRow(player) {
+    return (
+      <tr key={ player.identifiers.id }>
+        <td>{ player.identifiers.id }</td>
+        <td>{ player.identifiers.name }</td>
+        <td><div
+          className="colorDiv"
+          style={ { backgroundColor: player.identifiers.color } }
+        /></td>
+
+        <td>{ player.antCounts.numQueens }</td>
+        <td>{ player.antCounts.numWorkers }</td>
+
+        <td>{ player.combatCounts.numDead }</td>
+        <td>{ player.combatCounts.numKilled }</td>
+
+        <td>{ player.foodCounts.currentFood }</td>
+        <td>{ player.foodCounts.totalFood }</td>
+      </tr>
+    );
+  }
   render() {
     const players = this.props.players;
     return (
       <div className="PlayerTable">
         <Table striped bordered hover>
           <thead>
-            <tr>
-              { 
-                _.map(players[0], (counts, type) => { 
-                  return (
-                    <th key={ type } colSpan={ _.size(counts) }>{ keysToTitles[type] }</th>
-                  );
-                })
-              }
-            </tr>
-            <tr>
-              {
-                _.map(_.flatten(_.map(players[0], _.keys)), (type) => {
-                  return (
-                    <th key={ type } scope="col">{ keysToTitles[type] }</th>
-                  );
-                })
-              }
-            </tr>
+            { this.renderGroupHeader() }
+            { this.renderRowHeaders() }
           </thead>
           <tbody>
-            {
-              _.map(players, (player) => {
-                const values = _.flatten(_.map(player, _.values));
-                return (
-                  <tr key={ player.identifiers.id }>
-                    {
-                      _.map(values, (count, key) => {
-                        let value;
-                        if (key === 2) {
-                          value = (<div
-                            className="colorDiv"
-                            style={ { backgroundColor: count } }
-                          />);
-                        } else {
-                          value = count;
-                        }
-                        return (
-                          <td key={ key }>{ value }</td>
-                        );
-                      })
-                    }
-                  </tr>
-                );
-              })
-            }
+            { _.map(players, this.renderPlayerRow) }
           </tbody>
         </Table>
       </div>
