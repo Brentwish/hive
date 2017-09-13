@@ -35,12 +35,22 @@ class StatsTable extends Component {
           <tbody>
             {
               _.map(players, (player) => {
+                const values = _.flatten(_.map(player, _.values));
                 return (
                   <tr key={ player.identifiers.id }>
                     {
-                      _.map(_.flatten(_.map(player, _.values)), (count, key) => {
+                      _.map(values, (count, key) => {
+                        let value;
+                        if (key === 2) {
+                          value = (<div
+                            className="colorDiv"
+                            style={ { backgroundColor: count } }
+                          />);
+                        } else {
+                          value = count;
+                        }
                         return (
-                          <td key={ key }>{ count }</td>
+                          <td key={ key }>{ value }</td>
                         );
                       })
                     }
