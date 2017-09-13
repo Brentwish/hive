@@ -10,7 +10,7 @@ class StatsTable extends Component {
   renderGroupHeader() {
     return (
       <tr>
-        <th colSpan={ 3 }>Player</th>
+        <th colSpan={ 2 }>Player</th>
         <th colSpan={ 2 }>Ants</th>
         <th colSpan={ 2 }>Combat</th>
         <th colSpan={ 2 }>Food</th>
@@ -20,7 +20,6 @@ class StatsTable extends Component {
   renderRowHeaders() {
     return (
       <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Color</th>
         <th>Queens</th>
@@ -35,7 +34,6 @@ class StatsTable extends Component {
   renderPlayerRow(player) {
     return (
       <tr key={ player.identifiers.id }>
-        <td>{ player.identifiers.id }</td>
         <td>{ player.identifiers.name }</td>
         <td><div
           className="colorDiv"
