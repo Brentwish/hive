@@ -4,8 +4,8 @@ function Player(props) {
   this.id = props.id;
   this.name = props.name;
   this.ants = [];
-  this.numDeadAnts = 0;
-  this.numAntsKilled = 0;
+  this.numDead = 0;
+  this.numKilled = 0;
   this.totalFood = 0;
   this.currentFood = 0;
   this.board = props.board;

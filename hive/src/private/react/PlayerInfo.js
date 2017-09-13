@@ -3,8 +3,7 @@ import "./PlayerInfo.css"
 import { keysToTitles, graphTypes } from "../js/constants.js"
 
 import _ from "lodash";
-import { Tab, Tabs } from "react-bootstrap";
-import { ButtonToolbar, DropdownButton, MenuItem } from "react-bootstrap";
+import { Table, ButtonToolbar, DropdownButton, MenuItem } from "react-bootstrap";
 import { LineChart } from "react-easy-chart";
 
 class StatsTable extends Component {
@@ -12,9 +11,9 @@ class StatsTable extends Component {
     const players = this.props.players;
     return (
       <div className="PlayerTable">
-        <table>
+        <Table striped bordered hover>
           <thead>
-            <tr className="PlayerTable Header">
+            <tr>
               { 
                 _.map(players[0], (counts, type) => { 
                   return (
@@ -23,7 +22,7 @@ class StatsTable extends Component {
                 })
               }
             </tr>
-            <tr className="PlayerTable Subheader">
+            <tr>
               {
                 _.map(_.flatten(_.map(players[0], _.keys)), (type) => {
                   return (
@@ -50,7 +49,7 @@ class StatsTable extends Component {
               })
             }
           </tbody>
-        </table>
+        </Table>
       </div>
     );
   }

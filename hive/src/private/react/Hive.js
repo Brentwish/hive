@@ -144,8 +144,8 @@ class Hive extends Component {
           numWorkers,
         },
         combatCounts: {
-          numDeadAnts: p.numDeadAnts,
-          numAntsKilled: p.numAntsKilled,
+          numDead: p.numDead,
+          numKilled: p.numKilled,
         },
         foodCounts: {
           totalFood: p.totalFood,

@@ -6,39 +6,6 @@
 .PlayerTable {
   margin: 10px;
 }
-.PlayerTable table {
-  border: 1px solid black;
-}
-.PlayerTable td {
-  font-weight: 400;
-  text-align: right;
-  vertical-align: top;
-  white-space: pre;
-  border: 1px solid black;
-  padding: 2px;
-}
-.PlayerTable.Header {
-  font-weight: 600;
-  vertical-align: top;
-  white-space: pre;
-}
-.PlayerTable.Header th {
-  text-align: center;
-  border: 1px solid black;
-}
-.PlayerTable.Subheader {
-  text-align: right;
-  vertical-align: top;
-  font-weight: 500;
-  white-space: pre;
-}
-.PlayerTable.Subheader th {
-  text-align: center;
-  border: 1px solid black;
-}
-.PlayerTable th {
-  padding: 0 5px 0 5px;
-}
 .Graph {
   display: flex;
   flex-direction: column;
