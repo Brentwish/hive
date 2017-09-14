@@ -9,12 +9,13 @@ import _ from "lodash";
 function HiveGame(props) {
   this.board = new Board(props.width, props.height);
   this.players = _.map(props.players, (player, i) => {
-    return new Player(_.merge(player, {
+    return new Player({
       id: i,
-      color: playerColors[i],
+      name: player.name,
+      color: player.color,
       board: this.board,
-      code: player.AICode,
-    }));
+      code: player.code,
+    });
   });
   this.turn = 0;
   this.actionFunction = props.playerCode;

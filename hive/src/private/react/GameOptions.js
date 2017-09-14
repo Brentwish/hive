@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 import _ from "lodash";
 import "./GameOptions.css"
-import { Button, Tabs, Tab, Table } from "react-bootstrap";
+import { ButtonToolbar, DropdownButton, Button, Tabs, Tab, Table } from "react-bootstrap";
 import {
   foodGrades,
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
   MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
 } from "../js/constants.js";
+import { GithubPicker } from "react-color";
 
 class GameOptions extends Component {
   constructor(props) {
     super();
     this.state = {
-      currentTab: props.activeTab || 1
+      currentTab: props.activeTab || 1,
+      showColorPicker: false,
     };
   }
   handleSelect = (tab) => {
@@ -98,9 +100,12 @@ class GameOptions extends Component {
           { index + 1 }
         </td>
         <td>
-          <select value={ player } onChange={ (e) => this.props.updatePlayer(index, 'aiId', e.target.value) }>
+          <select value={ player.AIid } onChange={ (e) => this.props.updatePlayer(index, 'AIid', e.target.value) }>
             { _.map(this.props.AIs, (ai) => <option key={ ai.id } value={ ai.id }>{ ai.name }</option>) }
           </select>
+        </td>
+        <td>
+          { this.renderColorSelector(player, index) }
         </td>
         <td>
           <Button onClick={ () => this.handleRemovePlayer(index) } bsSize="xsmall" bsStyle="danger">
@@ -122,6 +127,23 @@ class GameOptions extends Component {
           { _.map(this.props.players, this.renderPlayerTableRow) }
         </tbody>
       </Table>
+    );
+  }
+  handleColorChange = (index, color) => {
+    if (!_.includes(_.map(this.props.players, "color"), color)) {
+      this.props.updatePlayer(index, "color", color);
+    }
+  }
+  renderColorSelector = (player, index) => {
+    return (
+      <div className="SketchPicker">
+        <DropdownButton noCaret id={ index } title="" style={ { backgroundColor: player.color } }>
+          <GithubPicker
+            onChange={ (color) => this.handleColorChange(index, color.hex)}
+            width="212px"
+          />
+        </DropdownButton>
+      </div>
     );
   }
   renderAISelector = () => {

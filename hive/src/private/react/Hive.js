@@ -9,7 +9,7 @@ import EditorPane from "./EditorPane.js";
 import GamePane from "./GamePane.js";
 import ApiReferencePane from "./ApiReferencePane.js";
 import HiveGame from "../js/HiveGame.js";
-import { UPDATE_PERIOD, foodGrades, graphTypes } from "../js/constants.js";
+import { UPDATE_PERIOD, playerColors, foodGrades, graphTypes } from "../js/constants.js";
 import { defaultPlayerFunction } from "../js/constants.js";
 import {
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
@@ -60,7 +60,7 @@ class Hive extends Component {
           AICode: localStorage.getItem("playerCode") || defaultPlayerFunction
         }
       },
-      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ "new_1" ],
+      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ { AIid: "new_1", color: "red" } ],
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
@@ -76,9 +76,17 @@ class Hive extends Component {
     }
   }
   hiveGameOptions() {
-    return _.merge(_.omit(this.state, "players"), {
-      players: _.compact(_.map(this.state.playerAIs, (ai) => this.state.AIs[ai])),
+    const players = [];
+    _.each(this.state.playerAIs, (playerAI) => {
+      if (!_.isEmpty(this.state.AIs[playerAI.AIid])) {
+        players.push({
+          name: this.state.AIs[playerAI.AIid].name,
+          code: this.state.AIs[playerAI.AIid].AICode,
+          color: playerAI.color,
+        });
+      }
     });
+    return _.merge(_.omit(this.state, "players"), { players });
   }
   initGraphs = () => {
     const graphs = {};
@@ -344,9 +352,9 @@ class Hive extends Component {
   }
   deleteAI = (id) => {
     if (this.state.AIs[id]) {
-      const newAIs =_.omit(this.state.AIs, id);
+      const newAIs = _.omit(this.state.AIs, id);
       const keys = _.keys(newAIs);
-      let updatedPlayerAIs = _.without(this.state.playerAIs, id);
+      let updatedPlayerAIs = _.filter(this.state.playerAIs, (playerAI) => { return playerAI.AIid === id });
       if (keys.length > 0) {
         const selectedAI = keys[0];
         if (_.isEmpty(updatedPlayerAIs)) {
@@ -359,7 +367,7 @@ class Hive extends Component {
         });
         localStorage.setItem("AIs", JSON.stringify(_.omit(this.state.AIs, id)));
         localStorage.setItem("editingAIid", selectedAI);
-        localStorage.setItem("editingAIid", JSON.stringify(updatedPlayerAIs));
+        localStorage.setItem("playerAIs", JSON.stringify(updatedPlayerAIs));
       }
     } else {
       console.log("Couldn't find AI with id", id);
@@ -376,8 +384,12 @@ class Hive extends Component {
   handleShowApi = () => {
     this.setState({ showApi: !this.state.showApi, shouldRenderAll: true });
   }
+  getUnusedColor = () => {
+    const currentColors = _.map(this.state.playerAIs, "color");
+    return _.sample(_.difference(playerColors, currentColors));
+  }
   addPlayer = () => {
-    const newPlayers = _.concat(this.state.playerAIs, this.state.editingAIid);
+    const newPlayers = _.concat(this.state.playerAIs, { AIid: this.state.editingAIid, color: this.getUnusedColor() });
     this.setState({ playerAIs: newPlayers });
     localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
   }
@@ -389,7 +401,7 @@ class Hive extends Component {
   }
   updatePlayer = (index, key, value) => {
     const newPlayers = _.clone(this.state.playerAIs);
-    newPlayers[index] = value;
+    newPlayers[index][key] = value;
     this.setState({ playerAIs: newPlayers });
     localStorage.setItem("playerAIs", JSON.stringify(newPlayers));
   }
