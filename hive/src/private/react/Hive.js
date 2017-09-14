@@ -60,7 +60,7 @@ class Hive extends Component {
           AICode: localStorage.getItem("playerCode") || defaultPlayerFunction
         }
       },
-      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ { AIid: "new_1", color: "red" } ],
+      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ { AIid: "new_1", color: playerColors[0] } ],
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
