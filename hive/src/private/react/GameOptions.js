@@ -3,7 +3,7 @@ import _ from "lodash";
 import "./GameOptions.css"
 import { ButtonToolbar, DropdownButton, Button, Tabs, Tab, Table } from "react-bootstrap";
 import {
-  foodGrades,
+  foodGrades, playerColors,
   MIN_NUM_PLAYERS, MAX_NUM_PLAYERS, MIN_BOARD_WIDTH,
   MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT
 } from "../js/constants.js";
@@ -139,8 +139,9 @@ class GameOptions extends Component {
       <div className="SketchPicker">
         <DropdownButton noCaret id={ index } title="" style={ { backgroundColor: player.color } }>
           <GithubPicker
-            onChange={ (color) => this.handleColorChange(index, color.hex)}
+            onChange={ (color) => this.handleColorChange(index, color.hex.toUpperCase())}
             width="212px"
+            colors={ playerColors }
           />
         </DropdownButton>
       </div>
