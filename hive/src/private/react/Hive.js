@@ -42,6 +42,8 @@ class Hive extends Component {
       pixelScale: 5,
       width: 200,
       height: 100,
+      gameWidth: 200,
+      gameHeight: 100,
       shouldRenderAll: true,
       shouldRenderTrails: false,
       players: [],
@@ -260,6 +262,8 @@ class Hive extends Component {
       showApi: false,
       shouldRenderAll: true,
       graphs: this.initGraphs(),
+      gameWidth: this.state.width,
+      gameHeight: this.state.height,
     });
     this.stepTimeout = setTimeout(this.step, 100);
   }
@@ -410,8 +414,8 @@ class Hive extends Component {
       <GamePane
         ref={ (g) => this._game = g }
 
-        gameWidth={ this.state.width }
-        gameHeight={ this.state.height }
+        gameWidth={ this.state.gameWidth }
+        gameHeight={ this.state.gameHeight }
         pixelScale={ this.state.pixelScale }
         onTileSelect={ this.handleTileSelect }
         showTrails={ this.state.shouldRenderTrails }
