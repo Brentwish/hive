@@ -130,7 +130,7 @@ class EditorPane extends Component {
           density={ this.props.density }
           saturation={ this.props.saturation }
           changeHandler={ this.props.changeHandler }
-          startGame={ this.props.startGame }
+          startGame={ this.props.onRun }
           players={ this.props.players }
           AIs={ this.props.AIs }
           onAddPlayer={ this.props.onAddPlayer }

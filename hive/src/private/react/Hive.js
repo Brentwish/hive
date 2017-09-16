@@ -470,7 +470,6 @@ class Hive extends Component {
         density={ this.state.density }
         saturation={ this.state.saturation }
         changeHandler={ this.changeHandler }
-        startGame={ this.handleStart }
         players={ this.state.playerAIs }
         AIs={ this.state.AIs }
         onAddPlayer={ this.addPlayer }
