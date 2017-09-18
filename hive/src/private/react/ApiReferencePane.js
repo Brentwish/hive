@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import "./ApiReferencePane.css"
 import { Pane, PaneControls, PaneContent } from "./Pane.js";
 import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import { Api } from "../../Api.js"
 
 import codeRenderer from './CodeRenderer.js';
 
@@ -10,21 +11,8 @@ class ApiReferencePane extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      source: [
-        '# Hive',
-        'This is hive.',
-        '\n',
-        '### Code Block',
-        '```js',
-        'if (antData.type === "worker") {',
-        '  return {',
-        '    type: "move",',
-        '    direction: _.sample(dirs),',
-        '  }',
-        '}',
-        '```'
-      ].join("\n")
-    }
+      source: Api
+		}
   }
   render() {
     return (
