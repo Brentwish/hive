@@ -20,7 +20,7 @@ import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Hive.css";
 
-let Lint = require('jshint');
+let Lint = require('jshint').JSHINT;
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -69,6 +69,7 @@ class Hive extends Component {
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
+      lintErrors: [],
     };
   }
 
@@ -293,11 +294,11 @@ class Hive extends Component {
     return ai ? ai.AICode : "";
   }
   handleEditorSubmit = () => {
-    if (Lint.JSHINT(this.currentAIcode(), LintOptions, LintGlobals)) {
+    if (Lint(this.currentAIcode(), LintOptions, LintGlobals)) {
       this.handleCreateNewGame();
       this.handleStart();
     } else {
-      _.each(Lint.JSHINT.errors, (error) => {
+      _.each(Lint.errors, (error) => {
         window.hive.consoleLogs.push({ type: "error", message: _.omit(error, ["id", "code", "evidence", "scope"]) })
       });
     }
@@ -317,7 +318,12 @@ class Hive extends Component {
     var blob = new Blob([this.currentAIcode()], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "HiveAI.js");
   }
+  lintCode = (code) => {
+    Lint(code, LintOptions, LintGlobals);
+    this.setState({ lintErrors: Lint.data().errors });
+  }
   updatePlayerCode = (newCode) => {
+    this.lintCode(newCode);
     this.updateAI(this.state.editingAIid, "AICode", newCode);
   }
   addAI = () => {
@@ -447,10 +453,11 @@ class Hive extends Component {
   }
   render() {
     let rightPane;
-    if (this.state.showApi) {
+    if (this.state.showApi || this.state.showErrors) {
       rightPane = (
         <ApiReferencePane
           onRun={ this.handleEditorSubmit }
+          lintErrors={ this.state.lintErrors }
         />
       );
     } else {
