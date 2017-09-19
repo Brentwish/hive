@@ -73,6 +73,7 @@ export const keysToTitles = {
   id: "ID",
   color: "Color",
 };
+
 export const listOfNames = [
   "Bob Jenkins", "LeeRoy Jenkins",
   "Cassy Jenkins", "Alexander Jenkins",
@@ -80,7 +81,20 @@ export const listOfNames = [
   "BoJack Jenkins", "Tubby Jenkins",
   "PhoLin Jenkins", "Tarloc Jenkins"
 ];
+
 export const graphTypes = ["TotalAnts", "DeadAnts", "AntsKilled", "TotalFood"];
+
+export const LintOptions = {
+  esversion: 6,
+  undef: true,
+};
+
+export const LintGlobals = {
+  "_": false,
+  "constants": false,
+  "Math": false,
+};
+
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }

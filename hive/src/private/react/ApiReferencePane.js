@@ -4,8 +4,8 @@ import "./ApiReferencePane.css"
 import { Pane, PaneControls, PaneContent } from "./Pane.js";
 import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
 import { Api } from "../../Api.js"
-
 import codeRenderer from './CodeRenderer.js';
+
 
 class ApiReferencePane extends Component {
   constructor(props) {

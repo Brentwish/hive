@@ -9,6 +9,7 @@ import EditorPane from "./EditorPane.js";
 import GamePane from "./GamePane.js";
 import ApiReferencePane from "./ApiReferencePane.js";
 import HiveGame from "../js/HiveGame.js";
+import { LintOptions, LintGlobals } from "../js/constants.js";
 import { UPDATE_PERIOD, playerColors, foodGrades, graphTypes } from "../js/constants.js";
 import { defaultPlayerFunction } from "../js/constants.js";
 import {
@@ -18,6 +19,8 @@ import {
 import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Hive.css";
+
+let Lint = require('jshint');
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -290,12 +293,13 @@ class Hive extends Component {
     return ai ? ai.AICode : "";
   }
   handleEditorSubmit = () => {
-    try {
-      eval(`(() => { ${this.currentAIcode()} })`);
+    if (Lint.JSHINT(this.currentAIcode(), LintOptions, LintGlobals)) {
       this.handleCreateNewGame();
       this.handleStart();
-    } catch (error) {
-      window.hive.consoleLogs.push({ type: "error", message: error.message });
+    } else {
+      _.each(Lint.JSHINT.errors, (error) => {
+        window.hive.consoleLogs.push({ type: "error", message: _.omit(error, ["id", "code", "evidence", "scope"]) })
+      });
     }
   }
   setGraphDimensions = () => {
