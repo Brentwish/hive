@@ -75,10 +75,7 @@ class Hive extends Component {
 
   componentDidMount() {
     if (!this.state.showApi) {
-      window.hive = new HiveGame(this.hiveGameOptions());
-      window.hive.init();
-      this.setState({ graphs: this.initGraphs() });
-      this.stepTimeout = setTimeout(this.step, 100);
+      this.handleStart()
     }
   }
   hiveGameOptions() {
@@ -297,10 +294,6 @@ class Hive extends Component {
     if (Lint(this.currentAIcode(), LintOptions, LintGlobals)) {
       this.handleCreateNewGame();
       this.handleStart();
-    } else {
-      _.each(Lint.errors, (error) => {
-        window.hive.consoleLogs.push({ type: "error", message: _.omit(error, ["id", "code", "evidence", "scope"]) })
-      });
     }
   }
   setGraphDimensions = () => {
@@ -452,8 +445,9 @@ class Hive extends Component {
     );
   }
   render() {
+    let leftPane;
     let rightPane;
-    if (this.state.showApi || this.state.showErrors) {
+    if (this.state.showApi) {
       rightPane = (
         <ApiReferencePane
           onRun={ this.handleEditorSubmit }

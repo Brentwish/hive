@@ -20,7 +20,6 @@ function HiveGame(props) {
   this.turn = 0;
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
-  this.consoleLogs = [];
   this.isGameOver = false;
   this.winningPlayer = "";
 }
@@ -92,23 +91,11 @@ HiveGame.prototype.findAnt = function(playerAntId) {
 }
 
 HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
-  const console = {
-    log: (expr) => {
-      this.consoleLogs.push({ type: "log", message: expr });
-    },
-    error: (expr) => {
-      this.consoleLogs.push({ type: "error", message: expr });
-    },
-    warn: (expr) => {
-      this.consoleLogs.push({ type: "warn", message: expr });
-    },
-  };
-  return { antAction: (function(_, constants, _console) {
-    var console = _console;
+  return { antAction: (function(_, constants) {
     var window = null;
     var f = eval(`(() => { ${funcText} })`)();
     return f;
-  })(_, constants, console) };
+  })(_, constants) };
 }
 
 HiveGame.prototype.updatePlayers = function() {
@@ -120,7 +107,6 @@ HiveGame.prototype.updatePlayers = function() {
           const action = func.antAction(ant.toDataHash());
           this.performAction(ant, action);
         } catch (error) {
-          this.consoleLogs.push({ type: "error", message: error.message });
           this.isGameOver = true;
         }
         ant.age += 1;
