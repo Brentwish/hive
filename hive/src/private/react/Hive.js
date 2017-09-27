@@ -316,7 +316,6 @@ class Hive extends Component {
     FileSaver.saveAs(blob, "HiveAI.js");
   }
   lintCode = (code) => {
-    debugger;
     Lint(code, LintOptions, LintGlobals);
     this.setState({ lintErrors: Lint.errors });
   }
@@ -370,7 +369,7 @@ class Hive extends Component {
       if (keys.length > 0) {
         const selectedAI = keys[0];
         if (_.isEmpty(updatedPlayerAIs)) {
-          updatedPlayerAIs = [selectedAI];
+          updatedPlayerAIs = [{ AIid: selectedAI, color: this.getUnusedColor() }];
         }
         this.setState({
           AIs: _.omit(this.state.AIs, id),
