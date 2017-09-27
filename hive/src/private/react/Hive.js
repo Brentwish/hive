@@ -69,6 +69,7 @@ class Hive extends Component {
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
+      showErrors: false,
       lintErrors: [],
     };
   }
@@ -291,7 +292,10 @@ class Hive extends Component {
     return ai ? ai.AICode : "";
   }
   handleEditorSubmit = () => {
-    if (Lint(this.currentAIcode(), LintOptions, LintGlobals)) {
+    this.lintCode(this.currentAIcode());
+    if (this.state.lintErrors.length > 0) {
+      this.setState({ showApi: true, showErrors: true });
+    } else {
       this.handleCreateNewGame();
       this.handleStart();
     }
@@ -312,8 +316,9 @@ class Hive extends Component {
     FileSaver.saveAs(blob, "HiveAI.js");
   }
   lintCode = (code) => {
+    debugger;
     Lint(code, LintOptions, LintGlobals);
-    this.setState({ lintErrors: Lint.data().errors });
+    this.setState({ lintErrors: Lint.errors });
   }
   updatePlayerCode = (newCode) => {
     this.lintCode(newCode);
@@ -452,6 +457,8 @@ class Hive extends Component {
         <ApiReferencePane
           onRun={ this.handleEditorSubmit }
           lintErrors={ this.state.lintErrors }
+          showErrors={ this.state.showErrors }
+          changeHandler={ this.state.changeHandler }
         />
       );
     } else {
