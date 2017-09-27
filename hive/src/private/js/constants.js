@@ -15,6 +15,7 @@ export const MAX_BOARD_HEIGHT = 600;
 export const MIN_NUM_PLAYERS = 1;
 export const MAX_NUM_PLAYERS = 10;
 export const STARTING_FOOD = 35;
+export const MAX_TRAIL_CHANNELS = 16;
 export const tileColors = {
   "empty": "#E4AF77",
   "wall": "#424949",
