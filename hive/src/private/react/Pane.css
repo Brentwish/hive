@@ -24,6 +24,10 @@ div.PaneControls div.btn-toolbar div.btn-group {
   flex: 1;
 }
 
+.PaneContent.scrollable {
+  overflow: auto;
+}
+
 .glyphicon {
   font-size: 20px;
 }
