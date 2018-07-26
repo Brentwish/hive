@@ -9,6 +9,7 @@ import EditorPane from "./EditorPane.js";
 import GamePane from "./GamePane.js";
 import ApiReferencePane from "./ApiReferencePane.js";
 import HiveGame from "../js/HiveGame.js";
+import { LintOptions, LintGlobals } from "../js/constants.js";
 import { UPDATE_PERIOD, playerColors, foodGrades, graphTypes } from "../js/constants.js";
 import { defaultPlayerFunction } from "../js/constants.js";
 import {
@@ -18,6 +19,8 @@ import {
 import _ from "lodash";
 import SplitPane from "react-split-pane";
 import "./Hive.css";
+
+let Lint = require('jshint').JSHINT;
 
 const logTime = function(updateTime, renderTime) {
   const goodCss = "";
@@ -42,6 +45,8 @@ class Hive extends Component {
       pixelScale: 5,
       width: 200,
       height: 100,
+      gameWidth: 200,
+      gameHeight: 100,
       shouldRenderAll: true,
       shouldRenderTrails: false,
       players: [],
@@ -60,19 +65,18 @@ class Hive extends Component {
           AICode: localStorage.getItem("playerCode") || defaultPlayerFunction
         }
       },
-      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ { AIid: "new_1", color: "red" } ],
+      playerAIs: JSON.parse(localStorage.getItem("playerAIs") || '""') || [ { AIid: "new_1", color: playerColors[0] } ],
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
+      showErrors: false,
+      lintErrors: [],
     };
   }
 
   componentDidMount() {
     if (!this.state.showApi) {
-      window.hive = new HiveGame(this.hiveGameOptions());
-      window.hive.init();
-      this.setState({ graphs: this.initGraphs() });
-      this.stepTimeout = setTimeout(this.step, 100);
+      this.handleStart()
     }
   }
   hiveGameOptions() {
@@ -260,6 +264,8 @@ class Hive extends Component {
       showApi: false,
       shouldRenderAll: true,
       graphs: this.initGraphs(),
+      gameWidth: this.state.width,
+      gameHeight: this.state.height,
     });
     this.stepTimeout = setTimeout(this.step, 100);
   }
@@ -286,12 +292,12 @@ class Hive extends Component {
     return ai ? ai.AICode : "";
   }
   handleEditorSubmit = () => {
-    try {
-      eval(`(() => { ${this.currentAIcode()} })`);
+    this.lintCode(this.currentAIcode());
+    if (this.state.lintErrors.length > 0) {
+      this.setState({ showApi: true, showErrors: true });
+    } else {
       this.handleCreateNewGame();
       this.handleStart();
-    } catch (error) {
-      window.hive.consoleLogs.push({ type: "error", message: error.message });
     }
   }
   setGraphDimensions = () => {
@@ -309,7 +315,12 @@ class Hive extends Component {
     var blob = new Blob([this.currentAIcode()], {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "HiveAI.js");
   }
+  lintCode = (code) => {
+    Lint(code, LintOptions, LintGlobals);
+    this.setState({ lintErrors: Lint.errors });
+  }
   updatePlayerCode = (newCode) => {
+    this.lintCode(newCode);
     this.updateAI(this.state.editingAIid, "AICode", newCode);
   }
   addAI = () => {
@@ -358,7 +369,7 @@ class Hive extends Component {
       if (keys.length > 0) {
         const selectedAI = keys[0];
         if (_.isEmpty(updatedPlayerAIs)) {
-          updatedPlayerAIs = [selectedAI];
+          updatedPlayerAIs = [{ AIid: selectedAI, color: this.getUnusedColor() }];
         }
         this.setState({
           AIs: _.omit(this.state.AIs, id),
@@ -410,8 +421,8 @@ class Hive extends Component {
       <GamePane
         ref={ (g) => this._game = g }
 
-        gameWidth={ this.state.width }
-        gameHeight={ this.state.height }
+        gameWidth={ this.state.gameWidth }
+        gameHeight={ this.state.gameHeight }
         pixelScale={ this.state.pixelScale }
         onTileSelect={ this.handleTileSelect }
         showTrails={ this.state.shouldRenderTrails }
@@ -438,11 +449,15 @@ class Hive extends Component {
     );
   }
   render() {
+    let leftPane;
     let rightPane;
     if (this.state.showApi) {
       rightPane = (
         <ApiReferencePane
           onRun={ this.handleEditorSubmit }
+          lintErrors={ this.state.lintErrors }
+          showErrors={ this.state.showErrors }
+          changeHandler={ this.state.changeHandler }
         />
       );
     } else {
@@ -466,7 +481,6 @@ class Hive extends Component {
         density={ this.state.density }
         saturation={ this.state.saturation }
         changeHandler={ this.changeHandler }
-        startGame={ this.handleStart }
         players={ this.state.playerAIs }
         AIs={ this.state.AIs }
         onAddPlayer={ this.addPlayer }

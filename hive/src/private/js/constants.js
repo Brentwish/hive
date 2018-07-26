@@ -15,6 +15,7 @@ export const MAX_BOARD_HEIGHT = 600;
 export const MIN_NUM_PLAYERS = 1;
 export const MAX_NUM_PLAYERS = 10;
 export const STARTING_FOOD = 35;
+export const MAX_TRAIL_CHANNELS = 16;
 export const tileColors = {
   "empty": "#E4AF77",
   "wall": "#424949",
@@ -73,6 +74,7 @@ export const keysToTitles = {
   id: "ID",
   color: "Color",
 };
+
 export const listOfNames = [
   "Bob Jenkins", "LeeRoy Jenkins",
   "Cassy Jenkins", "Alexander Jenkins",
@@ -80,7 +82,20 @@ export const listOfNames = [
   "BoJack Jenkins", "Tubby Jenkins",
   "PhoLin Jenkins", "Tarloc Jenkins"
 ];
+
 export const graphTypes = ["TotalAnts", "DeadAnts", "AntsKilled", "TotalFood"];
+
+export const LintOptions = {
+  esversion: 6,
+  undef: true,
+};
+
+export const LintGlobals = {
+  "_": false,
+  "constants": false,
+  "Math": false,
+};
+
 export function randomInt(upper = 1, lower = 0) {
   return Math.floor(Math.random() * upper + lower);
 }

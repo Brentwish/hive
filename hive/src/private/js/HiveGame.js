@@ -2,7 +2,7 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import Ant from "./Ant.js";
 import { listOfNames, randomInt, playerColors, dirs } from "./constants.js";
-import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH, STARTING_FOOD } from "./constants.js";
+import { MAX_FOOD, NEW_ANT_COST, NEW_QUEEN_COST, EGG_TIMER, MAX_TRAIL, ANT_ATTACK_POWER, ANT_HEALTH, QUEEN_HEALTH, STARTING_FOOD, MAX_TRAIL_CHANNELS } from "./constants.js";
 import constants from "./constants.js";
 import _ from "lodash";
 
@@ -20,7 +20,6 @@ function HiveGame(props) {
   this.turn = 0;
   this.actionFunction = props.playerCode;
   this.foodProps = { sparsity: props.sparsity, density: props.density, saturation: props.saturation };
-  this.consoleLogs = [];
   this.isGameOver = false;
   this.winningPlayer = "";
 }
@@ -92,23 +91,11 @@ HiveGame.prototype.findAnt = function(playerAntId) {
 }
 
 HiveGame.prototype.createPlayerFuncFromText = function(funcText) {
-  const console = {
-    log: (expr) => {
-      this.consoleLogs.push({ type: "log", message: expr });
-    },
-    error: (expr) => {
-      this.consoleLogs.push({ type: "error", message: expr });
-    },
-    warn: (expr) => {
-      this.consoleLogs.push({ type: "warn", message: expr });
-    },
-  };
-  return { antAction: (function(_, constants, _console) {
-    var console = _console;
+  return { antAction: (function(_, constants) {
     var window = null;
     var f = eval(`(() => { ${funcText} })`)();
     return f;
-  })(_, constants, console) };
+  })(_, constants) };
 }
 
 HiveGame.prototype.updatePlayers = function() {
@@ -120,7 +107,6 @@ HiveGame.prototype.updatePlayers = function() {
           const action = func.antAction(ant.toDataHash());
           this.performAction(ant, action);
         } catch (error) {
-          this.consoleLogs.push({ type: "error", message: error.message });
           this.isGameOver = true;
         }
         ant.age += 1;
@@ -143,7 +129,10 @@ HiveGame.prototype.isLegalAction = function(entity, action) {
     case "move":
       let trailCond = true;
       if (action.trail) {
-        trailCond = action.trail.name.length > 1 && _.isInteger(action.trail.strength);
+        trailCond = (
+          _.isInteger(action.trail.channel) && _.isInteger(action.trail.strength) &&
+          action.trail.channel >= 0 && action.trail.channel < MAX_TRAIL_CHANNELS
+        );
       }
       let eggCond = true;
       if (action.layEgg) {
@@ -181,7 +170,7 @@ HiveGame.prototype.performAction = function(entity, action) {
     switch (action.type) {
       case "move":
         if (action.trail) {
-          this.layTrailOnTile(entity, action.trail.name, action.trail.strength);
+          this.layTrailOnTile(entity, action.trail.channel, action.trail.strength);
         }
         const previousTile = entity.tile;
         this.move(entity, targetTile, action.direction, null);
@@ -247,9 +236,9 @@ HiveGame.prototype.performAction = function(entity, action) {
   }
 }
 
-HiveGame.prototype.layTrailOnTile = function(entity, name, qty) {
+HiveGame.prototype.layTrailOnTile = function(entity, channel, qty) {
   const trails = entity.tile.trails || {};
-  const trailName = `${entity.owner.id}_${name}`;
+  const trailName = `${entity.owner.id}_${channel}`;
   if (_.isEmpty(trails)) {
     this.board.pushNewTrailCoord(entity.tile);
   }
