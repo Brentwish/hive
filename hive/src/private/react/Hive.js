@@ -294,7 +294,9 @@ class Hive extends Component {
     const lintErrors = this.lintCode(this.currentAIcode());
     const newState = {};
     if (lintErrors.length > 0) {
-      this._refPane.togglePane(2);
+      if (this._refPane) {
+        this._refPane.togglePane(2);
+      }
       newState.lintErrors = lintErrors;
       newState.showApi = true;
     } else {
