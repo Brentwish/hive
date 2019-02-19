@@ -14,7 +14,7 @@ class PaneControls extends Component {
 class PaneContent extends Component {
   render() {
     return (
-      <div className="PaneContent">
+      <div className={ "PaneContent" + (this.props.scrollable ? " scrollable" : "") }>
         { this.props.children }
       </div>
     );

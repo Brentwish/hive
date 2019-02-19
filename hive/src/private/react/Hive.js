@@ -7,7 +7,7 @@ import InfoPane from "./InfoPane.js";
 import FileSaver from "file-saver";
 import EditorPane from "./EditorPane.js";
 import GamePane from "./GamePane.js";
-import ApiReferencePane from "./ApiReferencePane.js";
+import ReferencePane from "./ReferencePane.js";
 import HiveGame from "../js/HiveGame.js";
 import { LintOptions, LintGlobals } from "../js/constants.js";
 import { UPDATE_PERIOD, playerColors, foodGrades, graphTypes } from "../js/constants.js";
@@ -69,7 +69,6 @@ class Hive extends Component {
       editingAIid: localStorage.getItem("editingAIid") || "new_1",
       playerCode: localStorage.getItem("playerCode") || defaultPlayerFunction,
       showApi: false,
-      showErrors: false,
       lintErrors: [],
     };
   }
@@ -292,13 +291,21 @@ class Hive extends Component {
     return ai ? ai.AICode : "";
   }
   handleEditorSubmit = () => {
-    this.lintCode(this.currentAIcode());
-    if (this.state.lintErrors.length > 0) {
-      this.setState({ showApi: true, showErrors: true });
+    const lintErrors = this.lintCode(this.currentAIcode());
+    const newState = {};
+    if (lintErrors.length > 0) {
+      if (this._refPane) {
+        this._refPane.togglePane(2);
+      }
+      newState.lintErrors = lintErrors;
+      newState.showApi = true;
     } else {
+      newState.lintErrors = [];
+      newState.showApi = false;
       this.handleCreateNewGame();
       this.handleStart();
     }
+    this.setState(newState);
   }
   setGraphDimensions = () => {
     if (this._game && this._game._infoPane &&
@@ -317,7 +324,7 @@ class Hive extends Component {
   }
   lintCode = (code) => {
     Lint(code, LintOptions, LintGlobals);
-    this.setState({ lintErrors: Lint.errors });
+    return Lint.errors;
   }
   updatePlayerCode = (newCode) => {
     this.lintCode(newCode);
@@ -453,11 +460,10 @@ class Hive extends Component {
     let rightPane;
     if (this.state.showApi) {
       rightPane = (
-        <ApiReferencePane
+        <ReferencePane
+          ref={ (r) => this._refPane = r }
           onRun={ this.handleEditorSubmit }
           lintErrors={ this.state.lintErrors }
-          showErrors={ this.state.showErrors }
-          changeHandler={ this.state.changeHandler }
         />
       );
     } else {
