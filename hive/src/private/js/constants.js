@@ -88,6 +88,8 @@ export const graphTypes = ["TotalAnts", "DeadAnts", "AntsKilled", "TotalFood"];
 export const LintOptions = {
   esversion: 6,
   undef: true,
+  debug: true,
+  devel: true,
 };
 
 export const LintGlobals = {
